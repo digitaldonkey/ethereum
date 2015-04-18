@@ -1,0 +1,7 @@
+{
+  "name": "drupal/ethereum",
+  "description": "Integrates Drupal with Ethereum.",
+  "require": {
+    "graze/guzzle-jsonrpc": "~2.1"
+  }
+}

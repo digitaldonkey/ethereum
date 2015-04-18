@@ -1,0 +1,5 @@
+ethereum.settings:
+  route_name: ethereum.settings
+  parent: cointools.admin_index
+  title: 'Ethereum'
+  description: 'Configure Ethereum.'

@@ -1,0 +1,7 @@
+ethereum.settings:
+  path: '/admin/config/blockchain/ethereum'
+  defaults:
+    _form: '\Drupal\ethereum\Form\AdminForm'
+    _title: 'Configure Ethereum'
+  requirements:
+    _permission: 'administer site configuration'
