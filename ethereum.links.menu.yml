@@ -1,3 +1,9 @@
+ethereum.status:
+  route_name: ethereum.status
+  parent: system.admin_reports
+  title: 'Ethereum'
+  description: 'Status report for the Ethereum node.'
+
 ethereum.settings:
   route_name: ethereum.settings
   parent: cointools.admin_index

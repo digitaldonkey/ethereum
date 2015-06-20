@@ -1,3 +1,11 @@
+ethereum.status:
+  path: '/admin/reports/ethereum'
+  defaults:
+    _controller: 'Drupal\ethereum\Controller\EthereumController::status'
+    _title: 'Ethereum'
+  requirements:
+    _permission: 'administer site configuration'
+
 ethereum.settings:
   path: '/admin/config/blockchain/ethereum'
   defaults:
@@ -5,3 +13,4 @@ ethereum.settings:
     _title: 'Configure Ethereum'
   requirements:
     _permission: 'administer site configuration'
+
