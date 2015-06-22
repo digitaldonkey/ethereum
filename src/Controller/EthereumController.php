@@ -55,7 +55,7 @@ class EthereumController extends ControllerBase {
     $mining = $results['eth_mining'] ? ((int) (hexdec($results['eth_hashrate']) / 1000) . ' KH/s') : t("No");
 
     $rows[] = [t("Mining"), $mining];
-    $rows[] = [t("Lastest block"), hexdec($block['number'])];
+    $rows[] = [t("Latest block"), hexdec($block['number'])];
     $rows[] = [t("Latest block age"), \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - hexdec($block['timestamp']), 2)];
 
     return [
