@@ -48,7 +48,7 @@ class EthereumController extends ControllerBase {
     $rows[] = [t("Client version"), $results['web3_clientVersion']];
     $rows[] = [t("Network version"), $results['net_version']];
     $rows[] = [t("Protocol version"), $results['eth_protocolVersion']];
-    $rows[] = [t("Whisper version"), $results['shh_version']];
+    $rows[] = [t("Whisper version"), isset($results['shh_version']) ? $results['shh_version'] : t("n/a")];
     $rows[] = [t("Peers"), hexdec($results['net_peerCount'])];
     $rows[] = [t("Listening"), $results['net_listening'] ? t("Yes") : t("No")];
 
