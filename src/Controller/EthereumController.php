@@ -9,7 +9,7 @@ namespace Drupal\ethereum\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use GuzzleHttp\Url;
-use Graze\GuzzleHttp\JsonRpc\Client as JsonRpcClient;
+use Ethereum\Client;
 
 /**
  * Controller routines for Ethereum routes.
@@ -24,8 +24,8 @@ class EthereumController extends ControllerBase {
    */
   public function status() {
     $config = \Drupal::config('ethereum.settings');
-    $uri = new Url($config->get('scheme'), $config->get('hostname'), NULL, NULL, $config->get('port'));
-    $client = JsonRpcClient::factory($uri);
+    $url = new Url($config->get('scheme'), $config->get('hostname'), NULL, NULL, $config->get('port'));
+    $client = new Client($url);
 
     $commands = [
       'web3_clientVersion',
@@ -40,10 +40,10 @@ class EthereumController extends ControllerBase {
 
     $results = [];
     foreach ($commands as $command) {
-      $results[$command] = $client->send($client->request(1, $command, []))->getRpcResult();
+      $results[$command] = $client->request($command);
     }
 
-    $block = $client->send($client->request(1, 'eth_getBlockByNumber', ['latest', FALSE]))->getRpcResult();
+    $block = $client->request('eth_getBlockByNumber', ['latest', FALSE]);
 
     $rows[] = [t("Client version"), $results['web3_clientVersion']];
     $rows[] = [t("Network version"), $results['net_version']];
@@ -56,7 +56,7 @@ class EthereumController extends ControllerBase {
 
     $rows[] = [t("Mining"), $mining];
     $rows[] = [t("Latest block"), hexdec($block['number'])];
-    $rows[] = [t("Latest block age"), \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - hexdec($block['timestamp']), 2)];
+    $rows[] = [t("Latest block age"), \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - hexdec($block['timestamp']), 3)];
 
     return [
       '#theme' => 'table',

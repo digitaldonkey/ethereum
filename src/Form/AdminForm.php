@@ -9,7 +9,7 @@ namespace Drupal\ethereum\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use GuzzleHttp\Url;
-use Graze\GuzzleHttp\JsonRpc\Client as JsonRpcClient;
+use Ethereum\Client;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -67,11 +67,11 @@ class AdminForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $uri = new Url($values['scheme'], $values['hostname'], NULL, NULL, $values['port']);
+    $url = new Url($values['scheme'], $values['hostname'], NULL, NULL, $values['port']);
 
     try {
-      $client = JsonRpcClient::factory($uri);
-      $client->send($client->request(1, 'web3_clientVersion', []))->getRpcResult();
+      $client = new Client($url);
+      $client->request('web3_clientVersion');
     }
     catch (\Exception $exception) {
       $form_state->setErrorByName('', t("Unable to connect."));
