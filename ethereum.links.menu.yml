@@ -4,8 +4,13 @@ ethereum.status:
   title: 'Ethereum'
   description: 'Status report for the Ethereum node.'
 
+ethereum.admin_index:
+  route_name: ethereum.admin_index
+  parent: system.admin_config
+  title: 'Ethereum'
+
 ethereum.settings:
   route_name: ethereum.settings
-  parent: cointools.admin_index
-  title: 'Ethereum'
-  description: 'Configure Ethereum.'
+  parent: ethereum.admin_index
+  title: 'Connection'
+  description: 'Configure how Drupal connects to Ethereum.'

@@ -6,11 +6,18 @@ ethereum.status:
   requirements:
     _permission: 'administer site configuration'
 
+ethereum.admin_index:
+  path: '/admin/config/ethereum'
+  defaults:
+    _controller: '\Drupal\system\Controller\SystemController::systemAdminMenuBlockPage'
+    _title: 'Ethereum'
+  requirements:
+    _permission: 'access administration pages'
+
 ethereum.settings:
   path: '/admin/config/blockchain/ethereum'
   defaults:
     _form: '\Drupal\ethereum\Form\AdminForm'
-    _title: 'Configure Ethereum'
+    _title: 'Configure Ethereum connection'
   requirements:
     _permission: 'administer site configuration'
-
