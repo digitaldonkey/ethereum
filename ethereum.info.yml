@@ -1,7 +1,7 @@
-name: ethereum
+name: Ethereum
 type: module
-description: 'Components for integrating with ethereum.'
-package: ethereum
+description: 'Components for integrating with Ethereum.'
+package: Ethereum
 version: VERSION
 core: 8.x
 dependencies:
