@@ -8,7 +8,6 @@ namespace Drupal\ethereum\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use GuzzleHttp\Url;
 use Ethereum\Client;
 
 /**
@@ -67,7 +66,7 @@ class AdminForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
-    $url = new Url($values['scheme'], $values['hostname'], NULL, NULL, $values['port']);
+    $url = $values['scheme'] . '://' . $values['hostname'] . ':' . $values['port'];
 
     try {
       $client = new Client($url);

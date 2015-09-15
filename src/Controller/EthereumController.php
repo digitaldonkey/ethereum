@@ -8,7 +8,6 @@
 namespace Drupal\ethereum\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use GuzzleHttp\Url;
 use Ethereum\Client;
 
 /**
@@ -24,7 +23,7 @@ class EthereumController extends ControllerBase {
    */
   public function status() {
     $config = \Drupal::config('ethereum.settings');
-    $url = new Url($config->get('scheme'), $config->get('hostname'), NULL, NULL, $config->get('port'));
+    $url = $config->get('scheme') . '://' . $config->get('hostname') . ':' . $config->get('port');
     $client = new Client($url);
 
     $commands = [
