@@ -4,3 +4,5 @@ description: 'Components for integrating with Ethereum.'
 package: Ethereum
 version: VERSION
 core: 8.x
+configure: ethereum.settings
+
