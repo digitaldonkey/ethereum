@@ -1,6 +1,8 @@
 {
   "name": "drupal/ethereum",
   "description": "Integrates Drupal with Ethereum.",
+  "type": "drupal-module",
+  "license": "GPL-2.0+",
   "require": {
     "bluedroplet/ethereum-php-lib": "dev-master"
   }
