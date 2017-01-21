@@ -3,14 +3,19 @@
   "description": "Integrates Drupal with Ethereum.",
   "type": "drupal-module",
   "license": "GPL-2.0+",
+  "autoload": {
+    "psr-4": {
+      "Ethereum\\": "src/"
+    }
+  },
   "repositories": [
     {
-      "type": "package",
+      "type": "git",
       "package": {
         "name": "digitaldonkey/ethereum-php-lib",
         "version": "dev-master",
         "source": {
-          "url": "git://github.com/digitaldonkey/ethereum-php-lib.git",
+          "url": "https://github.com/digitaldonkey/ethereum-php-lib.git"
           "type": "git",
           "reference": "master"
         }

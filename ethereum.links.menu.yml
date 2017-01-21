@@ -1,7 +1,7 @@
 ethereum.status:
   route_name: ethereum.status
   parent: system.admin_reports
-  title: 'Ethereum'
+  title: 'Ethereum Status'
   description: 'Status report for the Ethereum node.'
 
 ethereum.admin_index:
@@ -12,5 +12,5 @@ ethereum.admin_index:
 ethereum.settings:
   route_name: ethereum.settings
   parent: ethereum.admin_index
-  title: 'Connection'
+  title: 'Ethereum Network Configuration'
   description: 'Configure how Drupal connects to Ethereum.'

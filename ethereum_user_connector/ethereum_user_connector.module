@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum_user_connector.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function ethereum_user_connector_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ethereum_user_connector module.
+    case 'help.page.ethereum_user_connector':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Drupal Drupal user connector enables Drupal Users to verify an Ethereum account address.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

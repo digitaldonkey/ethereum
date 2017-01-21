@@ -1,8 +1,7 @@
 name: Ethereum
 type: module
 description: 'Components for integrating with Ethereum.'
-package: Ethereum
-version: VERSION
+package: ethereum
+version: 8.x-1-alpha1
 core: 8.x
 configure: ethereum.settings
-
