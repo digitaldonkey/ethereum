@@ -15,8 +15,7 @@
         "name": "digitaldonkey/ethereum-php-lib",
         "version": "dev-master",
         "source": {
-          "url": "https://github.com/digitaldonkey/ethereum-php-lib.git"
-          "type": "git",
+          "url": "https://github.com/digitaldonkey/ethereum-php-lib.git",
           "reference": "master"
         }
       }
