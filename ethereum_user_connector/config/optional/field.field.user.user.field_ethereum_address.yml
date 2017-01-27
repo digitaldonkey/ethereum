@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.user.field_ethereum_address
+  module:
+    - user
+id: user.user.field_ethereum_address
+field_name: field_ethereum_address
+entity_type: user
+bundle: user
+label: 'Ethereum Address'
+description: 'Ether your Ethereum account address. Note that submitting a new Address requires re-verification.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: ethereum_address

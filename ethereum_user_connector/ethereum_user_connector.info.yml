@@ -4,4 +4,6 @@ description: Drupal Drupal user connector enables Drupal Users to verify an Ethe
 core: 8.x
 package: ethereum
 version: 8.x-1-alpha1
+dependencies:
+  - ethereum
 configure: ethereum.settings.user_connector
