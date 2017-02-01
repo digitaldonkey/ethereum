@@ -1,0 +1,5 @@
+ethereum.settings.user_connector:
+  route_name: entity.smartcontract.collection
+  parent: ethereum.admin_index
+  title: 'Ethereum Smart Contracts Configuration'
+  description: 'Manage Solidity Smart Contracts.'

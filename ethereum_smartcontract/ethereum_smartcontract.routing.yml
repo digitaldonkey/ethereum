@@ -1,0 +1,31 @@
+entity.smartcontract.collection:
+  path: '/admin/config/ethereum/smartcontracts'
+  defaults:
+    _entity_list: 'smartcontract'
+    _title: 'Smart Contracts'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.add_form:
+  path: '/admin/config/ethereum/smartcontract/add'
+  defaults:
+    _entity_form: 'smartcontract.add'
+    _title: 'Add smartcontract'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.edit_form:
+  path: '/admin/config/ethereum/smartcontract/{smartcontract}'
+  defaults:
+    _entity_form: 'smartcontract.edit'
+    _title: 'Edit smartcontract'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.delete_form:
+  path: '/admin/config/ethereum/smartcontract/{smartcontract}/delete'
+  defaults:
+    _entity_form: 'smartcontract.delete'
+    _title: 'Delete smartcontract'
+  requirements:
+    _permission: 'administer site configuration'

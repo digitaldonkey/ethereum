@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum_smartcontract.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function ethereum_smartcontract_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ethereum_smartcontract module.
+    case 'help.page.ethereum_smartcontract':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Entity to manage smart contracts.') . '</p>';
+      return $output;
+
+    default:
+  }
+}

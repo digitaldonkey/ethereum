@@ -1,0 +1,10 @@
+ethereum_smartcontract.contract.*:
+  type: config_entity
+  label: 'Smart Contract config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'

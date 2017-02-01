@@ -1,0 +1,12 @@
+name: Ethereum Smart Contract Entity
+type: module
+description: Entity to manage smart contracts.
+core: 8.x
+name: Ethereum User Connector
+dependencies:
+  - ethereum
+configure: entity.smartcontract.collection
+package: ethereum
+version: 8.x-1-alpha1
+
+

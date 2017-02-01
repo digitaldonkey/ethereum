@@ -1,0 +1,5 @@
+entity.smartcontract.add_form:
+  route_name: 'entity.smartcontract.add_form'
+  title: 'Add smartcontract'
+  appears_on:
+    - entity.smartcontract.collection
