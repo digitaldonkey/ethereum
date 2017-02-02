@@ -1,0 +1,4 @@
+ethereum-user-connector:
+  version: 1.x
+  js:
+    js/ethereum-user-connector.js: {}

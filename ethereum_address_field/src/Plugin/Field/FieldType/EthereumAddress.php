@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ethereum_user_connector\Plugin\Field\FieldType;
+namespace Drupal\ethereum_address_field\Plugin\Field\FieldType;
 
 use Drupal\Component\Utility\Random;
 use Drupal\Core\Field\FieldDefinitionInterface;
@@ -16,9 +16,9 @@ use Drupal\Core\TypedData\DataDefinition;
  * @FieldType(
  *   id = "ethereum_address",
  *   label = @Translation("Ethereum address"),
- *   description = @Translation("Ethereum Address connector"),
- *   default_widget = "ethereum_connector",
- *   default_formatter = "ethereum_connector_formatter"
+ *   description = @Translation("Provides a field for Ethereum addresses."),
+ *   default_widget = "ethereum_address_widget",
+ *   default_formatter = "ethereum_address_formatter_type"
  * )
  */
 class EthereumAddress extends FieldItemBase {
@@ -28,10 +28,10 @@ class EthereumAddress extends FieldItemBase {
    */
   public static function defaultStorageSettings() {
     return [
-        'max_length' => 42,
-        'is_ascii' => TRUE,
-        'case_sensitive' => FALSE,
-      ] + parent::defaultStorageSettings();
+      'max_length' => 42,
+      'is_ascii' => TRUE,
+      'case_sensitive' => FALSE,
+    ] + parent::defaultStorageSettings();
   }
 
   /**

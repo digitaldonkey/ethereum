@@ -56,9 +56,30 @@ class SmartContractForm extends EntityForm {
       '#disabled' => !$contract->isNew(),
     );
 
+    $form['contract_src'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('contract_src'),
+      '#maxlength' => 255,
+      '#default_value' => $contract->contract_src,
+      '#description' => $this->t("contract_src for the Smart Contract ."),
+      '#required' => TRUE,
+    );
+
+    $form['contract_js'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('contract_js'),
+      '#maxlength' => 255,
+      '#default_value' => $contract->contract_js,
+      '#description' => $this->t("contract_js for the Smart Contract ."),
+      '#required' => TRUE,
+    );
+
     // You will need additional form elements for your custom properties.
     return $form;
   }
+
+
+  // TODO VALIDATE.
 
   /**
   * {@inheritdoc}

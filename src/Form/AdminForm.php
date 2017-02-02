@@ -46,7 +46,7 @@ class AdminForm extends ConfigFormBase {
 //    ];
     $form['hostname'] = [
       '#type' => 'textfield',
-      '#title' => t("Hostname"),
+      '#title' => $this->t("Hostname"),
       '#default_value' => $config->get('hostname'),
     ];
 //    $form['port'] = [

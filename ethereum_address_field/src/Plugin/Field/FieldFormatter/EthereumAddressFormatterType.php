@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ethereum_user_connector\Plugin\Field\FieldFormatter;
+namespace Drupal\ethereum_address_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Field\FieldItemInterface;
@@ -9,17 +9,17 @@ use Drupal\Core\Field\FormatterBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'ethereum_connector_formatter' formatter.
+ * Plugin implementation of the 'ethereum_address_formatter_type' formatter.
  *
  * @FieldFormatter(
- *   id = "ethereum_connector_formatter",
- *   label = @Translation("Ethereum connector formatter"),
+ *   id = "ethereum_address_formatter_type",
+ *   label = @Translation("Ethereum address formatter type"),
  *   field_types = {
  *     "ethereum_address"
  *   }
  * )
  */
-class EthereumConnectorFormatter extends FormatterBase {
+class EthereumAddressFormatterType extends FormatterBase {
 
   /**
    * {@inheritdoc}
@@ -45,6 +45,7 @@ class EthereumConnectorFormatter extends FormatterBase {
   public function settingsSummary() {
     $summary = [];
     // Implement settings summary.
+
     return $summary;
   }
 

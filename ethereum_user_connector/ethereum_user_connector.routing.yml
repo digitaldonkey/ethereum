@@ -1,7 +1,7 @@
 ethereum.settings.user_connector:
   path: '/admin/config/ethereum/user-connector'
   defaults:
-    _controller: '\Drupal\ethereum_user_connector\Controller\EthereumUserConnector::AdminConfig'
+    _form: '\Drupal\ethereum_user_connector\Form\AdminForm'
     _title: 'Ethereum User Connector Configuration'
   requirements:
     _permission: 'administer site configuration'

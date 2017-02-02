@@ -6,4 +6,6 @@ package: ethereum
 version: 8.x-1-alpha1
 dependencies:
   - ethereum
+  - ethereum_smartcontract
+  - ethereum_address_field
 configure: ethereum.settings.user_connector

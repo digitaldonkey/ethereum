@@ -1,4 +1,4 @@
-ethereum.settings.user_connector:
+entity.smartcontract.collection:
   route_name: entity.smartcontract.collection
   parent: ethereum.admin_index
   title: 'Ethereum Smart Contracts Configuration'

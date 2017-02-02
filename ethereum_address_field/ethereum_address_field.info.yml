@@ -1,0 +1,7 @@
+name: Ethereum Address Field
+type: module
+description: Ethereum 20 digit hex address field. See: http://ethereum.stackexchange.com/a/3619/852
+core: 8.x
+package: ethereum
+dependencies:
+  - ethereum

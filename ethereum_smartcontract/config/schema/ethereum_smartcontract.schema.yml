@@ -8,3 +8,9 @@ ethereum_smartcontract.contract.*:
     label:
       type: label
       label: 'Label'
+    contract_src:
+      type: string
+      label: 'Contract Source file'
+    contract_js:
+      type: string
+      label: 'Compiled contract Javascript file.'

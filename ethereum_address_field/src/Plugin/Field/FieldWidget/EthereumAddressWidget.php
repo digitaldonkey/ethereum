@@ -1,32 +1,32 @@
 <?php
 
-namespace Drupal\ethereum_user_connector\Plugin\Field\FieldWidget;
+namespace Drupal\ethereum_address_field\Plugin\Field\FieldWidget;
 
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
- * Plugin implementation of the 'ethereum_connector' widget.
+ * Plugin implementation of the 'ethereum_address_widget' widget.
  *
  * @FieldWidget(
- *   id = "ethereum_connector",
- *   label = @Translation("Ethereum connector"),
+ *   id = "ethereum_address_widget",
+ *   label = @Translation("Ethereum address widget"),
  *   field_types = {
  *     "ethereum_address"
  *   }
  * )
  */
-class EthereumConnector extends WidgetBase {
+class EthereumAddressWidget extends WidgetBase {
 
   /**
    * {@inheritdoc}
    */
   public static function defaultSettings() {
     return [
-        'size' => 22,
-        'placeholder' => strtoupper('0xaec98826319ef42aab9530a23306d5a9b113e23d'),
-      ] + parent::defaultSettings();
+      'size' => 22,
+      'placeholder' => strtoupper('0xaec98826319ef42aab9530a23306d5a9b113e23d'),
+    ] + parent::defaultSettings();
   }
 
   /**
@@ -48,6 +48,7 @@ class EthereumConnector extends WidgetBase {
       '#default_value' => $this->getSetting('placeholder'),
       '#description' => $this->t('Text that will be shown inside the field until a value is entered. This hint is usually a sample value or a brief description of the expected format.'),
     ];
+
     return $elements;
   }
 
@@ -55,12 +56,11 @@ class EthereumConnector extends WidgetBase {
    * {@inheritdoc}
    */
   public function settingsSummary() {
-
     $summary = [];
 
     $summary[] = $this->t('Textfield size: @size', ['@size' => $this->getSetting('size')]);
     if (!empty($this->getSetting('placeholder'))) {
-      $summary[] = $this->t('Placeholder: @placeholder', ['@placeholder' => $this->getSetting('placeholder')]);
+      $summary[] = t('Placeholder: @placeholder', ['@placeholder' => $this->getSetting('placeholder')]);
     }
 
     return $summary;

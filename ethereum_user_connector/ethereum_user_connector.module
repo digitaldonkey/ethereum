@@ -38,12 +38,35 @@ function ethereum_user_connector_default_status () {
  */
 function ethereum_user_connector_user_presave(EntityInterface $entity) {
 
-  $last_address =    $entity->original->field_ethereum_address->getValue()[0]['value'];
+  $last_address = $entity->original->field_ethereum_address->getValue();
+  $last_address = isset($last_address[0]['value']) ? $last_address->getValue()[0]['value'] : NULL;
   $curr_address = $entity->field_ethereum_address->getValue()[0]['value'];
 
-  if ($last_address !== $curr_address) {
+  if (is_null($last_address) || $last_address !== $curr_address) {
     $hash = md5($GLOBALS['base_url'] . $curr_address);
     $entity->field_ethereum_drupal_hash->set(0, $hash);
-    $entity->field_ethereum_address_status->set(0, 1);
+    $entity->field_ethereum_account_status->set(0, 1);
   }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ethereum_user_connector_theme() {
+  $X = FALSE;
+  return [
+    'field_ethereum_account_status' => [
+      'template' => 'ethereum_address_confirm',
+      'render element' => 'field_ethereum_account_status',
+    ],
+  ];
+}
+
+function ethereum_user_connector_preprocess_field_ethereum_account_status(&$variables, $hook) {
+  $variables['title'] = $variables['field_ethereum_account_status']['#title'];
+  $variables['address'] = $variables['field_ethereum_account_status']['#ethereum_address'];
+  $variables['hash'] = $variables['field_ethereum_account_status']['#ethereum_drupal_hash'];
+  $variables['status_id'] = $variables['field_ethereum_account_status']['#status_number'];
+  $variables['status'] = $variables['field_ethereum_account_status']['#status'];
+
 }

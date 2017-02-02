@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\ethereum_user_connector\Tests;
+namespace Drupal\ethereum_address_field\Tests;
 
 use Drupal\Core\Url;
 use Drupal\simpletest\WebTestBase;
@@ -8,7 +8,7 @@ use Drupal\simpletest\WebTestBase;
 /**
  * Simple test to ensure that main page loads with module enabled.
  *
- * @group ethereum_user_connector
+ * @group ethereum_address_field
  */
 class LoadTest extends WebTestBase{
 
@@ -17,7 +17,7 @@ class LoadTest extends WebTestBase{
    *
    * @var array
    */
-  public static $modules = ['ethereum_user_connector'];
+  public static $modules = ['ethereum_address_field'];
 
   /**
    * A user with permission to administer site configuration.

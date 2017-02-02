@@ -1,0 +1,36 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum_address_field.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function ethereum_address_field_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ethereum_address_field module.
+    case 'help.page.ethereum_address_field':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Ethereum 20 digit hex address field.') . '</p>';
+      return $output;
+
+    default:
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ethereum_address_field_theme() {
+  return [
+    'ethereum_address_field' => [
+      'template' => 'ethereum_address_field',
+      'render element' => 'children',
+    ],
+  ];
+}

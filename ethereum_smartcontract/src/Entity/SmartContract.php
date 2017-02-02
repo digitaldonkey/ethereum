@@ -2,6 +2,7 @@
 
 namespace Drupal\ethereum_smartcontract\Entity;
 
+use Drupal;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\ethereum_smartcontract\SmartContractInterface;
 
@@ -26,6 +27,8 @@ use Drupal\ethereum_smartcontract\SmartContractInterface;
 *   entity_keys = {
 *     "id" = "id",
 *     "label" = "label",
+*     "contract_src" = "contract_src",
+*     "contract_js" = "contract_js",
 *   },
 *   links = {
 *     "edit-form" = "/admin/config/ethereum/smartcontracts/{smartcontract}",
@@ -35,21 +38,35 @@ use Drupal\ethereum_smartcontract\SmartContractInterface;
 */
 class SmartContract extends ConfigEntityBase implements SmartContractInterface {
 
-/**
-* The Example ID.
-*
-* @var string
-*/
-public $id;
+  const CONTRACT_PATH = 'vendor/contracts';
 
-/**
-* The Example label.
-*
-* @var string
-*/
-public $label;
+  /**
+  * The Example ID.
+  *
+  * @var string
+  */
+  public $id;
 
-// Your specific configuration property get/set methods go here,
-// implementing the interface.
+  /**
+  * The Example label.
+  *
+  * @var string
+  */
+  public $label;
+
+  public $contract_src;
+  public $contract_js;
+
+  public function get_contract_src_file() {
+    return $this->contractRootPath() . $this->contract_src;
+  }
+
+  public function get_contract_js_file() {
+    return $this->contractRootPath() . $this->contract_js;
+  }
+
+  private function contractRootPath() {
+    return DRUPAL_ROOT . '/' . drupal_get_path('module', 'ethereum_smartcontract') . '/' . self::CONTRACT_PATH . '/';
+  }
 }
 

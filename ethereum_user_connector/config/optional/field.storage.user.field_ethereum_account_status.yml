@@ -2,28 +2,30 @@ langcode: en
 status: true
 dependencies:
   module:
-    - options
+    - ethereum_user_connector
     - user
-id: user.field_ethereum_address_status
-field_name: field_ethereum_address_status
+id: user.field_ethereum_account_status
+field_name: field_ethereum_account_status
 entity_type: user
-type: list_string
+type: ethereum_status
 settings:
   allowed_values:
     -
       value: '0'
-      label: 'No address'
+      label: 'No Adress'
     -
       value: '1'
-      label: unverified
+      label: Unverified
     -
       value: '2'
-      label: verified
+      label: Verified
     -
       value: '3'
-      label: reverify
+      label: 'Reverification required'
   allowed_values_function: ''
-module: options
+  default_value:
+    value: 0
+module: ethereum_user_connector
 locked: false
 cardinality: 1
 translatable: true

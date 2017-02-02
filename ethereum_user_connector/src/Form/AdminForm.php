@@ -6,7 +6,7 @@
 
 namespace Drupal\ethereum_user_connector\Form;
 
-
+use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Ethereum\EthereumClient;
@@ -20,47 +20,28 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function getFormID() {
-    return 'ethereum_user_connector';
+    return 'ethereum_user_connector_admin';
   }
 
   /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['ethereum.user_connector.settings'];
+    return ['ethereum_user_connector.settings'];
   }
 
   /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = \Drupal::config('ethereum.user_connector.settings');
-
-//    $form['scheme'] = [
-//      '#type' => 'select',
-//      '#title' => t("Scheme"),
-//      '#options' => [
-//        'http' => 'HTTP',
-//        'https' => 'HTTPS',
-//      ],
-//      '#default_value' => $config->get('scheme'),
-//    ];
-
+    $config = \Drupal::config('ethereum_user_connector.settings');
     // Todo: Type should be Ethereum address
-    $form['user_connector_contract'] = [
+    // Todo: Add second field for Test-net.
+    $form['contract_address'] = [
       '#type' => 'textfield',
-      '#title' => t("Login Contract Address"),
-      '#default_value' => $config->get('user_connector_contract'),
+      '#title' => $this->t("Login Contract Address"),
+      '#default_value' => $config->get('contract_address'),
     ];
-//    $form['port'] = [
-//      '#type' => 'number',
-//      '#min' => 1,
-//      '#max' => 65535,
-//      '#step' => 1,
-//      '#title' => t("Port"),
-//      '#default_value' => $config->get('port'),
-//    ];
-
     return parent::buildForm($form, $form_state);
   }
 
@@ -69,10 +50,15 @@ class AdminForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
+    $config = Drupal::config('ethereum.settings');
     try {
-      $client = new EthereumClient($values['hostname']);
+
+      $client = new EthereumClient($config->get('hostname'));
 
       // TODO
+      // Validate address
+      // Get contract abi?
+      $DET = $config->get('hostname');
 
 //      $X = $client->net_listening();
 //      $client->eth_protocolVersion();
@@ -87,10 +73,10 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = \Drupal::configFactory()->getEditable('ethereum.settings');
+    $config = \Drupal::configFactory()->getEditable('ethereum_user_connector.settings');
 
-    //$settings = ['scheme', 'hostname', 'port'];
-    $settings = ['hostname'];
+    // White listing variables
+    $settings = ['contract_address'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);

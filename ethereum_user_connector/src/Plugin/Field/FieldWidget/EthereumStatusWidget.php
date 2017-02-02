@@ -10,10 +10,10 @@ use Drupal\Core\Form\FormStateInterface;
  * Plugin implementation of the 'ethereu_status_widget' widget.
  *
  * @FieldWidget(
- *   id = "ethereu_status_widget",
- *   label = @Translation("Ethereu status widget"),
+ *   id = "ethereum_status_widget",
+ *   label = @Translation("Ethereum Account status"),
  *   field_types = {
- *     "list_string"
+ *     "ethereum_status"
  *   }
  * )
  */
@@ -23,6 +23,9 @@ class EthereumStatusWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
+
+    $X = FALSE;
+
     return [
 
     ] + parent::defaultSettings();
@@ -50,39 +53,31 @@ class EthereumStatusWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
 
-    $Y = $form_state->getStorage();
+    $entity = $items->getEntity();
+    $settings = $entity->field_ethereum_account_status->getSettings();
+    $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
 
-    var_dump(\Drupal\user\UserInterface);
+    $config = \Drupal::config('ethereum_user_connector.settings');
+    // $config->get('contract_address');
 
-//    var_dump($form_state->getValue('field_ethereum_address'));
 
-//    var_dump($items);
-
-    // TODO Make Template and add Submission stuff....
-
-    // WHAT WE NEED
-    // - STATUS ID
-    // - STATUS NAME
-    // ADDRESS
-    // HASH (AT LEAST IN JS)
-
-//    $element['value'] = $element + [
-//        '#theme' => 'field_ethereum_address_status',
-//        'variables' => array ('#adress'=>"bbbbbbb"),
-//      ];
+    //$X = $entity->getFieldDefinition('field_ethereum_account_status');
+    // GET THE ABI ?!
 
     $element['value'] = $element + [
-      '#theme' => 'field_ethereum_address_status',
+      '#theme' => 'field_ethereum_account_status',
       '#children' => $items,
-      '#address' => 'Haöllos',
+      '#ethereum_address' => $entity->field_ethereum_address->value,
+      '#status_number' => $entity->field_ethereum_account_status->value,
+      '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
+      '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
       '#attached' => array(
-//          'library' => array('core/html5shiv'),
+         'library' => array('ethereum_user_connector/ethereum-user-connector'),
+      ),
+      '#attributes' => array(
+          'class' => 'ethereum-connection-status',
         ),
-//      '#attributes' => array(
-//          'class' => 'ethereum-connection-status',
-//        ),
-//       '#markup' => 'Hello',
-    ];
+      ];
 
     return $element;
   }
