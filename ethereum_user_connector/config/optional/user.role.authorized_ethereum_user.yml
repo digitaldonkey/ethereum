@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: authorized_ethereum_user
+label: 'Authorized Ethereum User'
+weight: 3
+is_admin: null
+permissions: {  }

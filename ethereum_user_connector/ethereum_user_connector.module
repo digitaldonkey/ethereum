@@ -38,7 +38,7 @@ function ethereum_user_connector_default_status () {
  */
 function ethereum_user_connector_user_presave(EntityInterface $entity) {
 
-  $last_address = $entity->original->field_ethereum_address->getValue();
+  $last_address = $entity->original->field_ethereum_address->value;
   $last_address = isset($last_address[0]['value']) ? $last_address->getValue()[0]['value'] : NULL;
   $curr_address = $entity->field_ethereum_address->getValue()[0]['value'];
 

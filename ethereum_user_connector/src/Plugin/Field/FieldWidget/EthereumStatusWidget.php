@@ -2,6 +2,7 @@
 
 namespace Drupal\ethereum_user_connector\Plugin\Field\FieldWidget;
 
+use Drupal;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -23,9 +24,6 @@ class EthereumStatusWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-
-    $X = FALSE;
-
     return [
 
     ] + parent::defaultSettings();
@@ -54,15 +52,9 @@ class EthereumStatusWidget extends WidgetBase {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
 
     $entity = $items->getEntity();
-    $settings = $entity->field_ethereum_account_status->getSettings();
     $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
 
-    $config = \Drupal::config('ethereum_user_connector.settings');
-    // $config->get('contract_address');
-
-
-    //$X = $entity->getFieldDefinition('field_ethereum_account_status');
-    // GET THE ABI ?!
+    $config = Drupal::config('ethereum_user_connector.settings');
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
@@ -72,14 +64,17 @@ class EthereumStatusWidget extends WidgetBase {
       '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
       '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
       '#attached' => array(
-         'library' => array('ethereum_user_connector/ethereum-user-connector'),
-      ),
-      '#attributes' => array(
-          'class' => 'ethereum-connection-status',
+        'library' => array(
+          'ethereum_user_connector/ethereum-user-connector',
+          // Adding the smartcontract library.
+          'ethereum_smartcontract/drupal_ethereum_account_validation',
         ),
-      ];
-
+        'drupalSettings' => array (
+          'contractAddress' => $config->get('contract_address'),
+          'drupalHash' => $entity->field_ethereum_drupal_hash->value,
+        )
+      ),
+    ];
     return $element;
   }
-
 }

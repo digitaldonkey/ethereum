@@ -1,4 +1,9 @@
 ethereum-user-connector:
-  version: 1.x
+  version: VERSION
   js:
     js/ethereum-user-connector.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupalSettings
+    - core/jquery.once

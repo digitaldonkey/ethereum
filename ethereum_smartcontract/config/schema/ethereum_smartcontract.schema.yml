@@ -10,7 +10,7 @@ ethereum_smartcontract.contract.*:
       label: 'Label'
     contract_src:
       type: string
-      label: 'Contract Source file'
+      label: 'Contract Source file (relative path to ethereum_smartcontract directory).'
     contract_js:
       type: string
-      label: 'Compiled contract Javascript file.'
+      label: 'Compiled contract Javascript file (relative path to ethereum_smartcontract directory).'

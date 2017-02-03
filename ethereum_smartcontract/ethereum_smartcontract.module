@@ -6,6 +6,7 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\ethereum_smartcontract\Entity as SmartContractEntity;
 
 /**
  * Implements hook_help().
@@ -21,4 +22,32 @@ function ethereum_smartcontract_help($route_name, RouteMatchInterface $route_mat
 
     default:
   }
+}
+
+
+/**
+ * Load smart contracts "dynamically" (they are still cached) based on configuration.
+ *
+ * @return array $libraries
+ *   An associative array of libraries registered by $extension. Keyed by
+ *   internal library name and passed by reference.
+ */
+function ethereum_smartcontract_library_info_build() {
+  $libraries = array();
+
+  // Get smartcontract Entities.
+  $contracts = \Drupal::entityTypeManager()->getStorage('smartcontract')->loadMultiple();
+
+  foreach ($contracts as $contract) {
+    $id = $contract->id();
+    if (!isset($libraries[$id])) {
+
+      $libraries[$id] = array(
+        'version' => 'VERSION',
+        'js' => array($contract->contract_js => array()),
+        'type' => 'asset',
+      );
+    }
+  }
+  return $libraries;
 }
