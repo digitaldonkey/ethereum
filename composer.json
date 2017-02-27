@@ -16,7 +16,7 @@
         "version": "dev-master",
         "source": {
           "url": "https://github.com/digitaldonkey/ethereum-php.git",
-          "reference": "master"
+          "reference": "dev-master"
         }
       }
     }
