@@ -11,14 +11,7 @@
   "repositories": [
     {
       "type": "git",
-      "package": {
-        "name": "digitaldonkey/ethereum-php",
-        "version": "dev-master",
-        "source": {
-          "url": "https://github.com/digitaldonkey/ethereum-php.git",
-          "reference": "dev-master"
-        }
-      }
+      "url": "https://github.com/digitaldonkey/ethereum-php.git"
     }
   ],
   "require": {
