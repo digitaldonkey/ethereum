@@ -12,17 +12,17 @@
     {
       "type": "git",
       "package": {
-        "name": "digitaldonkey/ethereum-php-lib",
+        "name": "digitaldonkey/ethereum-php",
         "version": "dev-master",
         "source": {
-          "url": "https://github.com/digitaldonkey/ethereum-php-lib.git",
+          "url": "https://github.com/digitaldonkey/ethereum-php.git",
           "reference": "master"
         }
       }
     }
   ],
   "require": {
-    "digitaldonkey/ethereum-php-lib": "dev-master",
+    "digitaldonkey/ethereum-php": "master",
     "league/commonmark": "~0.15"
   }
 }
