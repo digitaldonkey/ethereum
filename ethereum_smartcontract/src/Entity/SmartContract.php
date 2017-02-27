@@ -2,7 +2,6 @@
 
 namespace Drupal\ethereum_smartcontract\Entity;
 
-use Drupal;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\ethereum_smartcontract\SmartContractInterface;
 
@@ -57,16 +56,18 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
   public $contract_src;
   public $contract_js;
 
-  public function get_contract_src_file() {
-    return $this->contractRootPath() . $this->contract_src;
-  }
-
-  public function get_contract_js_file() {
-    return $this->contractRootPath() . $this->contract_js;
-  }
-
-  private function contractRootPath() {
-    return DRUPAL_ROOT . '/' . drupal_get_path('module', 'ethereum_smartcontract') . '/' . self::CONTRACT_PATH . '/';
-  }
+//  public static function get_contract_src_file($id) {
+//
+//    return $this->contractRootPath() . $this->contract_src;
+//  }
+//
+//  public function get_contract_js_file() {
+//    return $this->contractRootPath() . $this->contract_js;
+//  }
+//
+//  private function contractRootPath() {
+//    global $base_url;
+//    return $base_url . '/' . drupal_get_path('module', 'ethereum_smartcontract') . '/' . self::CONTRACT_PATH . '/';
+//  }
 }
 

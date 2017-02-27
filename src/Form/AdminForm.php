@@ -6,9 +6,10 @@
 
 namespace Drupal\ethereum\Form;
 
+use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Ethereum\EthereumClient;
+use Drupal\ethereum\Controller\EthereumController;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -33,30 +34,40 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = \Drupal::config('ethereum.settings');
+    $config = Drupal::config('ethereum.settings');
 
-//    $form['scheme'] = [
-//      '#type' => 'select',
-//      '#title' => t("Scheme"),
-//      '#options' => [
-//        'http' => 'HTTP',
-//        'https' => 'HTTPS',
-//      ],
-//      '#default_value' => $config->get('scheme'),
-//    ];
-    $form['hostname'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t("Hostname"),
-      '#default_value' => $config->get('hostname'),
+    $form['current_server'] = [
+      '#type' => 'select',
+      '#title' => $this->t("Select configuration"),
+      '#required' => TRUE,
+      '#description' => $this->t("Select a Ethereum Node to connect Drupal backend to."),
+      '#options' => [
+        'testnet' => $this->t("Infura Test Network"),
+        'mainnet' => $this->t("Infura Main Network"),
+        'custom' => $this->t("Custom network"),
+      ],
+      '#default_value' => $config->get('current_server'),
     ];
-//    $form['port'] = [
-//      '#type' => 'number',
-//      '#min' => 1,
-//      '#max' => 65535,
-//      '#step' => 1,
-//      '#title' => t("Port"),
-//      '#default_value' => $config->get('port'),
-//    ];
+
+    $form['testnet'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Infura Test Network"),
+      '#default_value' => $config->get('testnet'),
+      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('<a href="https://www.infura.io">Infura</a> provides access to Ethereum Nodes, so that you don\'t require to host you own.'),
+    ];
+    $form['mainnet'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Infura Main Network"),
+      '#default_value' => $config->get('mainnet'),
+      '#attributes' => array('disabled' => TRUE),
+    ];
+    $form['custom'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Custom Ethereum Node"),
+      '#default_value' => $config->get('custom'),
+      '#description' => t("To connect to a local geth or testrpc instance you might use: <br/>http://localhost:8545<br/>"),
+    ];
 
     return parent::buildForm($form, $form_state);
   }
@@ -67,15 +78,13 @@ class AdminForm extends ConfigFormBase {
   public function validateForm(array &$form, FormStateInterface $form_state) {
     $values = $form_state->getValues();
     try {
-      $client = new EthereumClient($values['hostname']);
-
-      // TODO
-
-//      $X = $client->net_listening();
-//      $client->eth_protocolVersion();
+      $host = $values[$values['current_server']];
+      $eth = new EthereumController($host);
+      // Try to connect.
+      $eth->client->eth_protocolVersion();
     }
     catch (\Exception $exception) {
-      $form_state->setErrorByName('', t("Unable to connect."));
+      $form_state->setErrorByName($values['current_server'], t("Unable to connect."));
       return;
     }
   }
@@ -87,7 +96,7 @@ class AdminForm extends ConfigFormBase {
     $config = \Drupal::configFactory()->getEditable('ethereum.settings');
 
     //$settings = ['scheme', 'hostname', 'port'];
-    $settings = ['hostname'];
+    $settings = ['current_server', 'mainnet', 'testnet', 'custom'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);

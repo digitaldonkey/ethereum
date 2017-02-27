@@ -1,29 +1,27 @@
+{# Map colors to status #}
+{% set status_css = {
+    "0": "",
+    "1": "color-warning",
+    "2": "color-success",
+    "3": "color-error"
+}
+%}
+
 <div class="form-item ethereum-status-widget">
     <label for="">{{ title }}</label>
 
     <div class="form-item">
 
-        {#<input id="ethereum_address" value="{{ address }}" class="is-disabled form-text" size="60" type="text" disabled="disabled" readonly="readonly"/>#}
-        {{ address }} ({{ status }})
-
-        <input id="ethereum_drupal_hash" value="{{ hash }}" type="hidden" />
+        <div class="{{ status_css[status_id] }}" style="display: inline-block; padding: .3em; margin: 0;">{{ address|upper }} ({{ status }})</div>
 
         {% if status_id == 1 %}
-        <span id="eth-account-validate" class="hidden">
+        <span class="ethereum-user-connector">
             <button class="button button--primary">Verify address</button>
         </span>
             <noscript>Javascript is required.</noscript>
         {% endif %}
 
-
-        <div id="missing-web3-message" role="contentinfo" aria-label="Error message" class="messages messages--error">
-            <div role="alert">
-                <h2 class="visually-hidden">Error message</h2>
-                Currently <a href="https://metamask.io/"> Metamask</a> Chrome(ium) extension and  <a href="https://github.com/ethereum/mist/releases"> Mist browser</a> are supported and required as transaction signer. Get <a href="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn">metamask extension here</a>.
-            </div>
-        </div>
-
+        <div id="myMessage"></div>
     </div>
 
 </div>
-{#{{ kint(status_id) }}#}

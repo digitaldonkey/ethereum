@@ -2,4 +2,4 @@ entity.smartcontract.collection:
   route_name: entity.smartcontract.collection
   parent: ethereum.admin_index
   title: 'Ethereum Smart Contracts Configuration'
-  description: 'Manage Solidity Smart Contracts.'
+  description: 'Manage Solidity smart contracts.'

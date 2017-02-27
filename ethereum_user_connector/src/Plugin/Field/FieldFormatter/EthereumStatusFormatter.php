@@ -45,7 +45,6 @@ class EthereumStatusFormatter extends FormatterBase {
   public function settingsSummary() {
     $summary = [];
     // Implement settings summary.
-
     return $summary;
   }
 
@@ -54,11 +53,9 @@ class EthereumStatusFormatter extends FormatterBase {
    */
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
-
     foreach ($items as $delta => $item) {
       $elements[$delta] = ['#markup' => $this->viewValue($item)];
     }
-
     return $elements;
   }
 
@@ -72,9 +69,8 @@ class EthereumStatusFormatter extends FormatterBase {
    *   The textual output generated.
    */
   protected function viewValue(FieldItemInterface $item) {
-    // The text value has no text format assigned to it, so the user input
-    // should equal the output, including newlines.
-    return nl2br(Html::escape($item->value));
+    $status_map = $this->getFieldSetting('allowed_values');
+    return $status_map[$item->value] . ' (' . $item->value .')';
   }
 
 }

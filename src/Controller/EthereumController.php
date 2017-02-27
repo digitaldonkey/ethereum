@@ -17,7 +17,19 @@ use Ethereum\Ethereum_Transaction;
 /**
  * Controller routines for Ethereum routes.
  */
-class EthereumController extends ControllerBase {
+class EthereumController extends  ControllerBase {
+
+  private $config;
+  public $client;
+
+  public function __construct($host = FALSE) {
+    if (!$host) {
+      $this->config = \Drupal::config('ethereum.settings');
+      $host = $this->config->get($this->config->get('current_server'));
+    }
+    $this->client = new EthereumClient($host);
+  }
+
 
   /**
    * Displays the ethereum status report.
@@ -26,38 +38,35 @@ class EthereumController extends ControllerBase {
    *   The current status of the ethereum node.
    */
   public function status() {
-    $config = \Drupal::config('ethereum.settings');
-    // $url = $config->get('scheme') . '://' . $config->get('hostname') . ':' . $config->get('port');
-    $client = new EthereumClient($config->get('hostname'));
 
 
-//    $block = $client->request('eth_getBlockByNumber', ['latest', FALSE]);
+//    $block = $this->client->request('eth_getBlockByNumber', ['latest', FALSE]);
 
 
 
     $rows[] = [$this->t('<b>Network status</b><br /><a href="https://github.com/digitaldonkey/ethereum">JsonRPC-API</a> Methods.'), ''];
 
-    $rows[] = [$this->t("Client version (web3_clientVersion)"), $client->web3_clientVersion()];
+    $rows[] = [$this->t("Client version (web3_clientVersion)"), $this->client->web3_clientVersion()];
 
-    $rows[] = [$this->t("Listening (net_listening)"), $client->net_listening() ? '✔' : '✘'];
-    $rows[] = [$this->t("Peers (net_peerCount)"), $client->net_peerCount()];
-    $rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $client->eth_protocolVersion()];
-    $rows[] = [$this->t("Network version (net_version)"), $client->net_version()];
-    $rows[] = [$this->t("Syncing (eth_syncing)"), $client->eth_syncing() ? '✔' : '✘'];
+    $rows[] = [$this->t("Listening (net_listening)"), $this->client->net_listening() ? '✔' : '✘'];
+    $rows[] = [$this->t("Peers (net_peerCount)"), $this->client->net_peerCount()];
+    $rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->client->eth_protocolVersion()];
+    $rows[] = [$this->t("Network version (net_version)"), $this->client->net_version()];
+    $rows[] = [$this->t("Syncing (eth_syncing)"), $this->client->eth_syncing() ? '✔' : '✘'];
 
     // TODO Wait/test Infura fix.
-    // $rows[] = [$this->t("Coinbase"), $client->eth_coinbase()];
+    // $rows[] = [$this->t("Coinbase"), $this->client->eth_coinbase()];
 
-    $rows[] = [$this->t("Mining (eth_mining)"), $client->eth_mining() ? '✔' : '✘'];
-    $rows[] = [$this->t("Mining hashrate (eth_hashrate)"), $client->eth_hashrate()];
+    $rows[] = [$this->t("Mining (eth_mining)"), $this->client->eth_mining() ? '✔' : '✘'];
+    $rows[] = [$this->t("Mining hashrate (eth_hashrate)"), $this->client->eth_hashrate()];
 
-    $price = $client->eth_gasPrice();
+    $price = $this->client->eth_gasPrice();
     $rows[] = [$this->t("Current price per gas in wei (eth_gasPrice)"), $price . ' wei ( ≡ ' . number_format(($price / 1000000000000000000), 8, '.', '') . ' Ether)' ];
 
     // TODO Wait/test Infura fix.
-    // $rows[] = [$this->t("Accounts (eth_accounts)"), $client->eth_accounts() ? '✔' : '✘'];
+    // $rows[] = [$this->t("Accounts (eth_accounts)"), $this->client->eth_accounts() ? '✔' : '✘'];
 
-    $rows[] = [$this->t("Client latest block number (eth_blockNumber)"), $client->eth_blockNumber()];
+    $rows[] = [$this->t("Client latest block number (eth_blockNumber)"), $this->client->eth_blockNumber()];
 
     // $rows[] = [$this->t("Latest block age"), \Drupal::service('date.formatter')->formatInterval(REQUEST_TIME - hexdec($block['timestamp']), 3)];
 
@@ -69,25 +78,23 @@ class EthereumController extends ControllerBase {
     // API testing with example values below.
     $rows[] = [$this->t('<br /><b>API testing</b><br />Methods to request specific information from <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC">JsonRPC-API</a> using example Data.'), ''];
 
-
-
     // RANDOM ADDRESS FOR TESTING
     // curl -X POST --data '{"jsonrpc":"2.0","method":"eth_getBalance","params":["0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8", "latest"],"id":1}' https://mainnet.infura.io/
     // -->  {"jsonrpc":"2.0","result":"0x3a20f4e2737dbf4898","id":1}
 
-    $balance = $client->eth_getBalance("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8");
+    $balance = $this->client->eth_getBalance("0xEA674fdDe714fd979de3EdF0F56AA9716B898ec8");
     $rows[] = [$this->t("Balance example Block (eth_getBalance(0xEA674...,latest))"), $balance . 'wei ( ≡ ' . number_format(($balance / 1000000000000000000), 8, '.', '') . ' Ether)'];
 
     // eth_getStorageAt()
     // TODO How to Test?
     $storage_address = '0x26dd6b7a2fff271aa7c5fe8cfb5ba0ab33f47408';
-    $storage = $client->eth_getStorageAt($storage_address,'0x0', 'latest');
+    $storage = $this->client->eth_getStorageAt($storage_address,'0x0', 'latest');
     $rows[] = [$this->t('Get Storage at Address (eth_getStorageAt(' . substr($storage_address, 0, 20) . '..., 0x0, latest))'), $storage ];
 
 
     // eth_getBlockByHash
     $address = '0x26dd6B7A2ffF271AA7c5FE8Cfb5bA0aB33F47408';
-    $hash = $client->eth_getStorageAt($address, "0x0", "latest");
+    $hash = $this->client->eth_getStorageAt($address, "0x0", "latest");
     $rows[] = [$this->t('eth_getBlockByHash(' . substr($storage_address, 0, 20) . ', 0x0, earliest))'), $hash ];
 
 
@@ -95,7 +102,7 @@ class EthereumController extends ControllerBase {
     $address = '0x26dd6b7a2fff271aa7c5fe8cfb5ba0ab33f47408';
     $qTAG= 'latest';
     $integer = TRUE;
-    $hash = $client->eth_getTransactionCount($address, $qTAG, $integer);
+    $hash = $this->client->eth_getTransactionCount($address, $qTAG, $integer);
     $rows[] = [$this->t('eth_getTransactionCount (' . substr($address, 0, 20) . ', TRUE))'), $hash ];
 
 
@@ -117,7 +124,7 @@ class EthereumController extends ControllerBase {
     $rows[] = [$this->t('<br /><b>PHP Ethereum controller API</b><br />provides additional methods. They are part of the <a href="https://github.com/digitaldonkey/ethereum-php-lib">Ethereum PHP library</a>, but not part of JsonRPC-API standard.'), ''];
 
     // Get Method signature.
-    $rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)"), $client->getMethodSignature('validateUserByHash(bytes32)')];
+    $rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)"), $this->client->getMethodSignature('validateUserByHash(bytes32)')];
 
 
     $from = '0xaEC98826319EF42aAB9530A23306d5a9b113E23D';
@@ -130,16 +137,10 @@ class EthereumController extends ControllerBase {
 
     $message = new Ethereum_Message($to);
     $message->setArgument(
-      $client->getMethodSignature('validateUserByHash(bytes32)'),
-      // '3542353545363636303831414234334143363533434644424136384146463338'
-      $client->strToHex('31080C38452FCF447999965502348333')
+      $this->client->getMethodSignature('validateUserByHash(bytes32)'),
+      $this->client->strToHex('31080C38452FCF447999965502348333')
     );
-    $rows[] = [$this->t('CALL'), $client->hexToStr($client->eth_call($message, 'latest'))];
-
-
-    // eth_call($message, $block)
-
-
+//    $rows[] = [$this->t('CALL'), $this->client->hexToStr($this->client->eth_call($message, 'latest'))];
 
     return [
       '#theme' => 'table',

@@ -9,7 +9,7 @@ namespace Drupal\ethereum_user_connector\Form;
 use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Ethereum\EthereumClient;
+use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -34,14 +34,58 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = \Drupal::config('ethereum_user_connector.settings');
-    // Todo: Type should be Ethereum address
-    // Todo: Add second field for Test-net.
-    $form['contract_address'] = [
+
+    // TODO: Type should be Ethereum address, when ethereum-php-lib supports it.
+    $config = $this->config('ethereum_user_connector.settings');
+
+    $form['testnet'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Login Contract Address Infura Test network"),
+      '#default_value' => $config->get('testnet'),
+//      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum test network. ADD LINK'),
+    ];
+
+    $form['mainnet'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Login Contract Address on Infura main network"),
+      '#default_value' => $config->get('mainnet'),
+//      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum main network. ADD LINK'),
+    ];
+
+    $form['custom'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address"),
-      '#default_value' => $config->get('contract_address'),
+      '#default_value' => $config->get('custom'),
+      '#description' => $this->t('Self deployed login smart contract address.'),
     ];
+
+    $form['info'] = [
+      '#markup' => '<br /><h3>Smart contract ABI</h3><p>Currently this is hardcoded. Will integrated with Ethereum <em>Smart Contract module</em></p><pre>
+111b72c3 accountCreated(address,bytes32,int256)
+3af41dc2 adminDeleteRegistry()
+345e3416 adminRetrieveDonations()
+49f0c90d adminSetAccountAdministrator(address)
+9b6d86d6 adminSetRegistrationDisabled(bool)
+f845862f newUser(bytes32)
+2573ce27 validateUserByHash(bytes32)</pre>',
+    ];
+
+    $form['contract_newUser_call'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("ABI for register call"),
+//      '#attributes' => array('disabled' => TRUE),
+      '#default_value' => $config->get('contract_newUser_call'),
+    ];
+
+    $form['contract_validateUserByHash_call'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("ABI for validate call"),
+//      '#attributes' => array('disabled' => TRUE),
+      '#default_value' => $config->get('contract_validateUserByHash_call'),
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -49,23 +93,28 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state->getValues();
-    $config = Drupal::config('ethereum.settings');
+
+    // Trim input for custom.
+    $custom_val = trim($form_state->getValue('custom'));
+    $form_state->setValue('custom', $custom_val);
+
+    $val = $form_state->getValue(Drupal::config('ethereum.settings')->get('current_server'));
+
     try {
+      $eth = new EthereumUserConnectorController();
 
-      $client = new EthereumClient($config->get('hostname'));
+      // Validate contract address.
+      $contract_code = $eth->client->eth_getCode($val, "latest");
+      // Remove trailing 0x
+      $contract_code = substr($contract_code, 2);
 
-      // TODO
-      // Validate address
-      // Get contract abi?
-      $DET = $config->get('hostname');
+      if (strpos($contract_code, $eth::ContractCode) === FALSE) {
+        $form_state->setErrorByName('contract_address', $this->t('Unable to verify contract code at address') . ': ' . $val);
+      }
 
-//      $X = $client->net_listening();
-//      $client->eth_protocolVersion();
     }
     catch (\Exception $exception) {
-      $form_state->setErrorByName('', t("Unable to connect."));
-      return;
+      $form_state->setErrorByName('', $this->t("Unable to connect to Ethereum Server. Please check config/ethereum/network."));
     }
   }
 
@@ -76,7 +125,7 @@ class AdminForm extends ConfigFormBase {
     $config = \Drupal::configFactory()->getEditable('ethereum_user_connector.settings');
 
     // White listing variables
-    $settings = ['contract_address'];
+    $settings = ['custom', 'testnet', 'mainnet', 'contract_newUser_call', 'contract_validateUserByHash_call'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);

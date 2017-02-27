@@ -1,0 +1,45 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use League\CommonMark\CommonMarkConverter;
+
+
+/**
+ * Implements hook_help().
+ *
+ * @inheritdoc
+ */
+function ethereum_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ethereum_user_connector module.
+    case 'help.page.ethereum':
+      return ethereum_getReadmeHtml('ethereum');
+    default:
+  }
+}
+
+
+/**
+ * Implements hook_help().
+ *
+ * @param $module string - Name of module.
+ *
+ * @return String - HTML content of the modules Readme.md markdown file.
+ */
+function ethereum_getReadmeHtml($module) {
+
+  $path = drupal_get_path('module', $module) . '/Readme.md';
+  $readme = @file_get_contents(DRUPAL_ROOT . '/'. $path);
+  if($readme === FALSE) {
+    return "<div class='messages messages--warning'>Missing Readme.md for $path.</div>";
+  }
+  else {
+    $converter = new CommonMarkConverter();
+    return $converter->convertToHtml($readme);
+  }
+}

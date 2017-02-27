@@ -15,18 +15,26 @@ function ethereum_smartcontract_help($route_name, RouteMatchInterface $route_mat
   switch ($route_name) {
     // Main module help for the ethereum_smartcontract module.
     case 'help.page.ethereum_smartcontract':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Entity to manage smart contracts.') . '</p>';
-      return $output;
-
+      return ethereum_getReadmeHtml('ethereum_smartcontract');
     default:
   }
 }
 
 
 /**
- * Load smart contracts "dynamically" (they are still cached) based on configuration.
+ * Implements hook_library_info_build().
+ *
+ * Loading smart contracts "dynamically" (they are still cached) based on configuration.
+ *
+ * You may load Contracts by attaching them.
+ * But it turned out that this will not work well. Using require.js to load the contracts now.
+ * '#attached' => array(
+ *    'library' => array(
+ *    'ethereum_smartcontract/drupal_ethereum_account_validation',
+ *   )
+ * ),
+ * Todo:
+ * This may be removed or we will need to wrap the contract function in order to run them when web3.js is ready.
  *
  * @return array $libraries
  *   An associative array of libraries registered by $extension. Keyed by
@@ -46,6 +54,9 @@ function ethereum_smartcontract_library_info_build() {
         'version' => 'VERSION',
         'js' => array($contract->contract_js => array()),
         'type' => 'asset',
+        'dependencies' => array(
+          'ethereum_smartcontract/ethereum-smartcontract',
+        )
       );
     }
   }

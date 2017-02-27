@@ -6,6 +6,9 @@ use Drupal;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
+//use Drupal\ethereum_smartcontract\Entity\SmartContract;
+//use Ethereum\EthereumClient;
+use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
 
 /**
  * Plugin implementation of the 'ethereu_status_widget' widget.
@@ -51,27 +54,40 @@ class EthereumStatusWidget extends WidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
 
+    global $base_path;
+
     $entity = $items->getEntity();
     $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
 
+    $connector = new EthereumUserConnectorController();
+
+    // Module settings.
     $config = Drupal::config('ethereum_user_connector.settings');
+
+    $contract_call_data = '0x' . $config->get('contract_new_user_call');
+    $param = $connector->client->strToHex($entity->field_ethereum_drupal_hash->value);
+    $ajax_verify_url = $base_path . 'ethereum/validate/';
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
       '#children' => $items,
-      '#ethereum_address' => $entity->field_ethereum_address->value,
+      '#user_ethereum_address' => $entity->field_ethereum_address->value,
       '#status_number' => $entity->field_ethereum_account_status->value,
       '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
       '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
       '#attached' => array(
         'library' => array(
           'ethereum_user_connector/ethereum-user-connector',
-          // Adding the smartcontract library.
-          'ethereum_smartcontract/drupal_ethereum_account_validation',
         ),
         'drupalSettings' => array (
-          'contractAddress' => $config->get('contract_address'),
-          'drupalHash' => $entity->field_ethereum_drupal_hash->value,
+          'ethereumUserConnector' => array (
+            'contractAddress' => $connector->get_contract_address(),
+            'contractCode' => $connector::ContractCode,
+            'userEthereumAddress' => $entity->field_ethereum_address->value,
+            'contractNewUserCall' => $contract_call_data . $param,
+            'verificationUrl' => $ajax_verify_url,
+            'drupalHash' => $entity->field_ethereum_drupal_hash->value,
+          )
         )
       ),
     ];

@@ -6,23 +6,9 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\Core\Entity\EntityInterface;
+use Drupal\user\Entity\User;
 
-/**
- * Implements hook_help().
- */
-function ethereum_user_connector_help($route_name, RouteMatchInterface $route_match) {
-  switch ($route_name) {
-    // Main module help for the ethereum_user_connector module.
-    case 'help.page.ethereum_user_connector':
-      $output = '';
-      $output .= '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Drupal Drupal user connector enables Drupal Users to verify an Ethereum account address.') . '</p>';
-      return $output;
-
-    default:
-  }
-}
+define('AUTHENTICATED_USER_ROLE', 'authorized_ethereum_user');
 
 /**
  * Provide default value callback.
@@ -34,26 +20,41 @@ function ethereum_user_connector_default_status () {
 /**
  * Pre save handler.
  *
- * If a user has submitted an address generate a hash and set the validation status.
+ * Handles actions related to field_ethereum_account_status status changes.
+ *  - Create hash when Ethereum address is updated.
+ *  - Set status to Unverified (1) when Ethereum address is updated.
+ *  - Adds/remove Role authorized_ethereum_user depending on status.
+ *
+ * @param $user User
  */
-function ethereum_user_connector_user_presave(EntityInterface $entity) {
+function ethereum_user_connector_user_presave(User $user) {
 
-  $last_address = $entity->original->field_ethereum_address->value;
-  $last_address = isset($last_address[0]['value']) ? $last_address->getValue()[0]['value'] : NULL;
-  $curr_address = $entity->field_ethereum_address->getValue()[0]['value'];
+  $original_entity = $user->original;
+  $last_address = $original_entity->field_ethereum_address->value;
+  $curr_address = $user->field_ethereum_address->getValue()[0]['value'];
 
+  // Create new hash if Address changed.
   if (is_null($last_address) || $last_address !== $curr_address) {
-    $hash = md5($GLOBALS['base_url'] . $curr_address);
-    $entity->field_ethereum_drupal_hash->set(0, $hash);
-    $entity->field_ethereum_account_status->set(0, 1);
+    $hash = md5($GLOBALS['base_url'] . $curr_address . (time() * random_int(0, PHP_INT_MAX)));
+    $user->field_ethereum_drupal_hash->set(0, $hash);
+    $user->field_ethereum_account_status->set(0, 1);
   }
+
+  // Add/remove authorized_ethereum_user role.
+  $account_status = $user->field_ethereum_account_status->getValue()[0]['value'];
+  if ($account_status == "2") {
+    $user->addRole(AUTHENTICATED_USER_ROLE);
+  }
+  else {
+    $user->removeRole(AUTHENTICATED_USER_ROLE);
+  }
+
 }
 
 /**
  * Implements hook_theme().
  */
 function ethereum_user_connector_theme() {
-  $X = FALSE;
   return [
     'field_ethereum_account_status' => [
       'template' => 'ethereum_address_confirm',
@@ -62,11 +63,41 @@ function ethereum_user_connector_theme() {
   ];
 }
 
-function ethereum_user_connector_preprocess_field_ethereum_account_status(&$variables, $hook) {
+/**
+ * Implements hook_preprocess_field().
+ *
+ * Prepare template variables for field_ethereum_account_status template.
+ *
+ * @inheritdoc
+ */
+function ethereum_user_connector_preprocess_field_ethereum_account_status(&$variables) {
   $variables['title'] = $variables['field_ethereum_account_status']['#title'];
-  $variables['address'] = $variables['field_ethereum_account_status']['#ethereum_address'];
+  $variables['address'] = $variables['field_ethereum_account_status']['#user_ethereum_address'];
   $variables['hash'] = $variables['field_ethereum_account_status']['#ethereum_drupal_hash'];
   $variables['status_id'] = $variables['field_ethereum_account_status']['#status_number'];
   $variables['status'] = $variables['field_ethereum_account_status']['#status'];
+}
 
+/**
+ * Implements hook_preprocess_field().
+ *
+ * Make Drupal hash read-only.
+ *
+ * @inheritdoc;
+ */
+function ethereum_user_connector_form_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+  $form['field_ethereum_drupal_hash']['#disabled'] = TRUE;
+}
+
+/**
+ * Implements hook_help().
+ *
+ * @inheritdoc
+ */
+function ethereum_user_connector_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.ethereum_user_connector':
+      return ethereum_getReadmeHtml('ethereum_user_connector');
+    default:
+  }
 }

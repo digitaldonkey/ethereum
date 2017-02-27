@@ -43,7 +43,7 @@ class SmartContractForm extends EntityForm {
       '#title' => $this->t('Label'),
       '#maxlength' => 255,
       '#default_value' => $contract->label(),
-      '#description' => $this->t("Label for the Smart Contract ."),
+      '#description' => $this->t("Label for smart contract ."),
       '#required' => TRUE,
     );
 
@@ -61,7 +61,7 @@ class SmartContractForm extends EntityForm {
       '#title' => $this->t('contract_src'),
       '#maxlength' => 255,
       '#default_value' => $contract->contract_src,
-      '#description' => $this->t("contract_src for the Smart Contract ."),
+      '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
     );
 
@@ -70,7 +70,7 @@ class SmartContractForm extends EntityForm {
       '#title' => $this->t('contract_js'),
       '#maxlength' => 255,
       '#default_value' => $contract->contract_js,
-      '#description' => $this->t("contract_js for the Smart Contract ."),
+      '#description' => $this->t("contract_js for smart contract ."),
       '#required' => TRUE,
     );
 

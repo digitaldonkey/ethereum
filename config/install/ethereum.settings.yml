@@ -1,1 +1,4 @@
-hostname: 'https://testnet.infura.io:8545/IvqXzecwpDZ8jpPaRV9C'
+current_server: testnet
+testnet: 'https://ropsten.infura.io/drupal'
+mainnet: 'https://mainnet.infura.io/drupal'
+custom: 'http://localhost:8545'

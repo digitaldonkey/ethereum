@@ -4,11 +4,11 @@
   "description": "Entity to manage smart contracts.",
   "keywords": ["Drupal"],
   "license": "GPL-2.0+",
-  "homepage": "https://www.drupal.org/project/ethereum_smartcontract",
+  "homepage": "https://www.drupal.org/project/ethereum",
   "minimum-stability": "dev",
   "support": {
-    "issues": "https://www.drupal.org/project/issues/ethereum_smartcontract",
-    "source": "http://cgit.drupalcode.org/ethereum_smartcontract"
+    "issues": "https://www.drupal.org/project/issues/ethereum",
+    "source": "http://cgit.drupalcode.org/ethereum"
   },
   "require": { }
 }

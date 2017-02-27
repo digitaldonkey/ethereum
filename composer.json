@@ -22,6 +22,7 @@
     }
   ],
   "require": {
-    "digitaldonkey/ethereum-php-lib": "dev-master"
+    "digitaldonkey/ethereum-php-lib": "dev-master",
+    "league/commonmark": "~0.15"
   }
 }
