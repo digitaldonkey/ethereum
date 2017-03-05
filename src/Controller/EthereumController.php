@@ -9,7 +9,7 @@ namespace Drupal\ethereum\Controller;
 
 use Drupal\contact\Entity\Message;
 use Drupal\Core\Controller\ControllerBase;
-use Ethereum\EthereumClient;
+use Ethereum\Ethereum;
 use Ethereum\Ethereum_Message;
 use Ethereum\Ethereum_Transaction;
 
@@ -27,7 +27,7 @@ class EthereumController extends  ControllerBase {
       $this->config = \Drupal::config('ethereum.settings');
       $host = $this->config->get($this->config->get('current_server'));
     }
-    $this->client = new EthereumClient($host);
+    $this->client = new Ethereum($host);
   }
 
 

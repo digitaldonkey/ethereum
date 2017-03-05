@@ -80,11 +80,20 @@ class AdminForm extends ConfigFormBase {
     try {
       $host = $values[$values['current_server']];
       $eth = new EthereumController($host);
+      //
+      // TODO
+      // eth_protocolVersion() return inconsistent types in Geth and Parity.
+      // I would consider this a bug, but we might have to work around later.
+      // For switching to net_version() Network Validation.
+      //
       // Try to connect.
-      $eth->client->eth_protocolVersion();
+      $version = $eth->client->net_version()->val();
+      if (!is_string($version)) {
+        throw new \Exception('eth_protocolVersion return is not valid.');
+      }
     }
     catch (\Exception $exception) {
-      $form_state->setErrorByName($values['current_server'], t("Unable to connect."));
+      $form_state->setErrorByName($values['current_server'], t("Unable to connect: " . $exception->getMessage() ));
       return;
     }
   }
@@ -94,8 +103,6 @@ class AdminForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = \Drupal::configFactory()->getEditable('ethereum.settings');
-
-    //$settings = ['scheme', 'hostname', 'port'];
     $settings = ['current_server', 'mainnet', 'testnet', 'custom'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {

@@ -7,7 +7,7 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 //use Drupal\ethereum_smartcontract\Entity\SmartContract;
-//use Ethereum\EthereumClient;
+//use Ethereum\Ethereum;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
 
 /**
