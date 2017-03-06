@@ -10,6 +10,8 @@ use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Ethereum\EthD20;
+use Ethereum\EthBlockParam;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -98,23 +100,24 @@ f845862f newUser(bytes32)
     $custom_val = trim($form_state->getValue('custom'));
     $form_state->setValue('custom', $custom_val);
 
-    $val = $form_state->getValue(Drupal::config('ethereum.settings')->get('current_server'));
+    $active_server = Drupal::config('ethereum.settings')->get('current_server');
+    $val = $form_state->getValue($active_server);
 
     try {
       $eth = new EthereumUserConnectorController();
 
       // Validate contract address.
-      $contract_code = $eth->client->eth_getCode($val, "latest");
-      // Remove trailing 0x
-      $contract_code = substr($contract_code, 2);
+      $contract_code = $eth->client->eth_getCode(new EthD20($val));
 
-      if (strpos($contract_code, $eth::ContractCode) === FALSE) {
+      if (strpos($contract_code->val(), $eth::ContractCode) === FALSE) {
         $form_state->setErrorByName('contract_address', $this->t('Unable to verify contract code at address') . ': ' . $val);
       }
 
     }
     catch (\Exception $exception) {
-      $form_state->setErrorByName('', $this->t("Unable to connect to Ethereum Server. Please check config/ethereum/network."));
+      $msg = $this->t("Unable find contract in currently active network. Please validate contract address on the network selected in admin/config/ethereum/network.");
+      $msg .= 'Error: ' . $exception->getMessage();
+      $form_state->setErrorByName($active_server, $msg);
     }
   }
 
