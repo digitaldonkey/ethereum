@@ -18,7 +18,7 @@ function ethereum_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     // Main module help for the ethereum_user_connector module.
     case 'help.page.ethereum':
-      return ethereum_getReadmeHtml('ethereum');
+      return ethereum_get_readme_html('ethereum');
     default:
   }
 }
@@ -26,12 +26,8 @@ function ethereum_help($route_name, RouteMatchInterface $route_match) {
 
 /**
  * Implements hook_help().
- *
- * @param $module string - Name of module.
- *
- * @return String - HTML content of the modules Readme.md markdown file.
  */
-function ethereum_getReadmeHtml($module) {
+function ethereum_get_readme_html($module) {
 
   $path = drupal_get_path('module', $module) . '/Readme.md';
   $readme = @file_get_contents(DRUPAL_ROOT . '/'. $path);

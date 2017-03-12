@@ -18,7 +18,7 @@
             event.preventDefault();
 
             if (initWeb3() && ensureProviderAddress()) {
-              ensureContractCode(validateEthereumUser);
+              validateContract(validateEthereumUser);
             }
 
           }
@@ -27,6 +27,7 @@
       });
 
       function validateEthereumUser() {
+        console.log('validateEthereumUser()');
 
         // Add transaction to register.
         web3.eth.sendTransaction({
@@ -99,7 +100,6 @@
        * Ensure the User Ethereum Address and Signing Account address match.
        */
       function initWeb3() {
-
         if (typeof web3 !== 'undefined') {
           web3 = new Web3(web3.currentProvider);
           return true;
@@ -117,7 +117,10 @@
       */
       function ensureProviderAddress() {
 
-        var matching = (web3.eth.defaultAccount.toUpperCase() === cnf.userEthereumAddress.toUpperCase());
+       console.log('ensureProviderAddress()');
+
+       var matching = (web3.eth.defaultAccount.toUpperCase() === cnf.userEthereumAddress.toUpperCase());
+
         if (!matching) {
           var msg ='The address submitted and the signing address must match. <br /> Web3 Address is ' + web3.eth.accounts[0].toUpperCase();
           message.innerHTML += Drupal.theme('message', msg, 'error');
@@ -131,16 +134,16 @@
       /**
        * Ensure the User Ethereum Address and Signing Account address match.
        */
-      function ensureContractCode(callback) {
+      function validateContract(callback) {
 
-        web3.eth.getCode(cnf.contractAddress , 'latest', function(error, result) {
+        web3.eth.call({to: cnf.contractAddress, data: cnf.validateContractCall}, 'latest', function(error, result) {
 
-          if(!error && result.substr(1).indexOf(cnf.contractCode) > -1) {
-            console.log('ensureContractCode() success;');
+          if(!error && result.substr(0, 2) === '0x' && result.substr(-1) === '1') {
+            console.log('validateContract() success;');
             callback();
           }
           else {
-            var msg = 'Can not verify code at address: ' + cnf.contractAddress;
+            var msg = 'Can not verify contract at given address: ' + cnf.contractAddress;
             message.innerHTML += Drupal.theme('message', msg, 'error');
           }
         });

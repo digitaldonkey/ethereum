@@ -10,8 +10,10 @@ use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Ethereum\EthD;
 use Ethereum\EthD20;
-use Ethereum\EthBlockParam;
+use Drupal\Core\Url;
+use Ethereum\CallTransaction;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -40,19 +42,25 @@ class AdminForm extends ConfigFormBase {
     // TODO: Type should be Ethereum address, when ethereum-php-lib supports it.
     $config = $this->config('ethereum_user_connector.settings');
 
+    $link = new Url('ethereum.settings');
+
+    $form['html'] = [
+      '#markup' => $this->t('<strong>Note:</strong> Only the value for the currently <a href="@link">active Ethereum Node</a> will be validated.', array('@link' => $link->toString())),
+    ];
+
     $form['testnet'] = [
       '#type' => 'textfield',
-      '#title' => $this->t("Login Contract Address Infura Test network"),
+      '#title' => $this->t("Login Contract Address Ethereum ropsten test network"),
       '#default_value' => $config->get('testnet'),
-//      '#attributes' => array('disabled' => TRUE),
+      '#attributes' => array('disabled' => TRUE),
       '#description' => $this->t('Pre-deployed on Ethereum test network. ADD LINK'),
     ];
 
     $form['mainnet'] = [
       '#type' => 'textfield',
-      '#title' => $this->t("Login Contract Address on Infura main network"),
+      '#title' => $this->t("Login Contract Address on Ethereum main network"),
       '#default_value' => $config->get('mainnet'),
-//      '#attributes' => array('disabled' => TRUE),
+      '#attributes' => array('disabled' => TRUE),
       '#description' => $this->t('Pre-deployed on Ethereum main network. ADD LINK'),
     ];
 
@@ -70,21 +78,30 @@ class AdminForm extends ConfigFormBase {
 345e3416 adminRetrieveDonations()
 49f0c90d adminSetAccountAdministrator(address)
 9b6d86d6 adminSetRegistrationDisabled(bool)
+06ae9483 contractExists()
 f845862f newUser(bytes32)
 2573ce27 validateUserByHash(bytes32)</pre>',
+    ];
+
+
+    $form['contract_contractExists_call'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("ABI for contractExist call"),
+      '#attributes' => array('disabled' => TRUE),
+      '#default_value' => $config->get('contract_contractExists_call'),
     ];
 
     $form['contract_newUser_call'] = [
       '#type' => 'textfield',
       '#title' => $this->t("ABI for register call"),
-//      '#attributes' => array('disabled' => TRUE),
+      '#attributes' => array('disabled' => TRUE),
       '#default_value' => $config->get('contract_newUser_call'),
     ];
 
     $form['contract_validateUserByHash_call'] = [
       '#type' => 'textfield',
       '#title' => $this->t("ABI for validate call"),
-//      '#attributes' => array('disabled' => TRUE),
+      '#attributes' => array('disabled' => TRUE),
       '#default_value' => $config->get('contract_validateUserByHash_call'),
     ];
 
@@ -107,12 +124,18 @@ f845862f newUser(bytes32)
       $eth = new EthereumUserConnectorController();
 
       // Validate contract address.
-      $contract_code = $eth->client->eth_getCode(new EthD20($val));
-
-      if (strpos($contract_code->val(), $eth::ContractCode) === FALSE) {
-        $form_state->setErrorByName('contract_address', $this->t('Unable to verify contract code at address') . ': ' . $val);
+      $signature = '0x' . $this->config('ethereum_user_connector.settings')->get('contract_contractExists_call');
+      /**
+       * E.g:
+       * curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0xaaaafb8dbb9f5c9d82f085e770f4ed65f3b3107c", "data":"0x06ae9483"},"latest"],"id":1}' localhost:8545
+      */
+      $message = new CallTransaction(new EthD20($val), NULL, NULL, NULL, NULL, new EthD($signature));
+      $result = $eth->client->eth_call($message);
+      // Set expected data type.
+      $contract_exists = $result->convertTo('bool')->val();
+      if (!$contract_exists) {
+        $form_state->setErrorByName('contract_address', $this->t('Unable to verify that contract exists at address: @address'), array('@address' => $val));
       }
-
     }
     catch (\Exception $exception) {
       $msg = $this->t("Unable find contract in currently active network. Please validate contract address on the network selected in admin/config/ethereum/network.");
@@ -128,7 +151,14 @@ f845862f newUser(bytes32)
     $config = \Drupal::configFactory()->getEditable('ethereum_user_connector.settings');
 
     // White listing variables
-    $settings = ['custom', 'testnet', 'mainnet', 'contract_newUser_call', 'contract_validateUserByHash_call'];
+    $settings = [
+      'custom',
+      'testnet',
+      'mainnet',
+      'contract_newUser_call',
+      'contract_validateUserByHash_call',
+      'contract_contractExists_call',
+    ];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);

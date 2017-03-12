@@ -15,7 +15,7 @@ function ethereum_smartcontract_help($route_name, RouteMatchInterface $route_mat
   switch ($route_name) {
     // Main module help for the ethereum_smartcontract module.
     case 'help.page.ethereum_smartcontract':
-      return ethereum_getReadmeHtml('ethereum_smartcontract');
+      return ethereum_get_readme_html('ethereum_smartcontract');
     default:
   }
 }

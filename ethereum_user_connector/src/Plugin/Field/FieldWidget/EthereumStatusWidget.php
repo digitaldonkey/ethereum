@@ -6,8 +6,6 @@ use Drupal;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
-//use Drupal\ethereum_smartcontract\Entity\SmartContract;
-//use Ethereum\Ethereum;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
 
 /**
@@ -27,9 +25,7 @@ class EthereumStatusWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public static function defaultSettings() {
-    return [
-
-    ] + parent::defaultSettings();
+    return parent::defaultSettings();
   }
 
   /**
@@ -60,13 +56,14 @@ class EthereumStatusWidget extends WidgetBase {
     $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
 
     $connector = new EthereumUserConnectorController();
+    $client = $connector->client;
 
     // Module settings.
     $config = Drupal::config('ethereum_user_connector.settings');
 
-    $contract_call_data = '0x' . $config->get('contract_new_user_call');
-    $param = $connector->client->strToHex($entity->field_ethereum_drupal_hash->value);
-    $ajax_verify_url = $base_path . 'ethereum/validate/';
+    $param = $client->strToHex($entity->field_ethereum_drupal_hash->value);
+
+    // TODO getContractAddress is not defined.
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
@@ -79,18 +76,19 @@ class EthereumStatusWidget extends WidgetBase {
         'library' => array(
           'ethereum_user_connector/ethereum-user-connector',
         ),
-        'drupalSettings' => array (
-          'ethereumUserConnector' => array (
-            'contractAddress' => $connector->get_contract_address(),
-            'contractCode' => $connector::ContractCode,
+        'drupalSettings' => array(
+          'ethereumUserConnector' => array(
+            'contractAddress' => $connector->getContractAddress(),
+            'validateContractCall' => $client->ensureHexPrefix($config->get('contract_contractExists_call')),
             'userEthereumAddress' => $entity->field_ethereum_address->value,
-            'contractNewUserCall' => $contract_call_data . $param,
-            'verificationUrl' => $ajax_verify_url,
+            'contractNewUserCall' => $client->ensureHexPrefix($config->get('contract_newUser_call')) . $param,
+            'verificationUrl' => $base_path . 'ethereum/validate/',
             'drupalHash' => $entity->field_ethereum_drupal_hash->value,
-          )
-        )
+          ),
+        ),
       ),
     ];
     return $element;
   }
+
 }

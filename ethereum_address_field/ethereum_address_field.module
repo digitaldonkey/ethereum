@@ -14,7 +14,7 @@ function ethereum_address_field_help($route_name, RouteMatchInterface $route_mat
   switch ($route_name) {
     // Main module help for the ethereum_address_field module.
     case 'help.page.ethereum_address_field':
-      return ethereum_getReadmeHtml('ethereum_address_field');
+      return ethereum_get_readme_html('ethereum_address_field');
     default:
   }
 }

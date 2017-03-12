@@ -7,17 +7,13 @@
 
 namespace Drupal\ethereum\Controller;
 
-use Drupal\contact\Entity\Message;
 use Drupal\Core\Controller\ControllerBase;
 use Ethereum\Ethereum;
-use Ethereum\Ethereum_Message;
-use Ethereum\Ethereum_Transaction;
-
 
 /**
  * Controller routines for Ethereum routes.
  */
-class EthereumController extends  ControllerBase {
+class EthereumController extends ControllerBase {
 
   private $config;
   public $client;
@@ -30,7 +26,6 @@ class EthereumController extends  ControllerBase {
     $this->client = new Ethereum($host);
   }
 
-
   /**
    * Displays the ethereum status report.
    *
@@ -38,11 +33,6 @@ class EthereumController extends  ControllerBase {
    *   The current status of the ethereum node.
    */
   public function status() {
-
-
-//    $block = $this->client->request('eth_getBlockByNumber', ['latest', FALSE]);
-
-
 
     $rows[] = [$this->t('<b>Network status</b><br /><a href="https://github.com/digitaldonkey/ethereum">JsonRPC-API</a> Methods.'), ''];
 
@@ -106,7 +96,6 @@ class EthereumController extends  ControllerBase {
     $rows[] = [$this->t('eth_getTransactionCount (' . substr($address, 0, 20) . ', TRUE))'), $hash ];
 
 
-
     // web3_sha3
     // Keccac SHA-256 (NOT SHA3-256!)
     // Get the SHA3 (keccak-256) of the method id:
@@ -116,8 +105,6 @@ class EthereumController extends  ControllerBase {
 
 //    $mining = $results['eth_mining'] ? ((int) (hexdec($results['eth_hashrate']) / 1000) . ' KH/s') : t("No");
 //    $rows[] = [$this->t("Mining"), $mining];
-
-
 
     // NON standard JsonRPC-API Methods below.
 
@@ -134,12 +121,12 @@ class EthereumController extends  ControllerBase {
     $value = '1234567890123456'; //
     $data = '';
 
-
-    $message = new Ethereum_Message($to);
-    $message->setArgument(
-      $this->client->getMethodSignature('validateUserByHash(bytes32)'),
-      $this->client->strToHex('31080C38452FCF447999965502348333')
-    );
+//
+//    $message = new Ethereum_Message($to);
+//    $message->setArgument(
+//      $this->client->getMethodSignature('validateUserByHash(bytes32)'),
+//      $this->client->strToHex('31080C38452FCF447999965502348333')
+//    );
 //    $rows[] = [$this->t('CALL'), $this->client->hexToStr($this->client->eth_call($message, 'latest'))];
 
     return [

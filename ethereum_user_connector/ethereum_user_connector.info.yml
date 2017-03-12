@@ -7,6 +7,7 @@ version: 8.x-1-alpha1
 dependencies:
   - ethereum
   - ethereum_address_field
+  - rest
 configure: ethereum.settings.user_connector
 test_dependencies:
  - restui

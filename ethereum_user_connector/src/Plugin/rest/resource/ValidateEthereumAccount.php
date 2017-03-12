@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Psr\Log\LoggerInterface;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Drupal\Component\Utility\Xss;
 
 
 /**
@@ -64,12 +65,15 @@ class ValidateEthereumAccount extends ResourceBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+
+    $X = FALSE;
+
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('ethereum_user_connector'),
+      $container->get('logger.factory')->get('ethereum_user_connectorethereum_user_connector'),
       $container->get('current_user')
     );
   }
@@ -79,20 +83,21 @@ class ValidateEthereumAccount extends ResourceBase {
    *
    * Returns a list of bundles for specified entity.
    *
-   * @param $hash String - Drupal hash requested in url param.
+   * @param string $hash
+   *   Drupal hash requested in url param.
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    *   Throws exception expected.
    *
-   * @return ResourceResponse - With validated data.
+   * @return ResourceResponse
+   *   With validated data.
    *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function get($hash) {
 
     if ($this->currentUser->isAuthenticated()) {
       $eth = new EthereumUserConnectorController();
-      $validation = $eth->verifyUserByHash($hash);
-
+      $validation = $eth->verifyUserByHash(Xss::filter($hash));
       if (is_array($validation) && $validation['success']) {
         $message = $this->t('Successfully validated account ' . $validation['ethereum_address'] . ' with hash ' . $validation['ethereum_drupal_hash']);
         Drupal::logger('ethereum_user_connector')->notice($message);

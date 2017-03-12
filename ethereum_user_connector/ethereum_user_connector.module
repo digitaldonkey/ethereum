@@ -7,6 +7,7 @@
 
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\Entity\User;
+use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController as UserConnector;
 
 define('AUTHENTICATED_USER_ROLE', 'authorized_ethereum_user');
 
@@ -29,13 +30,19 @@ function ethereum_user_connector_default_status () {
  */
 function ethereum_user_connector_user_presave(User $user) {
 
+  global $base_url;
+
   $original_entity = $user->original;
   $last_address = $original_entity->field_ethereum_address->value;
-  $curr_address = $user->field_ethereum_address->getValue()[0]['value'];
+  $last_hash = $original_entity->field_ethereum_drupal_hash->value;
 
-  // Create new hash if Address changed.
-  if (is_null($last_address) || $last_address !== $curr_address) {
-    $hash = md5($GLOBALS['base_url'] . $curr_address . (time() * random_int(0, PHP_INT_MAX)));
+  $curr_address = $user->field_ethereum_address->getValue()[0]['value'];
+  $curr_contract = UserConnector::getContractAddress();
+
+  // Generate a hash of this Drupal instance, Smart Contract and User address.
+  $hash = md5($base_url . $curr_address . $user->id() . $curr_contract);
+
+  if (is_null($last_address) || $last_hash !== $hash) {
     $user->field_ethereum_drupal_hash->set(0, $hash);
     $user->field_ethereum_account_status->set(0, 1);
   }
@@ -97,7 +104,7 @@ function ethereum_user_connector_form_user_form_alter(&$form, \Drupal\Core\Form\
 function ethereum_user_connector_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {
     case 'help.page.ethereum_user_connector':
-      return ethereum_getReadmeHtml('ethereum_user_connector');
+      return ethereum_get_readme_html('ethereum_user_connector');
     default:
   }
 }
