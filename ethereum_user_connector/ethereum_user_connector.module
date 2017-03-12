@@ -8,13 +8,14 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\Entity\User;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController as UserConnector;
+use Drupal\Core\Form\FormStateInterface;
 
-define('AUTHENTICATED_USER_ROLE', 'authorized_ethereum_user');
+define('ETHEREUM_USER_CONNECTOR_AUTH_ROLE', 'authorized_ethereum_user');
 
 /**
  * Provide default value callback.
  */
-function ethereum_user_connector_default_status () {
+function ethereum_user_connector_default_status() {
   return 0;
 }
 
@@ -29,13 +30,11 @@ function ethereum_user_connector_default_status () {
  * @param $user User
  */
 function ethereum_user_connector_user_presave(User $user) {
-
   global $base_url;
 
   $original_entity = $user->original;
   $last_address = $original_entity->field_ethereum_address->value;
   $last_hash = $original_entity->field_ethereum_drupal_hash->value;
-
   $curr_address = $user->field_ethereum_address->getValue()[0]['value'];
   $curr_contract = UserConnector::getContractAddress();
 
@@ -50,10 +49,10 @@ function ethereum_user_connector_user_presave(User $user) {
   // Add/remove authorized_ethereum_user role.
   $account_status = $user->field_ethereum_account_status->getValue()[0]['value'];
   if ($account_status == "2") {
-    $user->addRole(AUTHENTICATED_USER_ROLE);
+    $user->addRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
   }
   else {
-    $user->removeRole(AUTHENTICATED_USER_ROLE);
+    $user->removeRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
   }
 
 }
@@ -92,7 +91,7 @@ function ethereum_user_connector_preprocess_field_ethereum_account_status(&$vari
  *
  * @inheritdoc;
  */
-function ethereum_user_connector_form_user_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state) {
+function ethereum_user_connector_form_user_form_alter(&$form, FormStateInterface $form_state) {
   $form['field_ethereum_drupal_hash']['#disabled'] = TRUE;
 }
 

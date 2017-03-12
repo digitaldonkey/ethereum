@@ -89,7 +89,7 @@ class EthereumUserConnectorController extends EthereumController {
       // Update User's ethereum_account_status field.
       $uid = reset($entity_ids);
       $user = Drupal::entityTypeManager()->getStorage('user')->load($uid);
-      $user->get('field_ethereum_account_status')->setValue('2');
+      $user->field_ethereum_account_status->setValue('2');
       if ($user->save() !== SAVED_UPDATED) {
         throw new \Exception('Error updating user Ethereum status for UID: ' . $uid);
       }

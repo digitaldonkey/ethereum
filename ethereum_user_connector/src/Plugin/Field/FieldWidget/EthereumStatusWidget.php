@@ -61,7 +61,7 @@ class EthereumStatusWidget extends WidgetBase {
     // Module settings.
     $config = Drupal::config('ethereum_user_connector.settings');
 
-    $param = $client->strToHex($entity->field_ethereum_drupal_hash->value);
+    $param = $client->removeHexPrefix($client->strToHex($entity->field_ethereum_drupal_hash->value));
 
     // TODO getContractAddress is not defined.
 
