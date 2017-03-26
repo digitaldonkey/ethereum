@@ -63,12 +63,15 @@ class EthereumUserConnectorController extends EthereumController {
       $call = new EthD($this->client->ensureHexPrefix($this->config('ethereum_user_connector.settings')->get('contract_validateUserByHash_call')) . $hash_val);
 
       $contract_address = new EthD20($this->client->ensureHexPrefix($this->getContractAddress()));
-      /*
-       * curl https://ropsten.infura.io/drupal -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x4f1116b6e1a6e963efffa30c0a8541075cc51c45", "data":"0x2573ce276464656139653933323464616462633739373539386661633661326663363731"},"latest"],"id":1}'
-       * curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x688a4ec356d41fc1f7ecdb1e2725e5ceb7c59e9b", "data":"0x2573ce273935633061643731653665666534623335393762323832636636653334646266"},"latest"],"id":1}' localhost:8545
-       */
-      $user_address = $this->client->eth_call(new CallTransaction($contract_address, NULL, NULL, NULL, NULL, $call));
 
+      // This would empty the clients debug cache.
+      // $this->debug(TRUE);
+      //
+      $user_address = $this->client->eth_call(new CallTransaction($contract_address, NULL, NULL, NULL, NULL, $call));
+      //
+      // This would set a message debugging all parameters of the eth_call.
+      // $this->debug();
+      //
       $user_address = $user_address->convertTo('D20');
 
       if (!$user_address->val() === 0) {

@@ -1,0 +1,45 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.user.user.field_ethereum_account_status
+    - field.field.user.user.field_ethereum_address
+    - field.field.user.user.field_ethereum_drupal_hash
+    - field.field.user.user.user_picture
+    - image.style.thumbnail
+  module:
+    - ethereum_address_field
+    - ethereum_user_connector
+    - image
+    - user
+id: user.user.default
+targetEntityType: user
+bundle: user
+mode: default
+content:
+  field_ethereum_account_status:
+    type: ethereum_status_formatter
+    weight: 3
+    label: visually_hidden
+    settings: {  }
+    third_party_settings: {  }
+  field_ethereum_address:
+    type: ethereum_address_formatter_type
+    weight: 2
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+  member_for:
+    weight: 1
+    settings: {  }
+    third_party_settings: {  }
+  user_picture:
+    type: image
+    weight: 0
+    settings:
+      image_style: thumbnail
+      image_link: content
+    third_party_settings: {  }
+    label: hidden
+hidden:
+  field_ethereum_drupal_hash: true
