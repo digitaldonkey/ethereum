@@ -63,8 +63,6 @@ class EthereumController extends ControllerBase {
 
     $rows[] = [$this->t('<b>JsonRPC standard Methods</b>'), $this->t('Read more about <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC">Ethereum JsonRPC-API</a> implementation.')];
     $rows[] = [$this->t("Client version (web3_clientVersion)"), $this->client->web3_clientVersion()->val()];
-
-
     $rows[] = [$this->t("Listening (net_listening)"), $this->client->net_listening()->val() ? '✔' : '✘'];
     $rows[] = [$this->t("Peers (net_peerCount)"), $this->client->net_peerCount()->val()];
     $rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->client->eth_protocolVersion()->val()];
@@ -91,9 +89,9 @@ class EthereumController extends ControllerBase {
       \Drupal::service('date.formatter')->format($block_latest->getProperty('timestamp')->val(), 'html_datetime'),
     ];
 
-    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
+    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(1), new EthB(FALSE));
     $rows[] = [
-      $this->t("Earliest block age"),
+      $this->t("Age of block number '1' <br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
       \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp')->val(), 'html_datetime'),
     ];
 
@@ -104,7 +102,11 @@ class EthereumController extends ControllerBase {
 
     // Accounts.
     $rows[] = [$this->t("<b>Accounts info</b>"), ''];
-    $rows[] = [$this->t("Coinbase"), $this->client->eth_coinbase()->val()];
+    $coin_base = $this->client->eth_coinbase()->hexVal();
+    if ($coin_base === '0x0000000000000000000000000000000000000000') {
+      $coin_base = 'No coinbase available at this network node.';
+    }
+    $rows[] = [$this->t("Coinbase (eth_coinbase)"), $coin_base];
     $address = array();
     foreach ($this->client->eth_accounts() as $addr) {
       $address[] = $addr->hexVal();
