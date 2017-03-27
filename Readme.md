@@ -140,14 +140,7 @@ cd ..
 composer require drupal/ethereum
 cd web/
 drush en ethereum -y
-# Currently testrpc is required (will fix very soon)
-# Install see: https://github.com/ethereumjs/testrpc
-# Start testrpc
-testrpc
 ```
-
-Go to /admin/config/ethereum/network and enable custom network settings 
-Custom Ethereum Node → [http://localhost:8545](http://localhost:8545/)
 
 Visit /admin/reports/ethereum and check status page.
 
@@ -174,4 +167,3 @@ Edit drupal/conposer.json and add the 3 module and the PHP library repositories.
         "url": "https://github.com/digitaldonkey/ethereum-php.git"
     }
 ```
-
