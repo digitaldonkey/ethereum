@@ -48,19 +48,27 @@ class AdminForm extends ConfigFormBase {
       '#markup' => $this->t('<strong>Note:</strong> Only the value for the currently <a href="@link">active Ethereum Node</a> will be validated.', array('@link' => $link->toString())),
     ];
 
-    $form['testnet'] = [
+    $form['kovan'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum ropsten test network"),
-      '#default_value' => $config->get('testnet'),
-      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum test network. ADD LINK'),
+      '#default_value' => $config->get('kovan'),
+//      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum kovan test network. ADD LINK'),
+    ];
+
+    $form['ropsten'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Login Contract Address Ethereum ropsten test network"),
+      '#default_value' => $config->get('ropsten'),
+//      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum ropsten test network. ADD LINK'),
     ];
 
     $form['mainnet'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address on Ethereum main network"),
       '#default_value' => $config->get('mainnet'),
-      '#attributes' => array('disabled' => TRUE),
+//      '#attributes' => array('disabled' => TRUE),
       '#description' => $this->t('Pre-deployed on Ethereum main network. ADD LINK'),
     ];
 
@@ -131,6 +139,10 @@ f845862f newUser(bytes32)
       */
       $message = new CallTransaction(new EthD20($val), NULL, NULL, NULL, NULL, new EthD($signature));
       $result = $eth->client->eth_call($message);
+      //
+      // Debug JsonRPC contract validation call.
+      // $eth->debug();
+      //
       // Set expected data type.
       $contract_exists = $result->convertTo('bool')->val();
       if (!$contract_exists) {
@@ -153,7 +165,8 @@ f845862f newUser(bytes32)
     // White listing variables
     $settings = [
       'custom',
-      'testnet',
+      'kovan',
+      'ropsten',
       'mainnet',
       'contract_newUser_call',
       'contract_validateUserByHash_call',

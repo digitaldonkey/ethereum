@@ -86,19 +86,41 @@ class EthereumController extends ControllerBase {
     $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
     $rows[] = [
       $this->t("Latest block age"),
-      \Drupal::service('date.formatter')->format($block_latest->getProperty('timestamp')->val(), 'html_datetime'),
+      \Drupal::service('date.formatter')->format($block_latest->getProperty('timestamp'), 'html_datetime'),
     ];
+
+    // Testing_only.
 
     $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(1), new EthB(FALSE));
     $rows[] = [
       $this->t("Age of block number '1' <br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
-      \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp')->val(), 'html_datetime'),
+      \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp'), 'html_datetime'),
     ];
-
     $rows[] = [
       $this->t("Client first (eth_getBlockByNumber('earliest'))"),
       Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_earliest) . '</div>'),
     ];
+
+    // Second param will return TX hashes instead of full TX.
+    $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
+    $rows[] = [
+      $this->t("Client first (eth_getBlockByNumber('latest'))"),
+      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest) . '</div>'),
+    ];
+    $rows[] = [
+      $this->t("Uncles of latest block"),
+      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest->getProperty('uncles')) . '</div>'),
+    ];
+
+    $high_block = $this->client->eth_getBlockByNumber(new EthBlockParam(999999999), new EthB(FALSE));
+    $rows[] = [
+      $this->t("Get hash of a high block number<br /><small>Might be empty</small>"),
+
+      // TODO
+      // THIS DOSN'T WORK CONSISTENTLY! ANOTHER ARGUMENT FOR A NULL OBJECT!!
+      $high_block->getProperty('hash'),
+    ];
+
 
     // Accounts.
     $rows[] = [$this->t("<b>Accounts info</b>"), ''];
@@ -121,7 +143,7 @@ class EthereumController extends ControllerBase {
 
     // NON standard JsonRPC-API Methods below.
     $rows[] = [$this->t('<b>Non standard methods</b>'), $this->t('PHP Ethereum controller API provides additional methods. They are part of the <a href="https://github.com/digitaldonkey/ethereum-php">Ethereum PHP library</a>, but not part of JsonRPC-API standard.')];
-    $rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)"), $this->client->getMethodSignature('validateUserByHash(bytes32)')];
+    $rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)')"), $this->client->getMethodSignature('validateUserByHash(bytes32)')];
 
     // Debug output for all calls since last call of
     // $this->debug() or $this->debug(TRUE).

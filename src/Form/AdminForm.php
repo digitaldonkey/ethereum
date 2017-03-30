@@ -42,25 +42,33 @@ class AdminForm extends ConfigFormBase {
       '#required' => TRUE,
       '#description' => $this->t("Select a Ethereum Node to connect Drupal backend to."),
       '#options' => [
-        'testnet' => $this->t("Infura Test Network"),
+        'kovan' => $this->t("Infura new Kovan Network"),
+        'ropsten' => $this->t("Infura old Ropsten test Network"),
         'mainnet' => $this->t("Infura Main Network"),
         'custom' => $this->t("Custom network"),
       ],
       '#default_value' => $config->get('current_server'),
     ];
 
-    $form['testnet'] = [
+    $form['kovan'] = [
       '#type' => 'textfield',
-      '#title' => $this->t("Infura Test Network"),
-      '#default_value' => $config->get('testnet'),
+      '#title' => $this->t("Infura new Kovan Test Network"),
+      '#default_value' => $config->get('kovan'),
       '#attributes' => array('disabled' => TRUE),
       '#description' => $this->t('<a href="https://www.infura.io">Infura</a> provides access to Ethereum Nodes, so that you don\'t require to host you own.'),
+    ];
+    $form['ropsten'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t("Infura old Ropsten Test Network"),
+      '#default_value' => $config->get('ropsten'),
+      '#attributes' => array('disabled' => TRUE),
     ];
     $form['mainnet'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Infura Main Network"),
       '#default_value' => $config->get('mainnet'),
       '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('<a href="https://www.infura.io">Infura</a> provides access to Ethereum Nodes, so that you don\'t require to host you own.'),
     ];
     $form['custom'] = [
       '#type' => 'textfield',
@@ -103,7 +111,7 @@ class AdminForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = \Drupal::configFactory()->getEditable('ethereum.settings');
-    $settings = ['current_server', 'mainnet', 'testnet', 'custom'];
+    $settings = ['current_server', 'mainnet', 'ropsten', 'kovan', 'custom'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);
