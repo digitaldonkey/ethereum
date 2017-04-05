@@ -50,7 +50,7 @@ class AdminForm extends ConfigFormBase {
 
     $form['kovan'] = [
       '#type' => 'textfield',
-      '#title' => $this->t("Login Contract Address Ethereum ropsten test network"),
+      '#title' => $this->t("Login Contract Address Ethereum Kovan test network"),
       '#default_value' => $config->get('kovan'),
 //      '#attributes' => array('disabled' => TRUE),
       '#description' => $this->t('Pre-deployed on Ethereum kovan test network. ADD LINK'),
@@ -58,10 +58,10 @@ class AdminForm extends ConfigFormBase {
 
     $form['ropsten'] = [
       '#type' => 'textfield',
-      '#title' => $this->t("Login Contract Address Ethereum ropsten test network"),
+      '#title' => $this->t("Login Contract Address Ethereum Ropsten test network"),
       '#default_value' => $config->get('ropsten'),
 //      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum ropsten test network. ADD LINK'),
+      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network. ADD LINK'),
     ];
 
     $form['mainnet'] = [
