@@ -12,15 +12,22 @@
 
     <div class="form-item">
 
-        <div class="{{ status_css[status_id] }}" style="display: inline-block; padding: .3em; margin: 0;">{{ address|upper }} ({{ status }})</div>
+        <div id="ethereum-status"
+             class="{{ status_css[status_id] }}"
+             style="display: inline-block; padding: .3em; margin: 0;"
+             data-status--val="{{ status_id }}"
+             data-status--valid-address = "{{ address }}"
+             data-status--map='{{ status_map }}'
+             data-status--css-map='{{ status_css|json_encode() }}'>
+            <code class="ethereum-status--address">{{ address|lower }}</code>
+            (<span class="ethereum-status--message">{{ status }}</span>)
+        </div>
 
-        {% if status_id == 1 %}
-        <span class="ethereum-user-connector">
+        <span id="ethereum-verify" class="ethereum-user-connector" {{ (status_id != 2) ? '' : 'style="display: none" ' }}>
             <button class="button button--primary">Verify address</button>
         </span>
-            <noscript>Javascript is required.</noscript>
-        {% endif %}
 
+        <noscript>Javascript is required.</noscript>
         <div id="myMessage"></div>
     </div>
 

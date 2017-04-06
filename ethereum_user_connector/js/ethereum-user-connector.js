@@ -9,6 +9,8 @@
       // Message container.
       var message = document.getElementById('myMessage');
       var button = false;
+      var addressField = $('#edit-field-ethereum-address-0-value');
+      var status = $('#ethereum-status');
 
       $('.ethereum-user-connector', context).once('validateEthereumAccount').each(function () {
 
@@ -17,18 +19,76 @@
           click: function (event) {
             event.preventDefault();
 
-            liveLog('Start validating address ' + cnf.userEthereumAddress);
+            liveLog('Start validating address ' + addressStatus.get());
 
             if (initWeb3() && ensureProviderAddress()) {
               validateContract(validateEthereumUser);
             }
-
           }
         });
 
+        addressField.on({
+          change: function (event) {
+
+            var val = $.trim(event.target.value);
+
+            // Check if Address is valid.
+            // event.target.pattern = "0[x,X]{1}[0-9,a-f,A-F]{40}"
+            if (val && event.target.validity.valid) {
+              $(event.target).removeClass('error');
+              addressStatus.set(val);
+            }
+            else if (val) {
+              $(event.target).addClass('error');
+            }
+          }
+        });
       });
 
+      /**
+       * Manage the user Ethereum Address.
+       *
+       * This enables the user to change and verify the Address on one step.
+       */
+      var addressStatus = {
+        get: function() {
+          // Equals cnf.userEthereumAddress, but might be updated by user.
+          return $.trim(status.find('.ethereum-status--address').text());
+        },
+        isValidated: function (address) {
+          // In Drupal Ethereum we always save Ethereum addresses in lowercase!
+          address = (typeof address === 'undefined') ? this.get() : address.toLowerCase();
+          return (address === status.data('status--valid-address')) && (parseInt(status.data('status--val')) === 2);
+        },
+        setStatus: function (status_id) {
+          status.find('.ethereum-status--message').text(status.data('status--map')[status_id]);
+          // Remove color-* classes
+          status.attr('class', function(i, c){ return c.replace(/(^|\s)color-\S+/g, ''); });
+          status.addClass(status.data('status--css-map')[status_id]);
+          if (status_id !== 2) {
+            $('#ethereum-verify').show();
+          }
+        },
+        set: function (address) {
+          if (this.isValidated(address)) {
+            this.setStatus(2);
+          }
+          else {
+            this.setStatus(1);
+          }
+          status.find('.ethereum-status--address').text(address);
+        },
+        isChangedAddress: function () {
+          return (this.get().toLowerCase() !== cnf.userEthereumAddress.toLowerCase());
+        }
+      };
+
       function validateEthereumUser() {
+
+        if (addressStatus.isChangedAddress()) {
+          return ensureUserHash(validateEthereumUser);
+        }
+
         liveLog('Start validating user Ethereum address.');
 
         // Add transaction to register.
@@ -36,7 +96,7 @@
           // Address the contract is deployed.
           to: cnf.contractAddress,
           // Hash of the method signature and encoded parameters.
-          data: cnf.contractNewUserCall
+          data: cnf.contractNewUserCall + removePrefix(web3.toHex(cnf.drupalHash))
         },
         function (err, transactionHash) {
           liveLog('Submitted address.');
@@ -119,10 +179,10 @@
       */
       function ensureProviderAddress() {
        liveLog('Ensure web3 account and submitted address match.');
-       var matching = (web3.eth.defaultAccount.toUpperCase() === cnf.userEthereumAddress.toUpperCase());
+       var matching = (web3.eth.defaultAccount.toLowerCase() === addressStatus.get().toLowerCase());
 
         if (!matching) {
-          var msg ='The address submitted and the signing address must match. <br /> Web3 Address is ' + web3.eth.accounts[0].toUpperCase();
+          var msg ='The address submitted and the signing address must match. <br /> Web3 Address is ' + web3.eth.accounts[0];
           message.innerHTML += Drupal.theme('message', msg, 'error');
           return false;
         }
@@ -136,9 +196,7 @@
        */
       function validateContract(callback) {
         liveLog('Validate contract at address ' + cnf.contractAddress);
-
         web3.eth.call({to: cnf.contractAddress, data: cnf.validateContractCall}, 'latest', function(error, result) {
-
           if(!error && result.substr(0, 2) === '0x' && result.substr(-1) === '1') {
             liveLog('Successfully validated contract.');
             callback();
@@ -187,6 +245,33 @@
       }
 
       /**
+      * Update hash from Ethereum address.
+      *
+      * User can verify a new address without submitting the form first.
+      * We update the user's Eth address and get a new hash.
+      */
+      function ensureUserHash(callback) {
+
+      liveLog('Updating account address.');
+        console.log(addressStatus.get(), 'addressStatus.get()');
+
+       var url = cnf.updateAccountUrl + addressStatus.get();
+       $.get(url + '?_format=json&t=' + new Date().getTime(), {}, function(data, textStatus){
+         if (textStatus === 'success' && data.hash) {
+           liveLog('Got new user hash.');
+           cnf.userEthereumAddress = addressStatus.get();
+           cnf.drupalHash = data.hash;
+           callback();
+         }
+         else {
+           liveLog('Could not get new user hash. Failed :(');
+           console.log(textStatus, 'textStatus');
+           console.log(data, 'data');
+         }
+      });
+    }
+
+      /**
        * Ensure the User Ethereum Address and Signing Account address match.
        */
       function liveLog(content) {
@@ -206,6 +291,18 @@
         }
         else {
           log.text(content);
+        }
+      }
+
+      /**
+       * Remove "0x" Prefix if there is one.
+       */
+      function removePrefix(str) {
+        if (str.toLowerCase().substr(0, 2) === '0x') {
+          return str.substr(2);
+        }
+        else {
+          return str;
         }
       }
 
@@ -233,5 +330,3 @@
   };
 
 })(window.jQuery, window.Drupal);
-
-

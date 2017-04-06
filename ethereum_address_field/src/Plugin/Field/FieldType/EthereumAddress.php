@@ -99,7 +99,6 @@ class EthereumAddress extends FieldItemBase {
           )
         ),
       ));
-      // TODO validate Address by eth_getBalance() or eth_getStorageAt().
     }
 
     return $constraints;
@@ -119,7 +118,6 @@ class EthereumAddress extends FieldItemBase {
    */
   public function storageSettingsForm(array &$form, FormStateInterface $form_state, $has_data) {
     $elements = [];
-
     $elements['max_length'] = [
       '#type' => 'number',
       '#title' => $this->t('Maximum length'),
@@ -130,8 +128,14 @@ class EthereumAddress extends FieldItemBase {
       '#min' => 1,
       '#disabled' => TRUE,
     ];
-
     return $elements;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function preSave() {
+    $this->value = strtolower($this->value);
   }
 
   /**

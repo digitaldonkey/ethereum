@@ -10,7 +10,7 @@ field_name: field_ethereum_address
 entity_type: user
 bundle: user
 label: 'Ethereum Address'
-description: 'Ether your Ethereum account address. Note that submitting a new Address requires re-verification.'
+description: 'Ether your Ethereum account address (e.g: 0xaEC98826319EF42aAB9530A23306d5a9b113E23D). Note that submitting a new Address requires re-verification.'
 required: false
 translatable: false
 default_value: {  }

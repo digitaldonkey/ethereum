@@ -61,15 +61,12 @@ class EthereumStatusWidget extends WidgetBase {
     // Module settings.
     $config = Drupal::config('ethereum_user_connector.settings');
 
-    $param = $client->removeHexPrefix($client->strToHex($entity->field_ethereum_drupal_hash->value));
-
-    // TODO getContractAddress is not defined.
-
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
       '#children' => $items,
       '#user_ethereum_address' => $entity->field_ethereum_address->value,
       '#status_number' => $entity->field_ethereum_account_status->value,
+      '#status_map' => json_encode($status_map),
       '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
       '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
       '#attached' => array(
@@ -79,11 +76,12 @@ class EthereumStatusWidget extends WidgetBase {
         'drupalSettings' => array(
           'ethereumUserConnector' => array(
             'contractAddress' => $connector->getContractAddress(),
-            'validateContractCall' => $client->ensureHexPrefix($config->get('contract_contractExists_call')),
             'userEthereumAddress' => $entity->field_ethereum_address->value,
-            'contractNewUserCall' => $client->ensureHexPrefix($config->get('contract_newUser_call')) . $param,
-            'verificationUrl' => $base_path . 'ethereum/validate/',
             'drupalHash' => $entity->field_ethereum_drupal_hash->value,
+            'validateContractCall' => $client->ensureHexPrefix($config->get('contract_contractExists_call')),
+            'contractNewUserCall' => $client->ensureHexPrefix($config->get('contract_newUser_call')),
+            'verificationUrl' => $base_path . 'ethereum/validate/',
+            'updateAccountUrl' => $base_path . 'ethereum/update-account/',
           ),
         ),
       ),

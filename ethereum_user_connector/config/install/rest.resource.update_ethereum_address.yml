@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - ethereum_user_connector
+    - serialization
+    - user
+id: update_ethereum_address
+plugin_id: update_ethereum_address
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie

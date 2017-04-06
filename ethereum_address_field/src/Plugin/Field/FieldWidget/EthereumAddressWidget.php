@@ -25,7 +25,7 @@ class EthereumAddressWidget extends WidgetBase {
   public static function defaultSettings() {
     return [
       'size' => 22,
-      'placeholder' => strtoupper('0xaec98826319ef42aab9530a23306d5a9b113e23d'),
+      'placeholder' => '0xaec98826319ef42aab9530a23306d5a9b113e23d',
     ] + parent::defaultSettings();
   }
 
@@ -70,14 +70,21 @@ class EthereumAddressWidget extends WidgetBase {
    * {@inheritdoc}
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
+
     $element['value'] = $element + [
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]->value) ? $items[$delta]->value : NULL,
       '#size' => $this->getSetting('size'),
       '#placeholder' => $this->getSetting('placeholder'),
       '#maxlength' => $this->getFieldSetting('max_length'),
+      // See:
+      // https://www.w3schools.com/code/tryit.asp?filename=FEBTROZXKYL9
+      '#pattern' => '0[x,X]{1}[0-9,a-f,A-F]{40}',
+      '#attributes' => array(
+        'oninvalid' => 'setCustomValidity("' . $this->t('Please enter a valid Ethereum address. E.g: 0xaEC98826319EF42aAB9530A23306d5a9b113E23D') . '")',
+        'onchange' => "try{setCustomValidity('')}catch(e){}",
+      ),
     ];
-
     return $element;
   }
 

@@ -35,11 +35,11 @@ function ethereum_user_connector_user_presave(User $user) {
   $original_entity = $user->original;
   $last_address = $original_entity->field_ethereum_address->value;
   $last_hash = $original_entity->field_ethereum_drupal_hash->value;
-  $curr_address = $user->field_ethereum_address->getValue()[0]['value'];
+  $curr_address = strtolower($user->field_ethereum_address->getValue()[0]['value']);
   $curr_contract = UserConnector::getContractAddress();
 
   // Generate a hash of this Drupal instance, Smart Contract and User address.
-  $hash = md5($base_url . $curr_address . $user->id() . $curr_contract);
+  $hash = md5($base_url . $curr_address . $curr_contract);
 
   if (is_null($last_address) || $last_hash !== $hash) {
     $user->field_ethereum_drupal_hash->set(0, $hash);
@@ -79,6 +79,7 @@ function ethereum_user_connector_theme() {
 function ethereum_user_connector_preprocess_field_ethereum_account_status(&$variables) {
   $variables['title'] = $variables['field_ethereum_account_status']['#title'];
   $variables['address'] = $variables['field_ethereum_account_status']['#user_ethereum_address'];
+  $variables['status_map'] = $variables['field_ethereum_account_status']['#status_map'];
   $variables['hash'] = $variables['field_ethereum_account_status']['#ethereum_drupal_hash'];
   $variables['status_id'] = $variables['field_ethereum_account_status']['#status_number'];
   $variables['status'] = $variables['field_ethereum_account_status']['#status'];
