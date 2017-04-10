@@ -80,7 +80,7 @@
         },
         isChangedAddress: function () {
           var address = this.get() ? this.get().toLowerCase() : false;
-          if (!address) {
+          if (!address || typeof cnf.userEthereumAddress !== 'string') {
             return true;
           }
           return (address !== cnf.userEthereumAddress.toLowerCase());
