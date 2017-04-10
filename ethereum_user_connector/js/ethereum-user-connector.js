@@ -79,7 +79,11 @@
           status.find('.ethereum-status--address').text(address);
         },
         isChangedAddress: function () {
-          return (this.get().toLowerCase() !== cnf.userEthereumAddress.toLowerCase());
+          var address = this.get() ? this.get().toLowerCase() : false;
+          if (!address) {
+            return true;
+          }
+          return (address !== cnf.userEthereumAddress.toLowerCase());
         }
       };
 
