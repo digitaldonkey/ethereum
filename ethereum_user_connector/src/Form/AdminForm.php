@@ -52,16 +52,16 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Kovan test network"),
       '#default_value' => $config->get('kovan'),
-//      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum kovan test network. ADD LINK'),
+      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum kovan test network.') . ' <a href="https://kovan.etherscan.io/address/' . $config->get('kovan') . '">' . $config->get('kovan') . '</a>',
     ];
 
     $form['ropsten'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Ropsten test network"),
       '#default_value' => $config->get('ropsten'),
-//      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network. ADD LINK'),
+      '#attributes' => array('disabled' => TRUE),
+      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network (may be very slow).') . ' <a href="https://ropsten.etherscan.io/address/' . $config->get('ropsten') . '">' . $config->get('ropsten') . '</a>',
     ];
 
     $form['mainnet'] = [
@@ -69,7 +69,7 @@ class AdminForm extends ConfigFormBase {
       '#title' => $this->t("Login Contract Address on Ethereum main network"),
       '#default_value' => $config->get('mainnet'),
 //      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum main network. ADD LINK'),
+      '#description' => $this->t('Pre-deployed on Ethereum main network. Alpha testing. Not deployed yet!'),
     ];
 
     $form['custom'] = [

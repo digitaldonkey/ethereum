@@ -1,6 +1,6 @@
 custom: ''
 ropsten: '0xd4fbc42a04e61520c3075107c664d74a7874361e'
-kovan: '0x6dc525e5f10feac8aad2e2cb54bb1bc87d224c9e'
+kovan: '0xdacb85f3a6f12ca7893f887f875064880ce14d7d'
 mainnet: ''
 contract_validateUserByHash_call: '2573ce27'
 contract_newUser_call: 'f845862f'
