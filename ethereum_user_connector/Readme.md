@@ -2,6 +2,9 @@
 
 Drupal Drupal user connector enables Drupal Users to verify an Ethereum account address.
 
+You may check out A demo video here: https://youtu.be/Y5Sa7QtpXSE
+It shows a prove of concept how to set up a "unpayed paywall" using this module. 
+
 #### Module status
 
 * Smart contract integration of a simple user registry. 
