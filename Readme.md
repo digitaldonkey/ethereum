@@ -134,9 +134,9 @@ truffle serve
 ##Add Drupal Ethereum Module (Old Sandbox version)
 
 
-Till there is a dev release we need to manually add the dependencies to conposer.json file. 
+Till there is a dev release we need to manually add the dependencies to composer.json file. 
 
-Edit drupal/conposer.json and add the 3 module and the PHP library repositories. 
+Edit drupal/composer.json and add the 3 module and the PHP library repositories. 
 
 ```
 "repositories": [
