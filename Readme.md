@@ -32,7 +32,7 @@ If you used composer to install drupal core and the ethereum module everything s
  
 ## Drupal Ethereum Getting started
 
-You may checkout the <a href="https://www.youtube.com/watch?v=Y5Sa7QtpXSE">POC video and transcript</a> describin how to do a paywall with Drupal and Drupal Ethereum including all steps.
+You may checkout the <a href="https://www.youtube.com/watch?v=Y5Sa7QtpXSE">POC video and transcript</a> describing how to do a paywall with Drupal and Drupal Ethereum including all steps.
 
 
 **Install Drupal** 
