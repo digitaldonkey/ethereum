@@ -18,7 +18,7 @@ If you used composer to install Drupal core and the ethereum module everything s
 
 [RestUI](https://www.drupal.org/project/restui) is a user interface for Drupal 8's REST module.
 
-You will require a running *AMP server with PHP 5.6 + and [Composer](https://getcomposer.org/).  (There are also manual ways described in other Drupal documentation.) We will be using the packaged drupal7 install which is configured for Ubuntu on Ubuntu 16.04+ (17.04 suggested)
+You will require a running *AMP server with PHP 5.6 + and [Composer](https://getcomposer.org/).  (There are also manual ways described in other Drupal documentation.) We will be using the packaged drupal7 install which is configured for Ubuntu on Ubuntu 16.04+ (17.04 suggested) for simplicity's sake.
  
 ## Drupal Ethereum Getting started
 **Install Dependencies** 
