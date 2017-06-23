@@ -16,7 +16,7 @@ In the mid term scope the module will be a "framework" for configurable applicat
 * To get all required dependencies you need to run `composer install`  
 * Make sure Drupal has a Ethereum Node to read from by configuring *Configure Ethereum connection* (/admin/config/ethereum/network). **Saving the form settings** will validate the current settings and let you know if something is wrong. 
 * There are 3 different network settings provided. Default Ethereum node is set to Infura.io <a href="kovan.etherscan.io">Kovan test-network</a>.
-* You may up you own Etehreum node as described below. 
+* You may set up you own Ethereum node as described below. 
  
 More below at "Drupal Ethereum Getting started" and in the <a href="https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/ethereum_user_connector/Readme.md">user connector Readme</a>. 
  
@@ -24,7 +24,7 @@ More below at "Drupal Ethereum Getting started" and in the <a href="https://gith
 
 <a href="https://en.wikipedia.org/wiki/Ethereum">Ethereum</a> is a blockchain based, decentralized ledger system developed by the <a href="https://www.ethereum.org/">Ethereum foundation</a>. In order to connect to the Ethereum network you may use a service or set up you own network node.
 
-If you used composer to install drupal core and the ethereum module everything should work out of the box using <a href="infura.io">Infura's free service</a> to connect to Ethereum network. 
+If you used composer to install Drupal core and the Ethereum module everything should work out of the box using <a href="infura.io">Infura's free service</a> to connect to the Ethereum network. 
 
 <a href="https://www.lullabot.com/articles/goodbye-drush-make-hello-composer">Don't know composer</a>? You should. 
 
@@ -32,14 +32,14 @@ If you used composer to install drupal core and the ethereum module everything s
  
 ## Drupal Ethereum Getting started
 
-You may checkout the <a href="https://www.youtube.com/watch?v=Y5Sa7QtpXSE">POC video and transcript</a> describin how to do a paywall with Drupal and Drupal Ethereum including all steps.
+You may checkout the <a href="https://www.youtube.com/watch?v=Y5Sa7QtpXSE">POC video and transcript</a> describing how to do a paywall with Drupal and Drupal Ethereum including all steps.
 
 
 **Install Drupal** 
 
-You will need PHP [Composer](https://getcomposer.org/) to and [drush](http://www.drush.org/en/master/) installed on your system in order to do things fast. There are also manual ways described in Drupal documentation. 
+The quickest way to do this is to follow the steps below. You will need PHP [Composer](https://getcomposer.org/) and [drush](http://www.drush.org/en/master/) installed on your system. Alternatively, you can <a href="https://www.drupal.org/docs/8/install">install Drupal manually</a>. 
 
-**Download latest Drupal **
+**Download latest Drupal**
 
 ```
 composer create-project drupal-composer/drupal-project:~8.0 drupal --stability dev --no-interaction
@@ -65,7 +65,7 @@ drush site-install standard --db-url="mysql://root:root@localhost:3306/drupalEth
 
 _DON'T FORGET TO CHANGE YOUR PASSWORD AFTER FIRST LOGIN._
 
-**Download some existential plugins**
+**Download and enable additional Drupal modules**
 
 [RestUI](https://www.drupal.org/project/restui) is a user interface for Drupal 8's REST module.
 
@@ -79,7 +79,7 @@ Enable the modules
 ```
 cd web/
 drush en admin_toolbar_tools -y
-# If enabling REST API drops an error you may do it later in Drupal UI.
+# If enabling REST API produces an error you may do it later in the Drupal UI.
 drush en restui -y
 ```
 
@@ -93,14 +93,13 @@ cd web/
 drush en ethereum -y
 ```
 
-Visit /admin/config/ethereum and save setting to validate functionality. 
-Check status page at /admin/reports/ethereum
+Visit /admin/config/ethereum/network, save the configuration settings then check the status page at /admin/reports/ethereum to verify that it's working.
 
 
 ## Running your own Ethereum node
 
-If you want to use geth (go-ethereum client), here is how to <a href="https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum">install geth on many OS</a>.
-Then you start the geth server with rpc. On my mac like this. Keep in mind that the "*" allows connections from any host. 
+If you want to use geth (go-ethereum client), <a href="https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum">install it</a> then start the geth server with rpc.
+On a Mac this looks like this (be aware that the "*" allows connections from any host):
 
 ``` 
  geth --testnet  --rpc --rpccorsdomain="*"
@@ -109,7 +108,7 @@ Then you start the geth server with rpc. On my mac like this. Keep in mind that 
 
 **Development environment for *smart contracts* using Testrpc**
 
-If you want to check out developing your own smart contract it is recommended to use testrpc, which provides a fast Ethereum node for local testing. 
+If you want to experiment with developing your own smart contract, it is recommended to use testrpc, which provides a fast Ethereum node for local testing. 
 
 You may modify the currently provided *<a href="https://github.com/digitaldonkey/register_drupal_ethereum">Login Smart Contract</a>* by cloning/forking it. The repository contains a very little Truffle App which helps you to get started with test driven smart contract development. 
 
@@ -134,9 +133,9 @@ truffle serve
 ##Add Drupal Ethereum Module (Old Sandbox version)
 
 
-Till there is a dev release we need to manually add the dependencies to conposer.json file. 
+Until there is a dev release we need to manually add the dependencies to the composer.json file. 
 
-Edit drupal/conposer.json and add the 3 module and the PHP library repositories. 
+Edit drupal/composer.json and add the 3 modules and PHP library repositories. 
 
 ```
 "repositories": [
