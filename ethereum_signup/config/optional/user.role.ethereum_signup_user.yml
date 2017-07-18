@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+id: ethereum_signup_user
+label: 'Etherum signup authorized user'
+weight: 3
+is_admin: null
+permissions: {  }

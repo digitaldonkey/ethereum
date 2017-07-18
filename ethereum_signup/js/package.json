@@ -1,0 +1,16 @@
+{
+  "name": "drupal_personal_sign",
+  "version": "1.0.0",
+  "description": "",
+  "main": "ethereum-signup.js",
+  "dependencies": {},
+  "devDependencies": {
+    "eth-sig-util": "^1.2.1",
+    "ethereumjs-util": "^5.1.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
