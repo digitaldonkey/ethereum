@@ -1,9 +1,23 @@
+/**
+ * @file
+ *
+ * In order to use this script in development you require watchify (or browserify):
+ *
+ * cd ethereum_signup/js
+ * npm install
+ * npm install -g watchify
+ * watchify ethereum-signup.js -o ethereum-signup.bundle.js
+ *
+ */
 (function ($, Drupal) {
   "use strict";
 
   var message = document.getElementById('ethereum-signup-messages');
   var ethUtil = require('ethereumjs-util');
 
+  /**
+   * Drupal's standard init.
+   */
   Drupal.behaviors.ethereumSignup = {
     attach: function (context, settings) {
       $('#ethereum-signup', context).once('ethereumSignup').each(function () {
@@ -16,10 +30,7 @@
    * Check if web3 is available.
    */
   function getWeb3(callback, wrapper, settings) {
-
     liveLog('Get web3...');
-    console.log();
-
     if (typeof window.web3 === 'undefined') {
       missingWeb3(false, wrapper, settings);
     }
@@ -80,29 +91,34 @@
   }
 
   /**
+   * Get a login challenge.
    *
-   *
-   *
+   * Drupal will deliver a new challenge to sign for every log-in.
    */
   function getLoginChallenge(web3, wrapper, settings) {
-    liveLog('Verifying signature...');
+    liveLog('Get log-in challenge...');
 
     var data = {
       "action": 'challenge',
       "address": web3.eth.defaultAccount,
     };
 
-    console.log(data, 'data@getLoginChallenge');
-
     postRequest({
       url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
       data: JSON.stringify(data),
       success: function (data, textStatus) {
+        liveLog('Got challenge asking for signature...');
         signLoginRequest(data, textStatus, web3, wrapper, settings);
       }
     });
   }
 
+  /**
+   * Default post request.
+   *
+   * @param vars object
+   *   Params are the same as the jQuery ajax request.
+  */
   function postRequest(vars) {
     $.ajax($.extend(vars, {
       method: 'POST',
@@ -167,16 +183,18 @@
       });
   }
 
+  /**
+   * Default post request.
+   *
+   * @param signature string
+   *   Signature of the login challenge.
+   */
   function verifyLogin(web3, wrapper, settings, signature) {
-    console.log(signature, 'data@verifyLogin');
-
     var data = {
       "action": 'response',
       "address": web3.eth.defaultAccount,
       "signature": signature
     };
-
-    console.log(data, 'data@verifyLogin');
 
     postRequest({
       url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
@@ -187,21 +205,23 @@
     });
   }
 
+  /**
+   * Finally redirect user after successful login.
+   */
   function finalizeLogin(data, textStatus, web3, wrapper, settings) {
-    console.log('finalizeLogin', data);
+
     if(!data.success) {
       errorMessage(data.error);
     }
     if(data.success) {
-      console.log('finalizeLogin success', data.reload);
       window.location.href = data.reload;
     }
   }
 
+  /**
+   * Request user signature on login challenge.
+   */
   function signLoginRequest(data, textStatus, web3, wrapper, settings) {
-
-    console.log(data, textStatus);
-
     if(!data.success) {
       errorMessage(data.error);
     }
@@ -252,9 +272,9 @@
     });
   }
 
-
-
-
+  /**
+   * Call API to verify signup request.
+   */
   function verifySignup(web3, wrapper, settings, signature, email) {
     liveLog('Verifying signature...');
 
@@ -265,24 +285,28 @@
     if (email) {
       data.email = email;
     }
-    console.log(data, 'data');
 
     postRequest({
       url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
       data: JSON.stringify(data),
-      success: verifySignupSuccess
+      success: function (data, textStatus) {
+        verifySignupSuccess(web3, wrapper, settings, data, textStatus);
+      }
     });
   }
 
-  function verifySignupSuccess(data, textStatus) {
-    console.log('verifySignupSuccess');
-    console.log(textStatus, 'textStatus@verifySignupSuccess');
-    console.log(data, 'data@verifySignupSuccess');
+  /**
+   * Finalize signup process.
+   */
+  function verifySignupSuccess(web3, wrapper, settings, data, textStatus) {
     if(!data.success) {
       errorMessage(data.error);
     }
     if(data.success) {
       successMessage('Successfully created account.');
+    }
+    if (data.success && data.reload) {
+      window.location.href = data.reload;
     }
   }
 
@@ -423,7 +447,6 @@
    * Removes final messages (e.g. on restart of signup).
    */
   function clearMessage() {
-    console.log('clearMessage');
     liveLog(false);
     message.innerHTML = '';
   }

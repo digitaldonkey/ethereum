@@ -109,6 +109,8 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Require email to sign up.'),
       '#default_value' => $config->get('require_mail'),
+      // TODO This should be tackeled in input validation.
+      '#description' => $this->t('If you do not require email make sure "Require email verification when a visitor creates an account" is not checked in account settings. And "Notify user when account is activated" in user mail settings is not checked.'),
     ];
 
     $form['settings']['user_ethereum_register'] = [

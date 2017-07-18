@@ -70,7 +70,7 @@ class EthereumSignupController extends EthereumController {
   }
 
   public function verifyLogin($address, $signature) {
-
+    $error = NULL;
     $store = Drupal::service('user.shared_tempstore')->get(self::PROVIDER);
 
     $challenge_text = $store->get($address);
@@ -86,12 +86,26 @@ class EthereumSignupController extends EthereumController {
         $user = User::load($uid);
         user_login_finalize($user);
       }
+      else {
+        $error = $this->t('User with ' . $address . ' does not exist.');
+      }
     }
-    return array(
-      'success' => TRUE,
-      'reload' => $this->login_redirect,
+    else {
+      $error = $this->t('Signature verification failed.');
+    }
 
-  );
+    if (!$error) {
+      return array(
+        'success' => TRUE,
+        'reload' => $this->login_redirect,
+      );
+    }
+    else {
+      return array(
+        'success' => FALSE,
+        'error' => $error,
+      );
+    }
   }
 
 
@@ -234,18 +248,24 @@ class EthereumSignupController extends EthereumController {
           $new_user->save();
         }
 
+        // TODO MAYBE MESSAGES FOR WAITING APPROVAL
+
         if ($this->require_admin_confirm) {
           _user_mail_notify('register_pending_approval', $new_user);
         }
+
         if ($this->require_mail_confirm) {
           _user_mail_notify('register_no_approval_required', $new_user);
         }
 
+        // Login user.
         if ($this->log_in_user) {
-          // TODO Finalize Login.
+          if ($this->log_in_user) {
+            $auth->userLoginFinalize($new_user, $address, self::PROVIDER);
+            $resp->reload = $this->login_redirect;
+          }
         }
       }
-
     }
 
     // ERRORS:
