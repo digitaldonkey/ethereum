@@ -35,60 +35,7 @@ class AdminForm extends ConfigFormBase {
   }
 
 
-  /**
-   * Register options select.
-   *
-   * Create default value for select from config
-   *
-   * @param bool $admin_approval
-   *  Config setting require_admin_confirm.
-   * @param bool $email_confirm
-   *  Config setting require_admin_confirm.
-   *
-   * @return string
-   *  Default value for select.
-   */
-  private function getRegisterValue($admin_approval, $email_confirm) {
-    if ($admin_approval) {
-      return 'admin_confirm';
-    }
-    if ($email_confirm) {
-      return 'email_confirm';
-    }
-    return 'visitors';
-  }
 
-  /**
-   * Pre processing submission.
-   *
-   * Select user_ethereum_register is mapped to require_mail_confirm and
-   * require_admin_confirm.
-   * Additionally require_mail is set if require_mail_confirm=TRUE.
-   *
-   * @param $form_state
-   *    FormStateInterface.
-   */
-  private function setRegisterValue(FormStateInterface $form_state) {
-    $val = $form_state->getValue('user_ethereum_register');
-    $form_state->unsetValue('user_ethereum_register');
-    switch ($val) {
-      case 'visitors':
-        $form_state->setValue('require_mail_confirm', FALSE);
-        $form_state->setValue('require_admin_confirm', FALSE);
-        break;
-      case 'email_confirm':
-        $form_state->setValue('require_mail_confirm', TRUE);
-        $form_state->setValue('require_admin_confirm', FALSE);
-        break;
-      default:
-        $form_state->setValue('require_mail_confirm', FALSE);
-        $form_state->setValue('require_admin_confirm', TRUE);
-        break;
-    }
-    if ($form_state->getValue('require_mail_confirm')) {
-      $form_state->setValue('require_mail', TRUE);
-    }
-  }
 
   /**
    * {@inheritdoc}
@@ -109,8 +56,8 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Require email to sign up.'),
       '#default_value' => $config->get('require_mail'),
-      // TODO This should be tackeled in input validation.
-      '#description' => $this->t('If you do not require email make sure "Require email verification when a visitor creates an account" is not checked in account settings. And "Notify user when account is activated" in user mail settings is not checked.'),
+      // TODO This should be tackled in input validation.
+      '#description' => $this->t('Not requiring a email?<br />Make sure "Require email verification when a visitor creates an account" and "Notify user when account is activated" are not checked in account settings.'),
     ];
 
     $form['settings']['user_ethereum_register'] = [
@@ -135,7 +82,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Redirect after login'),
       '#default_value' => $config->get('login_redirect'),
-      '#description' => $this->t('Path relative to drupal web root.'),
+      '#description' => $this->t('Path relative to drupal web root. The value "user" will redirect to account home. Only users logging in with Ethereum will be redirected.'),
       '#required' => TRUE,
     ];
 
@@ -198,7 +145,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'textarea',
       '#title' => $this->t('Login text'),
       '#default_value' => $config->get('login_welcome_text'),
-      '#description' => $this->t('This text the user will be presented to digitally sign on login.'),
+      '#description' => $this->t('This text the user will be presented to digitally sign on login. It should contain a "#date" placeholder.</br>The date will be added to have a unique message (hash) on each login request.'),
       '#required' => TRUE,
     ];
 
@@ -209,7 +156,7 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    // TODO
+    // TODO.
   }
 
   /**
@@ -241,6 +188,66 @@ class AdminForm extends ConfigFormBase {
     }
     $config->save();
     parent::submitForm($form, $form_state);
+  }
+
+
+  /**
+   * Pre processing submission.
+   *
+   * Select user_ethereum_register is mapped to require_mail_confirm and
+   * require_admin_confirm.
+   * Additionally require_mail is set if require_mail_confirm=TRUE.
+   *
+   * @param $form_state
+   *    FormStateInterface.
+   */
+  private function setRegisterValue(FormStateInterface $form_state) {
+    $registration_type = $form_state->getValue('user_ethereum_register');
+    $form_state->unsetValue('user_ethereum_register');
+    switch ($registration_type) {
+      case 'visitors':
+        $form_state->setValue('require_mail_confirm', FALSE);
+        $form_state->setValue('require_admin_confirm', FALSE);
+        break;
+      case 'email_confirm':
+        $form_state->setValue('require_mail_confirm', TRUE);
+        $form_state->setValue('require_admin_confirm', FALSE);
+        break;
+      default:
+        $form_state->setValue('require_mail_confirm', FALSE);
+        $form_state->setValue('require_admin_confirm', TRUE);
+        break;
+    }
+
+    // Make sure email required is set when we need to send mails in registration process.
+    if ($registration_type !== 'visitors') {
+      $form_state->setValue('require_mail', TRUE);
+      drupal_set_message($this->t('Enabled "email required" because admin or email confirmation was set.'), 'warning');
+    }
+
+  }
+
+  /**
+   * Register options select.
+   *
+   * Create default value for select from config
+   *
+   * @param bool $admin_approval
+   *  Config setting require_admin_confirm.
+   * @param bool $email_confirm
+   *  Config setting require_admin_confirm.
+   *
+   * @return string
+   *  Default value for select.
+   */
+  private function getRegisterValue($admin_approval, $email_confirm) {
+    if ($admin_approval) {
+      return 'admin_confirm';
+    }
+    if ($email_confirm) {
+      return 'email_confirm';
+    }
+    return 'visitors';
   }
 
 }
