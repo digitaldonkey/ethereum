@@ -717,7 +717,7 @@ function from (value, encodingOrOffset, length) {
     throw new TypeError('"value" argument must not be a number')
   }
 
-  if (value instanceof ArrayBuffer) {
+  if (isArrayBuffer(value)) {
     return fromArrayBuffer(value, encodingOrOffset, length)
   }
 
@@ -977,7 +977,7 @@ function byteLength (string, encoding) {
   if (Buffer.isBuffer(string)) {
     return string.length
   }
-  if (isArrayBufferView(string) || string instanceof ArrayBuffer) {
+  if (isArrayBufferView(string) || isArrayBuffer(string)) {
     return string.byteLength
   }
   if (typeof string !== 'string') {
@@ -2307,6 +2307,14 @@ function blitBuffer (src, dst, offset, length) {
     dst[i + offset] = src[i]
   }
   return i
+}
+
+// ArrayBuffers from another context (i.e. an iframe) do not pass the `instanceof` check
+// but they should be treated as valid. See: https://github.com/feross/buffer/issues/166
+function isArrayBuffer (obj) {
+  return obj instanceof ArrayBuffer ||
+    (obj != null && obj.constructor != null && obj.constructor.name === 'ArrayBuffer' &&
+      typeof obj.byteLength === 'number')
 }
 
 // Node 0.10 supports `ArrayBuffer` but lacks `ArrayBuffer.isView`
@@ -14769,29 +14777,33 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":35,"minimalistic-assert":81,"minimalistic-crypto-utils":82}],56:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.2.3",
+  "_args": [
+    [
+      "elliptic@6.4.0",
+      "/Users/tho/htdocs/ConsenSys/DrupalEthereum/drupal/web/modules/contrib/ethereum/ethereum_signup/js"
+    ]
+  ],
+  "_development": true,
+  "_from": "elliptic@6.4.0",
   "_id": "elliptic@6.4.0",
   "_inBundle": false,
   "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^6.2.3",
+    "raw": "elliptic@6.4.0",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^6.2.3",
+    "rawSpec": "6.4.0",
     "saveSpec": null,
-    "fetchSpec": "^6.2.3"
+    "fetchSpec": "6.4.0"
   },
-  "_requiredBy": [
-    "/secp256k1"
-  ],
+  "_requiredBy": [],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-  "_spec": "elliptic@^6.2.3",
-  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/drupal/web/modules/contrib/ethereum/ethereum_signup/js/node_modules/secp256k1",
+  "_spec": "6.4.0",
+  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/drupal/web/modules/contrib/ethereum/ethereum_signup/js",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -14799,7 +14811,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -14809,7 +14820,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -15207,8 +15217,6 @@ exports.ecsign = function (msgHash, privateKey) {
  */
 exports.hashPersonalMessage = function (message) {
   var prefix = exports.toBuffer('\x19Ethereum Signed Message:\n' + message.length.toString());
-  console.log('ethereum-utils....');
-  console.log(Buffer.concat([prefix, message]), 'Buffer.concat([prefix, message])');
   return exports.sha3(Buffer.concat([prefix, message]));
 };
 
@@ -18350,8 +18358,8 @@ exports.isNumberInInterval = function (number, x, y, message) {
   if (number <= x || number >= y) throw RangeError(message)
 }
 
-}).call(this,{"isBuffer":require("../../../../../../../../../../../../../.nvm/versions/node/v7.8.0/lib/node_modules/watchify/node_modules/is-buffer/index.js")})
-},{"../../../../../../../../../../../../../.nvm/versions/node/v7.8.0/lib/node_modules/watchify/node_modules/is-buffer/index.js":9}],88:[function(require,module,exports){
+}).call(this,{"isBuffer":require("../../../../../../../../../../../../../.nvm/versions/node/v8.4.0/lib/node_modules/watchify/node_modules/is-buffer/index.js")})
+},{"../../../../../../../../../../../../../.nvm/versions/node/v8.4.0/lib/node_modules/watchify/node_modules/is-buffer/index.js":9}],88:[function(require,module,exports){
 'use strict'
 var Buffer = require('safe-buffer').Buffer
 var bip66 = require('bip66')
