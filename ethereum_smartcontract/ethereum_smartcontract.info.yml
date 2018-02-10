@@ -7,4 +7,3 @@ dependencies:
   - ethereum
 configure: entity.smartcontract.collection
 package: ethereum
-version: 8.x-1-alpha1
