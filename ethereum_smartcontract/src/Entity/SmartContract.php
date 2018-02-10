@@ -27,7 +27,7 @@ use Drupal\ethereum_smartcontract\SmartContractInterface;
 *     "id" = "id",
 *     "label" = "label",
 *     "contract_src" = "contract_src",
-*     "contract_js" = "contract_js",
+*     "contract_json" = "contract_json",
 *   },
 *   links = {
 *     "edit-form" = "/admin/config/ethereum/smartcontracts/{smartcontract}",
@@ -54,7 +54,7 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
   public $label;
 
   public $contract_src;
-  public $contract_js;
+  public $contract_json;
 
 //  public static function get_contract_src_file($id) {
 //

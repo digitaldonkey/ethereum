@@ -57,20 +57,18 @@ class SmartContractForm extends EntityForm {
     );
 
     $form['contract_src'] = array(
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('contract_src'),
-      '#maxlength' => 255,
       '#default_value' => $contract->contract_src,
       '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
     );
 
-    $form['contract_js'] = array(
-      '#type' => 'textfield',
-      '#title' => $this->t('contract_js'),
-      '#maxlength' => 255,
-      '#default_value' => $contract->contract_js,
-      '#description' => $this->t("contract_js for smart contract ."),
+    $form['contract_json'] = array(
+      '#type' => 'textarea',
+      '#title' => $this->t('contract_json'),
+      '#default_value' => $contract->contract_json,
+      '#description' => $this->t("Compiler Input and Output JSON Description."),
       '#required' => TRUE,
     );
 
