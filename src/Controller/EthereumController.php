@@ -7,12 +7,15 @@
 
 namespace Drupal\ethereum\Controller;
 
+//use Drupal;
+use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
 use Ethereum\Ethereum;
 use Ethereum\EthBlockParam;
 use Ethereum\EthB;
 use Ethereum\EthS;
 use Drupal\Core\Render\Markup;
+use Drupal\ethereum\Entity\EthereumServer;
 
 /**
  * Controller routines for Ethereum routes.
@@ -30,6 +33,134 @@ class EthereumController extends ControllerBase {
     }
     $this->client = new Ethereum($host);
   }
+
+  /**
+   * Returns Ethereum Networks.
+   *
+   * @param $detailed bool
+   *  By default we will return a Array keyed by Network ID (short version).
+   *   ID => Name - Description.
+   *  If $detailed = TRUE
+   *   Long version is [] = [id, label, description]
+   *
+   * @return array
+   *   Array of Ethereum Networks containing ID, Name, Description.
+   */
+  public static function getNetworksAsOptions($detailed = FALSE) {
+    $networks = [];
+      foreach (self::getNetworks() as $k => $item) {
+        $networks[$item['id']] = $item['label'] . ' - ' . $item['description'];
+      }
+      return $networks;
+  }
+
+  /**
+   * Returns Ethereum Networks.
+   *
+   * @param $detailed bool
+   *  By default we will return a Array keyed by Network ID (short version).
+   *   ID => Name - Description.
+   *  If $detailed = TRUE
+   *   Long version is [] = [id, label, description]
+   *
+   * @return array
+   *   Array of Ethereum Networks containing ID, Name, Description.
+   */
+  public static function getNetworks() {
+    $networks = \Drupal::config('ethereum.ethereum_networks')->getOriginal();
+    // Filter out non-numeric keys.
+    $networks = array_filter($networks, function ($k){ return is_int($k);}, ARRAY_FILTER_USE_KEY);
+    return $networks;
+  }
+
+  /**
+   * Ethereum Servers as options.
+   *
+   * @param $filter_enabled bool
+   *   return only servers with is_enabled = TRUE.
+   *
+   * @return array
+   *   Array [] = machine_name => Label
+  */
+  public static function getServerOptionsArray($filter_enabled = FALSE){
+    $servers = self::getServers($filter_enabled);
+    return array_map(function($k) { return $k->label; }, $servers);
+  }
+
+  /**
+   * Returns Ethereum Servers.
+   * @param $filter_enabled bool
+   *   Restrict to is_enabled=TRUE.
+   *
+   * @return  array [EthereumServer]
+   */
+  public static function getServers($filter_enabled = FALSE) {
+    $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
+    if ($filter_enabled) {
+      $servers = $storage->loadByProperties(['is_enabled' => TRUE]);
+    }
+    else {
+      $servers = $storage->loadMultiple();
+    }
+    return $servers;
+  }
+
+  /**
+   * getServerById().
+   *
+   *   ID => Name
+   * @param $id string
+   *   Server config id.
+   *
+   * @return EthereumServer
+   */
+  public static function getServerById($id) {
+    $storage = \Drupal::entityTypeManager()
+      ->getStorage('ethereum_server');
+    $X = $storage->loadByProperties(['id' => $id]);
+    return array_shift($X);
+  }
+
+
+  /**
+   * validateServerConnection().
+   *
+   *   ID => Name
+   * @param $server EthereumServer
+   *   Server config id.
+   *
+   * @return array
+   *    array[
+   *      error => bool,
+   *      message => TranslatableMarkup
+   *    ]
+   */
+    public static function validateServerConnection($server) {
+      $return = ['error' => FALSE, 'message'=>''];
+      try {
+        $eth = new EthereumController($server->url);
+
+        // Try to connect.
+        $networkVersion = $eth->client->net_version()->val();
+        if (!is_string($networkVersion)) {
+          throw new \Exception('eth_protocolVersion return is not valid.');
+        }
+
+        if ($server->network_id !== '*' && $networkVersion !== $server->network_id) {
+          throw new \Exception('Network ID does not match.');
+        }
+      }
+      catch (\Exception $exception) {
+        $return = [
+          'message' => t(
+            "Unable to connect to Server <b>"
+            . $server->label  . "</b><br />"
+            . $exception->getMessage() )
+        ];
+        $return['error'] = TRUE;
+      }
+      return $return;
+    }
 
   /**
    * Outputs function call logging as drupal message.
@@ -56,8 +187,8 @@ class EthereumController extends ControllerBase {
    *
    * This page provides a overview about Ethereum functions and usage.
    *
-   * @return string
-   *   The current status of the ethereum node.
+   * @return array
+   *   Render array. Table with current status of the ethereum node.
    */
   public function status() {
 

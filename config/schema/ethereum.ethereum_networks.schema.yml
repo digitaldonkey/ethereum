@@ -1,0 +1,13 @@
+ethereum.ethereum_networks.*:
+  type: config_entity
+  label: 'Ethereum Node available Networks'
+  mapping:
+    id:
+      type: string
+      label: 'Ethereum Network ID'
+    label:
+      type: label
+      label: 'Name'
+    description:
+      type: text
+      label: 'Description'

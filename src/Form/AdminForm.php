@@ -11,6 +11,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum\Controller\EthereumController;
 
+
 /**
 * Defines a form to configure maintenance settings for this site.
 */
@@ -36,46 +37,37 @@ class AdminForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = Drupal::config('ethereum.settings');
 
-    $form['current_server'] = [
+    // Verify current server.
+    $server = EthereumController::getServerById($config->get('current_server'));
+    $verify = EthereumController::validateServerConnection($server);
+    if ($verify['error']) {
+      drupal_set_message($verify['message'], 'error');
+    }
+
+    $form['servers'] = Drupal::entityTypeManager()
+      ->getListBuilder('ethereum_server')
+      ->render();
+
+    $form['default_network'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Ethereum Default Network'),
+    ];
+
+    $form['default_network']['current_server'] = [
       '#type' => 'select',
-      '#title' => $this->t("Select configuration"),
+      '#title' => $this->t("Default Server"),
       '#required' => TRUE,
-      '#description' => $this->t("Select a Ethereum Node to connect Drupal backend to."),
-      '#options' => [
-        'kovan' => $this->t("Infura new Kovan Network"),
-        'ropsten' => $this->t("Infura old Ropsten test Network"),
-        'mainnet' => $this->t("Infura Main Network"),
-        'custom' => $this->t("Custom network"),
-      ],
+      '#description' => $this->t("Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected."),
+      '#options' => EthereumController::getServerOptionsArray( TRUE),
       '#default_value' => $config->get('current_server'),
     ];
 
-    $form['kovan'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t("Infura new Kovan Test Network"),
-      '#default_value' => $config->get('kovan'),
-      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('<a href="https://www.infura.io">Infura</a> provides access to Ethereum Nodes, so that you don\'t require to host you own.'),
+    $form['default_network']['infura_note'] = [
+      '#type' => 'markup',
+      '#markup' => '<p><a href="https://infura.io/">Infura</a> is a webservice which provides access to Ethereum.<br />Infura requires a token for access. The "drupal" token only to get started. It is not intended for production use and may be revoked on extensive usage.<br /><b>Please <a href="https://infura.io/signup">register</a> your own free Infura token for your own application or run your own Ethereum node.</b><br /></p>',
     ];
-    $form['ropsten'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t("Infura old Ropsten Test Network"),
-      '#default_value' => $config->get('ropsten'),
-      '#attributes' => array('disabled' => TRUE),
-    ];
-    $form['mainnet'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t("Infura Main Network"),
-      '#default_value' => $config->get('mainnet'),
-      '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('<a href="https://www.infura.io">Infura</a> provides access to Ethereum Nodes, so that you don\'t require to host you own.'),
-    ];
-    $form['custom'] = [
-      '#type' => 'textfield',
-      '#title' => $this->t("Custom Ethereum Node"),
-      '#default_value' => $config->get('custom'),
-      '#description' => t("To connect to a local geth or testrpc instance you might use: <br/>http://localhost:8545<br/>"),
-    ];
+
+    $form['#attached']['library'][] = 'ethereum/ethereum-admin-form';
 
     return parent::buildForm($form, $form_state);
   }
@@ -84,25 +76,20 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $values = $form_state->getValues();
-    try {
-      $host = $values[$values['current_server']];
-      $eth = new EthereumController($host);
-      //
-      // TODO
-      // eth_protocolVersion() return inconsistent types in Geth and Parity.
-      // I would consider this a bug, but we might have to work around later.
-      // For switching to net_version() Network Validation.
-      //
-      // Try to connect.
-      $version = $eth->client->net_version()->val();
-      if (!is_string($version)) {
-        throw new \Exception('eth_protocolVersion return is not valid.');
-      }
+    $serverId = $form_state->getValues()['current_server'];
+
+    $server = EthereumController::getServerById($serverId);
+
+    if (!$server->is_enabled) {
+      $form_state->setError($form['current_server'],  $server->label() . t(' is not enabled.'));
     }
-    catch (\Exception $exception) {
-      $form_state->setErrorByName($values['current_server'], t("Unable to connect: " . $exception->getMessage() ));
-      return;
+
+    $verify = EthereumController::validateServerConnection($server);
+    if ($verify['error']) {
+      $form_state->setError(
+        $form['default_network']['current_server'],
+        $verify['message']
+      );
     }
   }
 
@@ -111,7 +98,7 @@ class AdminForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $config = \Drupal::configFactory()->getEditable('ethereum.settings');
-    $settings = ['current_server', 'mainnet', 'ropsten', 'kovan', 'custom'];
+    $settings = ['current_server'];
     $values = $form_state->getValues();
     foreach ($settings as $setting) {
       $config->set($setting, $values[$setting]);
