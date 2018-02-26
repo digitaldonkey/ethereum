@@ -5,6 +5,8 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\ethereum\Controller\EthereumController;
+
 
 /**
 * Form handler for the SmartContract add and edit forms.
@@ -57,9 +59,8 @@ class SmartContractForm extends EntityForm {
     );
 
     $form['contract_src'] = array(
-      '#type' => 'textfield',
+      '#type' => 'textarea',
       '#title' => $this->t('contract_src'),
-      '#maxlength' => 255,
       '#default_value' => $contract->contract_src,
       '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
@@ -74,12 +75,79 @@ class SmartContractForm extends EntityForm {
       '#required' => TRUE,
     );
 
-    // You will need additional form elements for your custom properties.
+    // Deployment by network.
+    // UI-Table with contract deploy address per network.
+    $form['networks'] = array(
+      '#type' => 'table',
+      '#header' => [
+        'Network ID',
+        'Network',
+        'Contract address',
+      ],
+    );
+    foreach (EthereumController::getNetworks() as $i => $net) {
+      $form['networks'][$i]['id'] = array(
+        '#markup' => '<b>' . $net['id'] . '</b>',
+      );
+      $form['networks'][$i]['net'] = array(
+        '#markup' => $net['label'] . '<br/>'.
+        '<small>' . $net['description'] . '</small>',
+      );
+      $form['networks'][$i]['contract'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Name'),
+        '#title_display' => 'invisible',
+      );
+    }
+
     return $form;
   }
 
 
   // TODO VALIDATE.
+
+  /**
+   * {@inheritdoc}
+   */
+//  public function validateForm(array $form, FormStateInterface $form_state) {
+//
+//
+//  }
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+
+    $contract_src = trim($form_state->getValue('contract_src'));
+
+//    $active_server = Drupal::config('ethereum.settings')->get('current_server');
+//    $val = $form_state->getValue($active_server);
+//
+//    try {
+//      $eth = new EthereumController();
+//
+//      // Validate contract address.
+//      $signature = '0x' . $this->config('ethereum_user_connector.settings')->get('contract_contractExists_call');
+//      /**
+//       * E.g:
+//       * curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0xaaaafb8dbb9f5c9d82f085e770f4ed65f3b3107c", "data":"0x06ae9483"},"latest"],"id":1}' localhost:8545
+//       */
+//      $message = new CallTransaction(new EthD20($val), NULL, NULL, NULL, NULL, new EthD($signature));
+//      $result = $eth->client->eth_call($message, new EthBlockParam());
+//      //
+//      // Debug JsonRPC contract validation call.
+//      // $eth->debug();
+//      //
+//      // Set expected data type.
+//      $contract_exists = $result->convertTo('bool')->val();
+//      if (!$contract_exists) {
+//        $form_state->setErrorByName('contract_address', $this->t('Unable to verify that contract exists at address: @address'), array('@address' => $val));
+//      }
+//    }
+//    catch (\Exception $exception) {
+//      $msg = $this->t("Unable find contract in currently active network. Please validate contract address on the network selected in admin/config/ethereum/network.");
+//      $msg .= 'Error: ' . $exception->getMessage();
+//      $form_state->setErrorByName($active_server, $msg);
+//    }
+
+  }
 
   /**
   * {@inheritdoc}

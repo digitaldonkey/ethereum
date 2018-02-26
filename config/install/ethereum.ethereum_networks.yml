@@ -1,0 +1,40 @@
+-
+  id: '0'
+  label: 'Olympic'
+  description: 'Olympic,Ethereum public pre-release testnet'
+-
+  id: '1'
+  label: 'Main'
+  description: 'Public Ethereum main network (Frontier, Homestead, Metropolis, ...)'
+-
+  id: '2'
+  label: 'Morden'
+  description: 'Public Ethereum testnet,now Ethereum Classic testnet'
+-
+  id: '3'
+  label: 'Ropsten'
+  description: 'Public Morden testnet'
+-
+  id: '4'
+  label: 'Rinkeby'
+  description: 'Public Geth PoA testnet'
+-
+  id: '8'
+  label: 'Ubiq'
+  description: 'Public Gubiq main network with flux difficulty chain'
+-
+  id: '42'
+  label: 'Kovan'
+  description: 'Public Parity PoA test network'
+-
+  id: '77'
+  label: 'Sokol'
+  description: 'Public POA Network test network'
+-
+  id: '99'
+  label: 'Core'
+  description: 'Public POA Network main network'
+-
+  id: '*'
+  label: 'ANY'
+  description: 'Local test clients without network Id restriction'
