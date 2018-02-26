@@ -36,6 +36,23 @@ class EthereumServerDeleteForm extends EntityConfirmFormBase {
   /**
    * {@inheritdoc}
    */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+
+    $defaultServer = \Drupal::config('ethereum.settings')->get('current_server');
+
+    // Deleting of current default server is prohibited.
+    if (($this->entity->id()=== $defaultServer)) {
+      $form_state->setError(
+        $form,
+        t('You can not delete the current drupal default server.')
+      );
+    }
+  }
+
+
+  /**
+   * {@inheritdoc}
+   */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
     drupal_set_message($this->t('Category %label has been deleted.', array('%label' => $this->entity->label())));
