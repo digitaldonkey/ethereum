@@ -10,6 +10,7 @@ use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Ethereum\EthBlockParam;
 use Ethereum\EthD;
 use Ethereum\EthD20;
 use Drupal\Core\Url;
@@ -138,7 +139,7 @@ f845862f newUser(bytes32)
        * curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0xaaaafb8dbb9f5c9d82f085e770f4ed65f3b3107c", "data":"0x06ae9483"},"latest"],"id":1}' localhost:8545
       */
       $message = new CallTransaction(new EthD20($val), NULL, NULL, NULL, NULL, new EthD($signature));
-      $result = $eth->client->eth_call($message);
+      $result = $eth->client->eth_call($message, new EthBlockParam());
       //
       // Debug JsonRPC contract validation call.
       // $eth->debug();
