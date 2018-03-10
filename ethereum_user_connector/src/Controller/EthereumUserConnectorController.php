@@ -1,13 +1,7 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ethereum\Controller\EthereumController.
- */
-
 namespace Drupal\ethereum_user_connector\Controller;
 
-use Drupal;
 use Drupal\ethereum\Controller\EthereumController;
 use Ethereum\CallTransaction;
 use Ethereum\EthD;
@@ -15,7 +9,7 @@ use Ethereum\EthD20;
 use Ethereum\EthS;
 
 /**
- * Controller routines for Ethereum routes.
+ * Controller routines for Ethereum User Connector routes.
  */
 class EthereumUserConnectorController extends EthereumController {
 
@@ -26,8 +20,8 @@ class EthereumUserConnectorController extends EthereumController {
    *   Address of the currently active contract.
    */
   public static function getContractAddress() {
-    $current = Drupal::config('ethereum.settings')->get('current_server');
-    return Drupal::config('ethereum_user_connector.settings')->get($current);
+    $current = \Drupal::config('ethereum.settings')->get('current_server');
+    return \Drupal::config('ethereum_user_connector.settings')->get($current);
   }
 
   /**
@@ -79,7 +73,7 @@ class EthereumUserConnectorController extends EthereumController {
       }
 
       // Check if User Exists
-      $query = Drupal::service('entity.query')
+      $query = \Drupal::service('entity.query')
         ->get('user')
         ->condition('field_ethereum_drupal_hash', $hash)
         ->condition('field_ethereum_address', $user_address->hexVal());
@@ -91,7 +85,7 @@ class EthereumUserConnectorController extends EthereumController {
 
       // Update User's ethereum_account_status field.
       $uid = reset($entity_ids);
-      $user = Drupal::entityTypeManager()->getStorage('user')->load($uid);
+      $user = \Drupal::entityTypeManager()->getStorage('user')->load($uid);
       $user->field_ethereum_account_status->setValue('2');
       if ($user->save() !== SAVED_UPDATED) {
         throw new \Exception('Error updating user Ethereum status for UID: ' . $uid);

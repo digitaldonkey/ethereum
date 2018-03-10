@@ -1,37 +1,44 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ethereum\Controller\EthereumController.
- */
-
 namespace Drupal\ethereum\Controller;
 
-//use Drupal;
-use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
-use Ethereum\Ethereum;
 use Ethereum\EthBlockParam;
 use Ethereum\EthB;
+use Ethereum\Ethereum;
 use Ethereum\EthS;
 use Drupal\Core\Render\Markup;
 use Drupal\ethereum\Entity\EthereumServer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for Ethereum routes.
  */
 class EthereumController extends ControllerBase {
 
-  private $config;
-  public $client;
+  /**
+   * The Ethereum JsonRPC client.
+   *
+   * @var \Ethereum\Ethereum
+   */
+  protected $client;
+
   private $debug = TRUE;
 
-  public function __construct($host = FALSE) {
-    if (!$host) {
-      $this->config = \Drupal::config('ethereum.settings');
-      $host = $this->config->get($this->config->get('current_server'));
-    }
-    $this->client = new Ethereum($host);
+  /**
+   * Constructs a new EthereumController.
+   */
+  public function __construct(Ethereum $ethereum_client) {
+    $this->client = $ethereum_client;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('ethereum.client')
+    );
   }
 
   /**
@@ -222,7 +229,7 @@ class EthereumController extends ControllerBase {
 
     // Testing_only.
 
-    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(1), new EthB(FALSE));
+    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
     $rows[] = [
       $this->t("Age of block number '1' <br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
       \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp'), 'html_datetime'),
