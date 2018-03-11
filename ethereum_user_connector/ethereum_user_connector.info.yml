@@ -5,7 +5,6 @@ core: 8.x
 package: ethereum
 dependencies:
   - ethereum
-  - ethereum_address_field
   - rest
 configure: ethereum.settings.user_connector
 test_dependencies:

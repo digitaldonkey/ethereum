@@ -8,7 +8,6 @@ dependencies:
     - field.field.user.user.user_picture
     - image.style.thumbnail
   module:
-    - ethereum_address_field
     - ethereum_user_connector
     - image
     - user
@@ -24,7 +23,7 @@ content:
     settings: {  }
     third_party_settings: {  }
   field_ethereum_address:
-    type: ethereum_address_formatter_type
+    type: basic_string
     weight: 2
     label: above
     settings: {  }
