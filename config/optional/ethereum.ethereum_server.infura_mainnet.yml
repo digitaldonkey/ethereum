@@ -2,5 +2,5 @@ id: infura_mainnet
 label: 'Infura Main Ethereum Network'
 url: 'https://mainnet.infura.io/drupal'
 network_id: '1'
-is_enabled: false
+status: false
 description: 'Infura (https://www.infura.io) provides access to Ethereum Nodes, so that you don''t require to host you own.'

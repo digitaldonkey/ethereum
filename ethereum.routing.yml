@@ -17,7 +17,7 @@ ethereum.admin_index:
 ethereum.settings:
   path: '/admin/config/ethereum/network'
   defaults:
-    _form: '\Drupal\ethereum\Form\AdminForm'
+    _form: '\Drupal\ethereum\Form\EthereumSettingsForm'
     _title: 'Configure Ethereum connection'
   requirements:
     _permission: 'administer site configuration'

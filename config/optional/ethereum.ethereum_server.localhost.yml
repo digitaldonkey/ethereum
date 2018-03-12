@@ -2,5 +2,5 @@ id: localhost
 label: Localhost
 url: 'http://localhost:8545'
 network_id: '*'
-is_enabled: true
+status: true
 description: 'Local Ethereum client like Geth or Parity on port 8545'

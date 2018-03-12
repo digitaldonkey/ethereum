@@ -1,9 +1,10 @@
 <?php
+
 namespace Drupal\ethereum\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\ethereum\EthereumServerInterface;
-
 
 /**
  * Defines the EthereumServer entity.
@@ -24,10 +25,15 @@ use Drupal\ethereum\EthereumServerInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "label",
- *     "description" = "description",*
- *     "url" = "url",
- *     "network_id" = "network_id",
- *     "is_enabled" = "is_enabled",
+ *     "status" = "status",
+ *   },
+ *   config_export = {
+ *     "id",
+ *     "label",
+ *     "description",
+ *     "url",
+ *     "network_id",
+ *     "status",
  *   },
  *   links = {
  *     "edit-form" = "/admin/config/ethereum/network/server/{ethereum_server}/edit",
@@ -38,48 +44,93 @@ use Drupal\ethereum\EthereumServerInterface;
 class EthereumServer extends ConfigEntityBase implements EthereumServerInterface {
 
   /**
-   * Server ID.
+   * The machine name of this server.
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
-   * Server name.
+   * The human-readable name of the server.
    *
    * @var string
    */
-  public $label;
-
+  protected $label;
 
   /**
-   * Enable server.
+   * A brief description of this server.
    *
-   * @var boolean
+   * @var string
    */
-  public $description;
+  protected $description;
 
   /**
-   * Server address (incl. port).
+   * The server address (including the port).
    *
    * @var string/uri
    */
-  public $url;
+  protected $url;
 
   /**
-   * Server Ethereum network ID.
+   * The Ethereum network ID of the server.
    *
-   * @see EthereumController::getNetworks()
+   * @see \Drupal\ethereum\Controller\EthereumController::getNetworks()
    *
    * @var integer
    */
-  public $network_id;
+  protected $network_id;
 
   /**
-   * Enable server.
-   *
-   * @var boolean
+   * {@inheritdoc}
    */
-  public $is_enabled;
+  public function getUrl() {
+    return $this->url;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getNetworkId() {
+    return $this->network_id;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function isDefaultServer() {
+    return $this->id() === \Drupal::config('ethereum.settings')->get('current_server');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateConnection() {
+    $return = ['error' => FALSE, 'message' => ''];
+    try {
+      /** @var \Ethereum\Ethereum $client */
+      $client = \Drupal::service('ethereum.client_factory')->get($this->getUrl());
+
+      // Try to connect.
+      $networkVersion = $client->net_version()->val();
+      if (!is_string($networkVersion)) {
+        throw new \Exception('eth_protocolVersion return is not valid.');
+      }
+
+      if ($this->getNetworkId() !== '*' && $networkVersion !== $this->getNetworkId()) {
+        throw new \Exception('Network ID does not match.');
+      }
+    }
+    catch (\Exception $exception) {
+      $return = [
+        'error' => TRUE,
+        'message' => new TranslatableMarkup('Unable to connect to server %label. @error_message', [
+          '%label' => $this->label(),
+          '@error_message' => $exception->getMessage()
+        ]),
+      ];
+    }
+
+    return $return;
+  }
 
 }

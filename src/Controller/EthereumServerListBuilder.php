@@ -7,7 +7,7 @@ use Drupal\Core\Entity\EntityInterface;
 use Drupal\Component\Render\FormattableMarkup;
 
 /**
- * Provides a listing of Example.
+ * Provides a listing of Ethereum servers.
  */
 class EthereumServerListBuilder extends ConfigEntityListBuilder {
 
@@ -15,11 +15,12 @@ class EthereumServerListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
-    $header['is_enabled'] = $this->t('Enabled');
+    $header['status'] = $this->t('Enabled');
     $header['id'] = $this->t('ID');
     $header['label'] = $this->t('Name');
     $header['network_id'] = $this->t('Network ID');
-    $header['url'] = $this->t('Server url');
+    $header['url'] = $this->t('Server URL');
+
     return $header + parent::buildHeader();
   }
 
@@ -27,18 +28,12 @@ class EthereumServerListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-
-//    $row['is_enabled'] = new FormattableMarkup ('<span data-server-enabled="@enabled">@symbol</span>', [
-//        '@enabled' => $entity->is_enabled ? 'true' : 'false',
-//        '@symbol' => $entity->is_enabled ? '✔' : '✘',
-//      ]
-//    );
-
-    $row['is_enabled'] = $entity->is_enabled ? '✔' : '✘';
+    /** @var \Drupal\ethereum\EthereumServerInterface $entity */
+    $row['status'] = $entity->status() ? '✔' : '✘';
 
     $row['id'] = $entity->id();
 
-    $row['label'] = new FormattableMarkup ('
+    $row['label'] = new FormattableMarkup('
         <div 
           class="server-info"
           data-server-enabled="@enabled"
@@ -50,20 +45,16 @@ class EthereumServerListBuilder extends ConfigEntityListBuilder {
           <div class="live-info"></div>
         </div>', [
         '@label' => $entity->label(),
-        '@description' => $entity->description,
-        '@enabled' => $entity->is_enabled ? 'true' : 'false',
-        '@address' => $entity->url,
-        '@network_id' => $entity->network_id,
+        '@description' => $entity->get('description'),
+        '@enabled' => $entity->status() ? 'true' : 'false',
+        '@address' => $entity->getUrl(),
+        '@network_id' => $entity->getNetworkId(),
       ]
     );
 
-    $row['network_id'] = $entity->network_id;
+    $row['network_id'] = $entity->getNetworkId();
 
-//    $row['url'] = new FormattableMarkup ('<span data-server-address="@address">@address</span>', [
-//        '@address' => $entity->url,
-//      ]
-//    );
-    $row['url'] = $entity->url;
+    $row['url'] = $entity->getUrl();
 
     return $row + parent::buildRow($entity);
   }
