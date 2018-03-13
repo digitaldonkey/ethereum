@@ -29,12 +29,12 @@ class EthereumServerListBuilder extends ConfigEntityListBuilder {
   public function buildRow(EntityInterface $entity) {
 
 //    $row['is_enabled'] = new FormattableMarkup ('<span data-server-enabled="@enabled">@symbol</span>', [
-//        '@enabled' => $entity->is_enabled ? 'true' : 'false',
-//        '@symbol' => $entity->is_enabled ? '✔' : '✘',
+//        '@enabled' => $entity->get('is_enabled') ? 'true' : 'false',
+//        '@symbol' => $entity->get('is_enabled') ? '✔' : '✘',
 //      ]
 //    );
 
-    $row['is_enabled'] = $entity->is_enabled ? '✔' : '✘';
+    $row['is_enabled'] = $entity->get('is_enabled') ? '✔' : '✘';
 
     $row['id'] = $entity->id();
 
@@ -50,20 +50,20 @@ class EthereumServerListBuilder extends ConfigEntityListBuilder {
           <div class="live-info"></div>
         </div>', [
         '@label' => $entity->label(),
-        '@description' => $entity->description,
-        '@enabled' => $entity->is_enabled ? 'true' : 'false',
-        '@address' => $entity->url,
-        '@network_id' => $entity->network_id,
+        '@description' => $entity->get('description'),
+        '@enabled' => $entity->get('is_enabled') ? 'true' : 'false',
+        '@address' => $entity->get('url'),
+        '@network_id' => $entity->get('network_id'),
       ]
     );
 
-    $row['network_id'] = $entity->network_id;
+    $row['network_id'] = $entity->get('network_id');
 
 //    $row['url'] = new FormattableMarkup ('<span data-server-address="@address">@address</span>', [
-//        '@address' => $entity->url,
+//        '@address' => $entity->get('url'),
 //      ]
 //    );
-    $row['url'] = $entity->url;
+    $row['url'] = $entity->get('url');
 
     return $row + parent::buildRow($entity);
   }

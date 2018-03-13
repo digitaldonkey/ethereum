@@ -7,10 +7,10 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
-use Ethereum\CallTransaction;
-use Ethereum\EthBlockParam;
-use Ethereum\EthD;
-use Ethereum\EthD20;
+use Ethereum\DataType\CallTransaction;
+use Ethereum\DataType\EthBlockParam;
+use Ethereum\DataType\EthD;
+use Ethereum\DataType\EthD20;
 use Ethereum\Ethereum;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -31,7 +31,6 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
    */
   public function __construct(ConfigFactoryInterface $config_factory, Ethereum $ethereum_client) {
     parent::__construct($config_factory);
-
     $this->client = $ethereum_client;
   }
 
@@ -73,20 +72,20 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
       '#markup' => $this->t('<strong>Note:</strong> Only the value for the currently <a href="@link">active Ethereum Node</a> will be validated.', array('@link' => $link->toString())),
     ];
 
-    $form['kovan'] = [
+    $form['infura_kovan'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Kovan test network"),
-      '#default_value' => $config->get('kovan'),
+      '#default_value' => $config->get('infura_kovan'),
       '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum kovan test network.') . ' <a href="https://kovan.etherscan.io/address/' . $config->get('kovan') . '">' . $config->get('kovan') . '</a>',
+      '#description' => $this->t('Pre-deployed on Ethereum kovan test network.') . ' <a href="https://kovan.etherscan.io/address/' . $config->get('infura_kovan') . '">' . $config->get('infura_kovan') . '</a>',
     ];
 
-    $form['ropsten'] = [
+    $form['infura_ropsten'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Ropsten test network"),
-      '#default_value' => $config->get('ropsten'),
+      '#default_value' => $config->get('infura_ropsten'),
       '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network (may be very slow).') . ' <a href="https://ropsten.etherscan.io/address/' . $config->get('ropsten') . '">' . $config->get('ropsten') . '</a>',
+      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network (may be very slow).') . ' <a href="https://ropsten.etherscan.io/address/' . $config->get('infura_ropsten') . '">' . $config->get('infura_ropsten') . '</a>',
     ];
 
     $form['mainnet'] = [
@@ -189,8 +188,8 @@ f845862f newUser(bytes32)
     // White listing variables
     $settings = [
       'custom',
-      'kovan',
-      'ropsten',
+      'infura_kovan',
+      'infura_ropsten',
       'mainnet',
       'contract_newUser_call',
       'contract_validateUserByHash_call',

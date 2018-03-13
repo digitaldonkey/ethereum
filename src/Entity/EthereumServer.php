@@ -42,14 +42,14 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    *
    * @var string
    */
-  public $id;
+  protected $id;
 
   /**
    * Server name.
    *
    * @var string
    */
-  public $label;
+  protected $label;
 
 
   /**
@@ -57,14 +57,14 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    *
    * @var boolean
    */
-  public $description;
+  protected $description;
 
   /**
    * Server address (incl. port).
    *
    * @var string/uri
    */
-  public $url;
+  protected $url;
 
   /**
    * Server Ethereum network ID.
@@ -73,13 +73,13 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    *
    * @var integer
    */
-  public $network_id;
+  protected $network_id;
 
   /**
    * Enable server.
    *
    * @var boolean
    */
-  public $is_enabled;
+  protected $is_enabled;
 
 }

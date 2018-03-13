@@ -63,7 +63,7 @@ class EthereumServerForm extends EntityForm {
       '#title' => $this->t("Network uri"),
       '#description' => t("Server uri with port number. e.g: http://localhost:8545"),
       '#required' => TRUE,
-      '#default_value' => $server->url,
+      '#default_value' => $server->get('url'),
     ];
 
     $defaultServer = \Drupal::config('ethereum.settings')->get('current_server');
@@ -72,7 +72,7 @@ class EthereumServerForm extends EntityForm {
       '#type' => 'checkbox',
       '#title' => $this->t('Server enabled'),
       '#description' => $this->t('Disabled servers will be ignored entirely. You cant disable the current Drupal default server.'),
-      '#default_value' => $server->is_enabled,
+      '#default_value' => $server->get('is_enabled'),
       '#disabled' => ($server->id() === $defaultServer),
     );
 
@@ -81,7 +81,7 @@ class EthereumServerForm extends EntityForm {
       '#title' => $this->t('Ethereum Network ID'),
       '#options' => EthereumController::getNetworksAsOptions(),
       '#required' => TRUE,
-      '#default_value' => $server->network_id,
+      '#default_value' => $server->get('network_id'),
     ];
 
     $form['description'] = [
@@ -89,7 +89,7 @@ class EthereumServerForm extends EntityForm {
       '#title' => $this->t('Description'),
       '#description' => $this->t("What ever you want to say about this Ethereum node."),
       '#maxlength' => 512,
-      '#default_value' => $server->description,
+      '#default_value' => $server->get('description'),
     ];
 
     return $form;

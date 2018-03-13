@@ -80,7 +80,7 @@ class AdminForm extends ConfigFormBase {
 
     $server = EthereumController::getServerById($serverId);
 
-    if (!$server->is_enabled) {
+    if (!$server->get('is_enabled')) {
       $form_state->setError($form['current_server'],  $server->label() . t(' is not enabled.'));
     }
 
