@@ -11,9 +11,9 @@ namespace Drupal\ethereum\Controller;
 use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
 use Ethereum\Ethereum;
-use Ethereum\EthBlockParam;
-use Ethereum\EthB;
-use Ethereum\EthS;
+use Ethereum\DataType\EthBlockParam;
+use Ethereum\DataType\EthB;
+use Ethereum\DataType\EthS;
 use Drupal\Core\Render\Markup;
 use Drupal\ethereum\Entity\EthereumServer;
 
@@ -27,9 +27,13 @@ class EthereumController extends ControllerBase {
   private $debug = TRUE;
 
   public function __construct($host = FALSE) {
+
+    // @todo Use url or ethereum_server entity to construct?
+
     if (!$host) {
-      $this->config = \Drupal::config('ethereum.settings');
-      $host = $this->config->get($this->config->get('current_server'));
+      $current_server_id = \Drupal::config('ethereum.settings')->get('current_server');
+      $current_server = \Drupal::config('ethereum.ethereum_server.' . $current_server_id);
+      $host = $current_server->get('url');
     }
     $this->client = new Ethereum($host);
   }
@@ -115,10 +119,8 @@ class EthereumController extends ControllerBase {
    * @return EthereumServer
    */
   public static function getServerById($id) {
-    $storage = \Drupal::entityTypeManager()
-      ->getStorage('ethereum_server');
-    $X = $storage->loadByProperties(['id' => $id]);
-    return array_shift($X);
+    $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
+    return array_shift($storage->loadByProperties(['id' => $id]));
   }
 
 
@@ -222,7 +224,7 @@ class EthereumController extends ControllerBase {
 
     // Testing_only.
 
-    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(1), new EthB(FALSE));
+    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(0), new EthB(FALSE));
     $rows[] = [
       $this->t("Age of block number '1' <br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
       \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp'), 'html_datetime'),
@@ -233,7 +235,7 @@ class EthereumController extends ControllerBase {
     ];
 
     // Second param will return TX hashes instead of full TX.
-    $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
+    $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
     $rows[] = [
       $this->t("Client first (eth_getBlockByNumber('latest'))"),
       Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest) . '</div>'),
@@ -242,13 +244,9 @@ class EthereumController extends ControllerBase {
       $this->t("Uncles of latest block"),
       Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest->getProperty('uncles')) . '</div>'),
     ];
-
     $high_block = $this->client->eth_getBlockByNumber(new EthBlockParam(999999999), new EthB(FALSE));
     $rows[] = [
       $this->t("Get hash of a high block number<br /><small>Might be empty</small>"),
-
-      // TODO
-      // THIS DOSN'T WORK CONSISTENTLY! ANOTHER ARGUMENT FOR A NULL OBJECT!!
       $high_block->getProperty('hash'),
     ];
 
