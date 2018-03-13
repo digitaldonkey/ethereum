@@ -10,5 +10,8 @@
     "issues": "https://www.drupal.org/project/issues/ethereum",
     "source": "http://cgit.drupalcode.org/ethereum"
   },
-  "require": { }
+  "require": {
+    "bower-asset/web3": "0.19.0",
+    "npm-asset/solc": " 0.4.21"
+  }
 }

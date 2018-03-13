@@ -96,6 +96,7 @@ class UpdateEthereumAddress extends ResourceBase {
    */
   public function get($address) {
 
+    // @todo Add setting for allow anonymous signup?
     if ($this->currentUser->isAuthenticated()) {
 
       $address = strtolower(Xss::filter($address));

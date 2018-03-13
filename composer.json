@@ -12,6 +12,10 @@
     {
       "type": "git",
       "url": "https://github.com/digitaldonkey/ethereum-php.git"
+    },
+    {
+      "type": "composer",
+      "url": "https://asset-packagist.org"
     }
   ],
   "require": {

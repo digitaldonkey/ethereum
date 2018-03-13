@@ -145,6 +145,7 @@ f845862f newUser(bytes32)
       // $eth->debug();
       //
       // Set expected data type.
+      // TODO convertTo is depreciated. please use toconvertByAbi($abiType).
       $contract_exists = $result->convertTo('bool')->val();
       if (!$contract_exists) {
         $form_state->setErrorByName('contract_address', $this->t('Unable to verify that contract exists at address: @address'), array('@address' => $val));
