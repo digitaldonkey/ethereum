@@ -1,25 +1,48 @@
 <?php
-/**
-* @file
-* Contains \Drupal\ethereum\Form\AdminForm.
-*/
 
 namespace Drupal\ethereum_user_connector\Form;
 
-use Drupal;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
-use Ethereum\EthBlockParam;
-use Ethereum\EthD;
-use Ethereum\EthD20;
 use Drupal\Core\Url;
-use Ethereum\CallTransaction;
+use Ethereum\DataType\CallTransaction;
+use Ethereum\DataType\EthBlockParam;
+use Ethereum\DataType\EthD;
+use Ethereum\DataType\EthD20;
+use Ethereum\Ethereum;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
 * Defines a form to configure maintenance settings for this site.
 */
-class AdminForm extends ConfigFormBase {
+class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
+
+  /**
+   * The Ethereum JsonRPC client.
+   *
+   * @var \Ethereum\Ethereum
+   */
+  protected $client;
+
+  /**
+   * Constructs a new AdminForm.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, Ethereum $ethereum_client) {
+    parent::__construct($config_factory);
+    $this->client = $ethereum_client;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('ethereum.client')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -49,20 +72,20 @@ class AdminForm extends ConfigFormBase {
       '#markup' => $this->t('<strong>Note:</strong> Only the value for the currently <a href="@link">active Ethereum Node</a> will be validated.', array('@link' => $link->toString())),
     ];
 
-    $form['kovan'] = [
+    $form['infura_kovan'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Kovan test network"),
-      '#default_value' => $config->get('kovan'),
+      '#default_value' => $config->get('infura_kovan'),
       '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum kovan test network.') . ' <a href="https://kovan.etherscan.io/address/' . $config->get('kovan') . '">' . $config->get('kovan') . '</a>',
+      '#description' => $this->t('Pre-deployed on Ethereum kovan test network.') . ' <a href="https://kovan.etherscan.io/address/' . $config->get('infura_kovan') . '">' . $config->get('infura_kovan') . '</a>',
     ];
 
-    $form['ropsten'] = [
+    $form['infura_ropsten'] = [
       '#type' => 'textfield',
       '#title' => $this->t("Login Contract Address Ethereum Ropsten test network"),
-      '#default_value' => $config->get('ropsten'),
+      '#default_value' => $config->get('infura_ropsten'),
       '#attributes' => array('disabled' => TRUE),
-      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network (may be very slow).') . ' <a href="https://ropsten.etherscan.io/address/' . $config->get('ropsten') . '">' . $config->get('ropsten') . '</a>',
+      '#description' => $this->t('Pre-deployed on Ethereum Ropsten test network (may be very slow).') . ' <a href="https://ropsten.etherscan.io/address/' . $config->get('infura_ropsten') . '">' . $config->get('infura_ropsten') . '</a>',
     ];
 
     $form['mainnet'] = [
@@ -126,12 +149,10 @@ f845862f newUser(bytes32)
     $custom_val = trim($form_state->getValue('custom'));
     $form_state->setValue('custom', $custom_val);
 
-    $active_server = Drupal::config('ethereum.settings')->get('current_server');
+    $active_server = $this->configFactory->get('ethereum.settings')->get('current_server');
     $val = $form_state->getValue($active_server);
 
     try {
-      $eth = new EthereumUserConnectorController();
-
       // Validate contract address.
       $signature = '0x' . $this->config('ethereum_user_connector.settings')->get('contract_contractExists_call');
       /**
@@ -139,7 +160,7 @@ f845862f newUser(bytes32)
        * curl -X POST --data '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0xaaaafb8dbb9f5c9d82f085e770f4ed65f3b3107c", "data":"0x06ae9483"},"latest"],"id":1}' localhost:8545
       */
       $message = new CallTransaction(new EthD20($val), NULL, NULL, NULL, NULL, new EthD($signature));
-      $result = $eth->client->eth_call($message, new EthBlockParam());
+      $result = $this->client->eth_call($message, new EthBlockParam());
       //
       // Debug JsonRPC contract validation call.
       // $eth->debug();
@@ -167,8 +188,8 @@ f845862f newUser(bytes32)
     // White listing variables
     $settings = [
       'custom',
-      'kovan',
-      'ropsten',
+      'infura_kovan',
+      'infura_ropsten',
       'mainnet',
       'contract_newUser_call',
       'contract_validateUserByHash_call',

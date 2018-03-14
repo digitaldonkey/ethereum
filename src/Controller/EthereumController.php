@@ -1,29 +1,29 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ethereum\Controller\EthereumController.
- */
-
 namespace Drupal\ethereum\Controller;
 
-//use Drupal;
-use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
+
 use Ethereum\Ethereum;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthS;
 use Drupal\Core\Render\Markup;
 use Drupal\ethereum\Entity\EthereumServer;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for Ethereum routes.
  */
 class EthereumController extends ControllerBase {
 
-  private $config;
-  public $client;
+  /**
+   * The Ethereum JsonRPC client.
+   *
+   * @var \Ethereum\Ethereum
+   */
+  protected $client;
+
   private $debug = TRUE;
 
   public function __construct($host = FALSE) {
@@ -88,7 +88,7 @@ class EthereumController extends ControllerBase {
   */
   public static function getServerOptionsArray($filter_enabled = FALSE){
     $servers = self::getServers($filter_enabled);
-    return array_map(function($k) { return $k->label; }, $servers);
+    return array_map(function($k) { return $k->get('label'); }, $servers);
   }
 
   /**
@@ -119,8 +119,7 @@ class EthereumController extends ControllerBase {
    * @return EthereumServer
    */
   public static function getServerById($id) {
-    $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
-    return array_shift($storage->loadByProperties(['id' => $id]));
+    return \Drupal::config('ethereum.ethereum_server.' . $id);
   }
 
 
@@ -140,7 +139,7 @@ class EthereumController extends ControllerBase {
     public static function validateServerConnection($server) {
       $return = ['error' => FALSE, 'message'=>''];
       try {
-        $eth = new EthereumController($server->url);
+        $eth = new EthereumController($server->get('url'));
 
         // Try to connect.
         $networkVersion = $eth->client->net_version()->val();
@@ -148,7 +147,7 @@ class EthereumController extends ControllerBase {
           throw new \Exception('eth_protocolVersion return is not valid.');
         }
 
-        if ($server->network_id !== '*' && $networkVersion !== $server->network_id) {
+        if ($server->get('network_id') !== '*' && $networkVersion !== $server->get('network_id')) {
           throw new \Exception('Network ID does not match.');
         }
       }
@@ -156,7 +155,7 @@ class EthereumController extends ControllerBase {
         $return = [
           'message' => t(
             "Unable to connect to Server <b>"
-            . $server->label  . "</b><br />"
+            . $server->get('label')  . "</b><br />"
             . $exception->getMessage() )
         ];
         $return['error'] = TRUE;
@@ -224,9 +223,9 @@ class EthereumController extends ControllerBase {
 
     // Testing_only.
 
-    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam(0), new EthB(FALSE));
+    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
     $rows[] = [
-      $this->t("Age of block number '1' <br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
+      $this->t("Age of 'earliest' block<br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
       \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp'), 'html_datetime'),
     ];
     $rows[] = [
