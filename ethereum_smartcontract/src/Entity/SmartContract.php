@@ -27,7 +27,8 @@ use Drupal\ethereum_smartcontract\SmartContractInterface;
 *     "id" = "id",
 *     "label" = "label",
 *     "contract_src" = "contract_src",
-*     "contract_js" = "contract_js",
+*     "contract_compiled_json" = "contract_compiled_json",
+*     "networks" = "networks",
 *   },
 *   links = {
 *     "edit-form" = "/admin/config/ethereum/smartcontracts/{smartcontract}",
@@ -40,34 +41,40 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
   const CONTRACT_PATH = 'vendor/contracts';
 
   /**
-  * The Example ID.
+  * Contract machine name.
   *
-  * @var string
+  * @var $id string
   */
   public $id;
 
   /**
-  * The Example label.
+  * Contract human readable name.
   *
-  * @var string
+  * @var $label string
   */
   public $label;
 
+  /**
+   * Contract Solidity source code.
+   *
+   * @var $contract_src string
+   */
   public $contract_src;
-  public $contract_js;
 
-//  public static function get_contract_src_file($id) {
-//
-//    return $this->contractRootPath() . $this->contract_src;
-//  }
-//
-//  public function get_contract_js_file() {
-//    return $this->contractRootPath() . $this->contract_js;
-//  }
-//
-//  private function contractRootPath() {
-//    global $base_url;
-//    return $base_url . '/' . drupal_get_path('module', 'ethereum_smartcontract') . '/' . self::CONTRACT_PATH . '/';
-//  }
+ /**
+  * Compiled contract JSON as provided by solidity compiler (solc).
+  *
+  * @var $contract_compiled_json string
+  */
+  public $contract_compiled_json;
+
+
+  /**
+   * Compiled contract JSON as provided by solidity compiler (solc).
+   *
+   * @var $contract_compiled_json string
+   */
+   public $networks;
+
 }
 

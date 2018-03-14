@@ -1,4 +1,9 @@
-ethereum-smartcontract:
+smartcontract-entity-form:
   version: VERSION
   js:
-    vendor/requirejs/require.js: {}
+    js/browser-solc/browser-solc.min.js: {}
+    js/smartcontract-entity-form.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

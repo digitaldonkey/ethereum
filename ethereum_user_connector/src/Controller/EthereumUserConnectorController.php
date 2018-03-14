@@ -66,6 +66,7 @@ class EthereumUserConnectorController extends EthereumController {
       // This would set a message debugging all parameters of the eth_call.
       // $this->debug();
       //
+      // TODO convertTo is depreciated please use toconvertByAbi($abiType).
       $user_address = $user_address->convertTo('D20');
 
       if (!$user_address->val() === 0) {

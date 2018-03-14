@@ -11,6 +11,12 @@ ethereum_smartcontract.contract.*:
     contract_src:
       type: string
       label: 'Contract Source file (relative path to ethereum_smartcontract directory).'
-    contract_js:
+    contract_compiled_json:
       type: string
-      label: 'Compiled contract Javascript file (relative path to ethereum_smartcontract directory).'
+      label: 'Compiled contract JSON as provided by solidity compiler (solc).'
+    networks:
+      type: sequence
+      label: 'Contract addresses by network id.'
+      sequence:
+        -  type: string
+           label: '<network_id> => <contract address>'

@@ -54,7 +54,7 @@ class EthereumServerForm extends EntityForm {
     $form['status'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Enabled'),
-      '#description' => $this->t('Disabled servers will be ignored entirely. You cant disable the current default server.'),
+      '#description' => $this->t("Disabled servers will be ignored entirely. You can't disable the current default server."),
       '#default_value' => $server->status(),
       '#disabled' => $server->isDefaultServer(),
     ];

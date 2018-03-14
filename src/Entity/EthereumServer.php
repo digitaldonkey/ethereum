@@ -67,7 +67,7 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   /**
    * The server address (including the port).
    *
-   * @var string/uri
+   * @var string|uri
    */
   protected $url;
 
