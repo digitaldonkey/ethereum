@@ -8,7 +8,6 @@
 use Drupal\Core\Routing\RouteMatchInterface;
 use League\CommonMark\CommonMarkConverter;
 
-
 /**
  * Implements hook_help().
  *
@@ -23,12 +22,10 @@ function ethereum_help($route_name, RouteMatchInterface $route_match) {
   }
 }
 
-
 /**
  * Implements hook_help().
  */
 function ethereum_get_readme_html($module) {
-
   $path = drupal_get_path('module', $module) . '/Readme.md';
   $readme = @file_get_contents(DRUPAL_ROOT . '/'. $path);
   if($readme === FALSE) {
@@ -38,4 +35,13 @@ function ethereum_get_readme_html($module) {
     $converter = new CommonMarkConverter();
     return $converter->convertToHtml($readme);
   }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function ethereum_field_formatter_info_alter(array &$info) {
+  // Allow the 'Ethereum address' field type to use the existing 'Basic string'
+  // formatter.
+  $info['basic_string']['field_types'][] = 'ethereum_address';
 }

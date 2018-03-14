@@ -11,7 +11,7 @@ settings:
   max_length: 42
   is_ascii: true
   case_sensitive: false
-module: ethereum_address_field
+module: ethereum
 locked: false
 cardinality: 1
 translatable: true
