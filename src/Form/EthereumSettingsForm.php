@@ -1,27 +1,22 @@
 <?php
-/**
-* @file
-* Contains \Drupal\ethereum\Form\AdminForm.
-*/
 
 namespace Drupal\ethereum\Form;
 
-use Drupal;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum\Controller\EthereumController;
-
+use Drupal\ethereum\Entity\EthereumServer;
 
 /**
-* Defines a form to configure maintenance settings for this site.
+* Defines a form to configure Ethereum connection settings for this site.
 */
-class AdminForm extends ConfigFormBase {
+class EthereumSettingsForm extends ConfigFormBase {
 
   /**
    * {@inheritdoc}
    */
   public function getFormID() {
-    return 'ethereum';
+    return 'ethereum_settings';
   }
 
   /**
@@ -35,16 +30,18 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = Drupal::config('ethereum.settings');
+    $config = $this->config('ethereum.settings');
 
     // Verify current server.
-    $server = EthereumController::getServerById($config->get('current_server'));
-    $verify = EthereumController::validateServerConnection($server);
-    if ($verify['error']) {
-      drupal_set_message($verify['message'], 'error');
+    if (!$form_state->getUserInput()) {
+      $server = EthereumServer::load($config->get('current_server'));
+      $verify = $server->validateConnection();
+      if ($verify['error']) {
+        $this->messenger()->addError($verify['message']);
+      }
     }
 
-    $form['servers'] = Drupal::entityTypeManager()
+    $form['servers'] = \Drupal::entityTypeManager()
       ->getListBuilder('ethereum_server')
       ->render();
 
@@ -58,7 +55,7 @@ class AdminForm extends ConfigFormBase {
       '#title' => $this->t("Default Server"),
       '#required' => TRUE,
       '#description' => $this->t("Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected."),
-      '#options' => EthereumController::getServerOptionsArray( TRUE),
+      '#options' => EthereumController::getServerOptionsArray(TRUE),
       '#default_value' => $config->get('current_server'),
     ];
 
@@ -76,15 +73,14 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $serverId = $form_state->getValues()['current_server'];
+    $server_id = $form_state->getValue('current_server');
+    $server = EthereumServer::load($server_id);
 
-    $server = EthereumController::getServerById($serverId);
-
-    if (!$server->get('is_enabled')) {
-      $form_state->setError($form['current_server'],  $server->label() . t(' is not enabled.'));
+    if (!$server->status()) {
+      $form_state->setError($form['default_network']['current_server'], $this->t('%label is not enabled.', ['%label' => $server->label()]));
     }
 
-    $verify = EthereumController::validateServerConnection($server);
+    $verify = $server->validateConnection();
     if ($verify['error']) {
       $form_state->setError(
         $form['default_network']['current_server'],
@@ -97,13 +93,9 @@ class AdminForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = \Drupal::configFactory()->getEditable('ethereum.settings');
-    $settings = ['current_server'];
-    $values = $form_state->getValues();
-    foreach ($settings as $setting) {
-      $config->set($setting, $values[$setting]);
-    }
-    $config->save();
+    $this->config('ethereum.settings')
+      ->set('current_server', $form_state->getValue('current_server'))
+      ->save();
 
     parent::submitForm($form, $form_state);
   }

@@ -40,7 +40,7 @@ class EthereumClientFactory {
   public function get($host = NULL) {
     if (!$host) {
       $current_server = $this->configFactory->get('ethereum.settings')->get('current_server');
-      $host = EthereumServer::load($current_server)->get('url');
+      $host = EthereumServer::load($current_server)->getUrl();
     }
 
     return new Ethereum($host);

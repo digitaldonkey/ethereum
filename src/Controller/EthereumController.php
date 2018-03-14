@@ -9,7 +9,6 @@ use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\EthB;
 use Ethereum\DataType\EthS;
 use Drupal\Core\Render\Markup;
-use Drupal\ethereum\Entity\EthereumServer;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,16 +25,20 @@ class EthereumController extends ControllerBase {
 
   private $debug = TRUE;
 
-  public function __construct($host = FALSE) {
+  /**
+   * Constructs a new EthereumController.
+   */
+  public function __construct(Ethereum $ethereum_client) {
+    $this->client = $ethereum_client;
+  }
 
-    // @todo Use url or ethereum_server entity to construct?
-
-    if (!$host) {
-      $current_server_id = \Drupal::config('ethereum.settings')->get('current_server');
-      $current_server = \Drupal::config('ethereum.ethereum_server.' . $current_server_id);
-      $host = $current_server->get('url');
-    }
-    $this->client = new Ethereum($host);
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('ethereum.client')
+    );
   }
 
   /**
@@ -61,12 +64,6 @@ class EthereumController extends ControllerBase {
   /**
    * Returns Ethereum Networks.
    *
-   * @param $detailed bool
-   *  By default we will return a Array keyed by Network ID (short version).
-   *   ID => Name - Description.
-   *  If $detailed = TRUE
-   *   Long version is [] = [id, label, description]
-   *
    * @return array
    *   Array of Ethereum Networks containing ID, Name, Description.
    */
@@ -80,88 +77,36 @@ class EthereumController extends ControllerBase {
   /**
    * Ethereum Servers as options.
    *
-   * @param $filter_enabled bool
-   *   return only servers with is_enabled = TRUE.
+   * @param bool $filter_enabled
+   *   (optional) Restrict to enabled servers. Defaults to FALSE.
    *
    * @return array
    *   Array [] = machine_name => Label
   */
   public static function getServerOptionsArray($filter_enabled = FALSE){
     $servers = self::getServers($filter_enabled);
-    return array_map(function($k) { return $k->get('label'); }, $servers);
+    return array_map(function($k) { return $k->label(); }, $servers);
   }
 
   /**
    * Returns Ethereum Servers.
-   * @param $filter_enabled bool
-   *   Restrict to is_enabled=TRUE.
    *
-   * @return  array [EthereumServer]
+   * @param bool $filter_enabled
+   *   (optional) Restrict to enabled servers. Defaults to FALSE.
+   *
+   * @return \Drupal\ethereum\EthereumServerInterface[]
+   *   An array of Ethereum server entities.
    */
   public static function getServers($filter_enabled = FALSE) {
     $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
     if ($filter_enabled) {
-      $servers = $storage->loadByProperties(['is_enabled' => TRUE]);
+      $servers = $storage->loadByProperties(['status' => TRUE]);
     }
     else {
       $servers = $storage->loadMultiple();
     }
     return $servers;
   }
-
-  /**
-   * getServerById().
-   *
-   *   ID => Name
-   * @param $id string
-   *   Server config id.
-   *
-   * @return EthereumServer
-   */
-  public static function getServerById($id) {
-    return \Drupal::config('ethereum.ethereum_server.' . $id);
-  }
-
-
-  /**
-   * validateServerConnection().
-   *
-   *   ID => Name
-   * @param $server EthereumServer
-   *   Server config id.
-   *
-   * @return array
-   *    array[
-   *      error => bool,
-   *      message => TranslatableMarkup
-   *    ]
-   */
-    public static function validateServerConnection($server) {
-      $return = ['error' => FALSE, 'message'=>''];
-      try {
-        $eth = new EthereumController($server->get('url'));
-
-        // Try to connect.
-        $networkVersion = $eth->client->net_version()->val();
-        if (!is_string($networkVersion)) {
-          throw new \Exception('eth_protocolVersion return is not valid.');
-        }
-
-        if ($server->get('network_id') !== '*' && $networkVersion !== $server->get('network_id')) {
-          throw new \Exception('Network ID does not match.');
-        }
-      }
-      catch (\Exception $exception) {
-        $return = [
-          'message' => t(
-            "Unable to connect to Server <b>"
-            . $server->get('label')  . "</b><br />"
-            . $exception->getMessage() )
-        ];
-        $return['error'] = TRUE;
-      }
-      return $return;
-    }
 
   /**
    * Outputs function call logging as drupal message.
