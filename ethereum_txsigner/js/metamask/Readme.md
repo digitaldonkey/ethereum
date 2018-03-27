@@ -6,10 +6,26 @@ In Firefox `about:debugging#workers`
 In Chrome dev tools go to Application>Service Workers
 
 
-`npm install --global browserify`
-`npm install --global watchify`
+Build
 
+```
+npm install --global browserify
 cd ethereum/ethereum_txsigner/js/metamask
-browserify src/metamask.js -o built/bundle.js
+npm run build
+```
 
-watchify src/metamask.js -o built/bundle.js -v -t
+Develop
+
+```
+npm install --global watchify
+cd ethereum/ethereum_txsigner/js/metamask
+npm run dev
+```
+
+Currently only testing in 
+*/ethereum/ethereum_txsigner/js/metamask/index.html*
+
+
+Todo for merge 
+* Automatically load when TX signer is enabled
+
