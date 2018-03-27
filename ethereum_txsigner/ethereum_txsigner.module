@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum_txsigner.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\ethereum_txsigner\Entity as TxSignerEntity;
+
+/**
+ * Implements hook_help().
+ */
+function ethereum_txsigner_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the ethereum_txsigner module.
+    case 'help.page.ethereum_txsigner':
+      return ethereum_get_readme_html('ethereum_txsigner');
+    default:
+  }
+}
+
+// WHY USE ES2015
+// https://philipwalton.com/articles/deploying-es2015-code-in-production-today/
+
+///**
+// * Implements hook_library_info_build().
+// *
+// * Loading txsigner "dynamically" (they are still cached) based on configuration.
+// *
+// * You may load Contracts by attaching them.
+// * But it turned out that this will not work well. Using require.js to load the contracts now.
+// * '#attached' => array(
+// *    'library' => array(
+// *    'ethereum_smartcontract/drupal_ethereum_account_validation',
+// *   )
+// * ),
+// * Todo:
+// * This may be removed or we will need to wrap the contract function in order to run them when web3.js is ready.
+// *
+// * @return array $libraries
+// *   An associative array of libraries registered by $extension. Keyed by
+// *   internal library name and passed by reference.
+// */
+//function ethereum_txsigner_library_info_build() {
+//  $libraries = array();
+//
+//  // Get txsigner Entities.
+//  $contracts = \Drupal::entityTypeManager()->getStorage('smartcontract')->loadMultiple();
+//
+//  foreach ($contracts as $contract) {
+//    $id = $contract->id();
+//    if (!isset($libraries[$id])) {
+//
+//      $libraries[$id] = array(
+//        'version' => 'VERSION',
+//        'js' => array($contract->contract_js => array()),
+//        'type' => 'asset',
+//        'dependencies' => array(
+//          'ethereum_smartcontract/ethereum-smartcontract',
+//        )
+//      );
+//    }
+//  }
+//  return $libraries;
+//}

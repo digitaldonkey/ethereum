@@ -1,0 +1,27 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <button id="action-button-1">GET ACCOUNT</button>
+  <div id="account"></div>
+  <button id="action-button-2">SEND TRANSACTION</button>
+  <div id="cb-value" ></div>
+
+  <div id="web3status"></div>
+
+  <!-- This iframe is the "bridge" used that tha app can communicate with wallet.metamask.io via service worker -->
+  <iframe src="https://wallet.metamask.io/proxy" style="width:0;height:0;border:0; border:none;"></iframe>
+  <!--
+      No support for browsers not supporting ES6
+      https://philipwalton.com/articles/deploying-es2015-code-in-production-today
+  -->
+  <script src="built/bundle.js"></script>
+
+</body>
+</html>

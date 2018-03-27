@@ -1,0 +1,15 @@
+entity.txsigner.collection:
+  path: '/admin/config/ethereum/txsigner'
+  defaults:
+    _entity_list: 'txsigner'
+    _title: 'Transaction Signers'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.txsigner.edit_form:
+  path: '/admin/config/ethereum/txsigner/{txsigner}'
+  defaults:
+    _entity_form: 'txsigner.edit'
+    _title: 'Edit txsigner'
+  requirements:
+    _permission: 'administer site configuration'

@@ -1,0 +1,13 @@
+ethereum_txsigner.txsigner.*:
+  type: config_entity
+  label: 'TX-Signer config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    is_enabled:
+      type: boolean
+      label: 'Enable or disable this TX signer component.'

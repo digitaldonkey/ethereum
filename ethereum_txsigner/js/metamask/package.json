@@ -1,0 +1,45 @@
+{
+  "name": "drupal_mascara",
+  "version": "1.0.0",
+  "description": "**Reinitialize Mascara**",
+  "main": "srx/metamask.js",
+  "scripts": {
+    "build": "browserify src/metamask.js -o built/bundle.js -v",
+    "dev": " watchify --debug  src/metamask.js -o built/bundle.js -v",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thorsten Krug",
+  "license": "MIT",
+  "dependencies": {
+    "iframe": "^1.0.0",
+    "metamascara": "^2.2.1",
+    "web3": "^1.0.0-beta.33"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^16.1.1",
+    "browserify-css": "^0.14.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "uglify-js": "^3.3.16"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "browserify-css",
+        "babelify"
+      ]
+    ]
+  },
+  "browserify-css": {
+    "autoInject": true,
+    "minify": true,
+    "rootDir": "."
+  }
+}
