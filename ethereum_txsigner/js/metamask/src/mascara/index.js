@@ -6,6 +6,8 @@ const Web3StatusIndicator = require('../web3status')
 // Holds the popup window reference.
 let mascaraPopup = null
 
+// Url for Mascara wallet.
+const MASCARA_URL = 'https://wallet.metamask.io'
 
 
 module.exports = class MascaraWrapper {
@@ -24,10 +26,6 @@ module.exports = class MascaraWrapper {
     this.provider = 'unknown'
     this.status = new Web3StatusIndicator(this.wrapper)
     this.callback = callback
-
-    // Url for Mascara wallet.
-    this.MASCARA_URL = 'https://wallet.metamask.io'
-
     // Messages set with logToDom will be displayed for this time [ms] if net set permanent.
     this.MESSAGE_DISPLAY_TIMEOUT = 800
     this.logTimer = null
@@ -57,14 +55,22 @@ module.exports = class MascaraWrapper {
   async isAccountUnlocked() {
     try {
       const accounts = await this.web3.eth.getAccounts()
+
+      // @todo this does not work in Safari 11.1
+
       if (accounts.length) {
         this.account = accounts[0]
       }
       else {
-        this.addActionButton(true)
-        // Can't distinguish if account is locked or not existing.
-        // @see https://github.com/MetaMask/mascara/issues/20
-        this.logToDom('Can not find account. Is it locked? You may create one opening Mascara.', true)
+        if (this.provider === 'mascara') {
+          this.addActionButton(true)
+          // Can't distinguish if account is locked or not existing.
+          // @see https://github.com/MetaMask/mascara/issues/20
+          this.logToDom('Can not find account. Is it locked? You may create one opening Mascara.', true)
+        }
+        else {
+          this.logToDom('Can not find accountgs. Is it locked?', true)
+        }
       }
     }
     catch (err) {
@@ -105,7 +111,7 @@ module.exports = class MascaraWrapper {
   openMascara() {
     if (mascaraPopup === null || mascaraPopup.closed) {
       const popupOpts = 'toolbar=0,scrollbars=1,resizable=0,status=0,titlebar=0,location=0,top= 30,left= 30,width=350,height=750'
-      mascaraPopup = window.open(this.MASCARA_URL, 'mascara', popupOpts)
+      mascaraPopup = window.open(MASCARA_URL, 'mascara', popupOpts)
     }
     if (mascaraPopup.focus) {
       mascaraPopup.focus()
