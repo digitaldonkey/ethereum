@@ -69,7 +69,7 @@ module.exports = class MascaraWrapper {
           this.logToDom('Can not find account. Is it locked? You may create one opening Mascara.', true)
         }
         else {
-          this.logToDom('Can not find accountgs. Is it locked?', true)
+          this.logToDom('Can not find account. Is it locked?', true)
         }
       }
     }
