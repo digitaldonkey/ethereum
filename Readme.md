@@ -85,6 +85,25 @@ drush en restui -y
 
 **Add Drupal Ethereum Module**
 
+Add the following to the "repositories" section of your root `composer.json` file:
+
+```
+"web3": {
+    "type": "package",
+    "package": {
+        "name": "ethereum/web3.js",
+        "version": "1.0.0-beta.34",
+        "type": "drupal-library",
+        "dist": {
+            "url": "https://github.com/ethereum/web3.js/archive/v1.0.0-beta.34.zip",
+            "type": "zip"
+        }
+    }
+},
+```
+
+Then you should be able to install the module as usual (through Composer):
+
 ```
 # Composer commands need to be run from the drupal directory
 cd ..

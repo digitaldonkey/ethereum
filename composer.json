@@ -1,25 +1,16 @@
 {
   "name": "drupal/ethereum",
-  "description": "Integrates Drupal with Ethereum.",
   "type": "drupal-module",
+  "description": "Integrates Drupal with Ethereum.",
+  "homepage": "http://drupal.org/project/ethereum",
   "license": "GPL-2.0+",
-  "autoload": {
-    "psr-4": {
-      "Ethereum\\": "src/"
-    }
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/ethereum",
+    "source": "http://cgit.drupalcode.org/ethereum"
   },
-  "repositories": [
-    {
-      "type": "git",
-      "url": "https://github.com/digitaldonkey/ethereum-php.git"
-    },
-    {
-      "type": "composer",
-      "url": "https://asset-packagist.org"
-    }
-  ],
   "require": {
     "digitaldonkey/ethereum-php": "dev-dev",
-    "league/commonmark": "~0.15"
+    "league/commonmark": "~0.15",
+    "ethereum/web3.js": "1.0.0-beta.34"
   }
 }
