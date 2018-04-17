@@ -8,6 +8,9 @@ ethereum_txsigner.txsigner.*:
     label:
       type: label
       label: 'Label'
-    is_enabled:
-      type: boolean
-      label: 'Enable or disable this TX signer component.'
+    jsFilePath:
+      type: string
+      label: 'Javascript file path relative to drupal root.'
+    cssFilePath:
+      type: string
+      label: 'CSS file path relative to drupal root.'

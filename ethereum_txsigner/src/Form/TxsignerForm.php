@@ -5,6 +5,7 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\ethereum_txsigner\Entity\Txsigner;
 
 /**
 * Form handler for the TxsignerForm add and edit forms.
@@ -53,27 +54,59 @@ class TxsignerForm extends EntityForm {
       '#disabled' => !$this->entity->isNew(),
     );
 
-    $form['is_enabled'] = array(
+    $form['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Enable this transaction signer library.'),
-      '#default_value' => $this->entity->is_enabled,
+      '#default_value' => $this->entity->status(),
     );
 
-    // TODO
-    // We might implement a use only on this path condition (like block visibility).
-    // See: https://www.previousnext.com.au/blog/using-drupal-8-condition-plugins-api
-    // Implement per TxSigner or for all TxSigners?
+    $form['jsFilePath'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('Javascript file.'),
+      '#description' => $this->t('Javascript file.'),
+      '#maxlength' => 255,
+      '#default_value' => $this->entity->jsFilePath('jsFilePath'),
+      '#required' => FALSE,
+    );
+
+    $form['cssFilePath'] = array(
+      '#type' => 'textfield',
+      '#title' => $this->t('CSS file.'),
+      '#description' => $this->t('CSS file path.'),
+      '#maxlength' => 255,
+      '#default_value' => $this->entity->cssFilePath('jsFilePath'),
+      '#required' => FALSE,
+    );
+
+
+    // --> Block visibility settings.
 
     return $form;
+  }
+
+
+  /**
+   * @param array $form
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+  $jsFile = $form_state->getValue('jsFilePath');
+    if (!Txsigner::isValidFilePath($jsFile)) {
+      $form_state->setErrorByName('jsFilePath', $this->t('Cant not find file @file', ['@file' => $jsFile]));
+    }
+
+    $cssFile = $form_state->getValue('cssFilePath');
+    if (!Txsigner::isValidFilePath($cssFile)) {
+      $form_state->setErrorByName('cssFilePath', $this->t('Cant not find file @file', ['@file' => $cssFile]));
+    }
   }
 
   /**
   * {@inheritdoc}
   */
   public function save(array $form, FormStateInterface $form_state) {
-
-    // TODO
-    // We should ensure that always at least one TX signer is active.
 
     $status = $this->entity->save();
 

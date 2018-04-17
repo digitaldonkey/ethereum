@@ -3,5 +3,6 @@ langcode: en
 status: true
 dependencies: {  }
 id: mascara
-label: 'Metamask mascera'
-is_enabled: true
+label: 'Metamask Mascara'
+jsFilePath: 'mascara/built/mascara.js'
+cssFilePath: 'mascara/css/styles.css'

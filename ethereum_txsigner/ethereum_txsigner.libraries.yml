@@ -1,4 +1,0 @@
-ethereum-txsigner:
-  version: VERSION
-  js:
-    vendor/requirejs/require.js: {}

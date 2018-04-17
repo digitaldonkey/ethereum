@@ -4,9 +4,11 @@
   "description": "**Reinitialize Mascara**",
   "main": "srx/metamask.js",
   "scripts": {
-    "build": "browserify src/metamask.js -o built/bundle.js -v",
-    "dev": " watchify --debug  src/metamask.js -o built/bundle.js -v",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "browserify src/index.js -o built/mascara.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/mascara.min.js -- ./built/mascara.js",
+    "dev": " watchify --debug  src/index.js -o built/mascara.js -v",
+    "production": "browserify src/index.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/mascara.min.js",
+    "minify-only": "./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/mascara.min.js -- ./built/mascara.js",
+    "build-only": "browserify src/index.js -o built/mascara.js"
   },
   "author": "Thorsten Krug",
   "license": "MIT",
@@ -27,19 +29,13 @@
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-standard": "^3.0.1",
-    "uglify-js": "^3.3.16"
+    "uglify-es": "^3.3.9"
   },
   "browserify": {
     "transform": [
       [
-        "browserify-css",
         "babelify"
       ]
     ]
-  },
-  "browserify-css": {
-    "autoInject": true,
-    "minify": true,
-    "rootDir": "."
   }
 }

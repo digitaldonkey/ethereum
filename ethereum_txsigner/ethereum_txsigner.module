@@ -23,44 +23,50 @@ function ethereum_txsigner_help($route_name, RouteMatchInterface $route_match) {
 // WHY USE ES2015
 // https://philipwalton.com/articles/deploying-es2015-code-in-production-today/
 
-///**
-// * Implements hook_library_info_build().
-// *
-// * Loading txsigner "dynamically" (they are still cached) based on configuration.
-// *
-// * You may load Contracts by attaching them.
-// * But it turned out that this will not work well. Using require.js to load the contracts now.
-// * '#attached' => array(
-// *    'library' => array(
-// *    'ethereum_smartcontract/drupal_ethereum_account_validation',
-// *   )
-// * ),
-// * Todo:
-// * This may be removed or we will need to wrap the contract function in order to run them when web3.js is ready.
-// *
-// * @return array $libraries
-// *   An associative array of libraries registered by $extension. Keyed by
-// *   internal library name and passed by reference.
-// */
-//function ethereum_txsigner_library_info_build() {
-//  $libraries = array();
+/**
+ * Implements hook_library_info_build().
+ *
+ * Loading txsigner "dynamically" (they are still cached) based on configuration.
+ *
+ * @return array
+ * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ */
+function ethereum_txsigner_library_info_build() {
+  $libraries = array();
+
+  $libraries['txsigners'] = [
+    'version' => 'VERSION',
+    'type' => 'file',
+    'js' => [],
+    'css' => []
+  ];
+
+  $txSigners =  \Drupal::entityTypeManager()->getStorage('txsigner')->loadMultiple();
+  foreach ($txSigners as $txsigner) {
+    // Js files loaded by libraries must be relative to module root.
+    // @todo allow TX signer implementation in independent module.
+    // Better would be to allow TX signers be defined only using config,
+    // but for now we are fixed to ethereum_txsigner/js/<PATH.js>
+    if ($txsigner->jsFilePath()) {
+      $libraries['txsigners']['js']['js/' . $txsigner->jsFilePath()] = [];
+    }
+    if ($txsigner->cssFilePath()) {
+      $libraries['txsigners']['css']['theme']['js/' . $txsigner->cssFilePath()] = [];
+    }
+  }
+
+//  $activeServerId = \Drupal::config('ethereum.settings')->get('current_server');
+//  $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
 //
-//  // Get txsigner Entities.
-//  $contracts = \Drupal::entityTypeManager()->getStorage('smartcontract')->loadMultiple();
-//
-//  foreach ($contracts as $contract) {
-//    $id = $contract->id();
-//    if (!isset($libraries[$id])) {
-//
-//      $libraries[$id] = array(
-//        'version' => 'VERSION',
-//        'js' => array($contract->contract_js => array()),
-//        'type' => 'asset',
-//        'dependencies' => array(
-//          'ethereum_smartcontract/ethereum-smartcontract',
-//        )
-//      );
-//    }
-//  }
-//  return $libraries;
-//}
+//  $libraries['drupalSettings']['ethereum_network']['cuddlySlider']['foo'] = 'bar';
+//  $libraries['ethereum_network'] = [
+//    'type' => 'setting',
+//    'data' => array('ethereum_network' => [
+//      'network_id' => $activeServer->get('network_id'),
+//      'label' => $activeServer->label()
+//    ]),
+//  ];
+
+
+  return $libraries;
+}

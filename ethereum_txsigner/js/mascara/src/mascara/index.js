@@ -2,30 +2,37 @@ const metamask = require('metamascara')
 const Web3 = require('web3')
 const Web3StatusIndicator = require('../web3status')
 
-
 // Holds the popup window reference.
 let mascaraPopup = null
 
 // Url for Mascara wallet.
 const MASCARA_URL = 'https://wallet.metamask.io'
 
-
+/*!
+ * Mascara app launcher.
+ *
+ * @license MIT
+ */
 module.exports = class MascaraWrapper {
+
+  // EXAMPLE init config see mascara/src/index.js
 
   /**
    *
    * @param contextId
    *   Dom Id for the Web3 user feedback.
-   * @param callback
-   *   Function to be called when Web3 is present and accounts unlocked.
+   * @param config
+   *   Config. See above.
    */
-  constructor(contextId, callback) {
-    this.wrapper = document.getElementById(contextId)
-    this.web3 = null
+  constructor(contextId, config) {
+    this.config = config
+    this.wrapper = this.getWrapper(contextId)
+    this._web3 = null
     this._account = null
+    this._network = 'unknown'
     this.provider = 'unknown'
     this.status = new Web3StatusIndicator(this.wrapper)
-    this.callback = callback
+
     // Messages set with logToDom will be displayed for this time [ms] if net set permanent.
     this.MESSAGE_DISPLAY_TIMEOUT = 800
     this.logTimer = null
@@ -46,6 +53,51 @@ module.exports = class MascaraWrapper {
       window.console.log('Note that firefox does not support ServiceWorkers in private browsing/incognito mode.')
     }
 
+  }
+
+  /**
+   * Main wrapper for Mascara
+   *
+   * Create inside <div id="mascaraStatus"> inside <div id="contextId">.
+   *
+   * @param contextId
+   * @returns {Node}
+   */
+  getWrapper(contextId) {
+    const wrapper = document.getElementById('mascaraStatus')
+    if (!wrapper) {
+      const div = document.createElement('span')
+      div.setAttribute('id', 'mascara-status')
+      return document.getElementById(contextId).appendChild(div)
+    }
+    return wrapper
+  }
+
+
+  /**
+   *
+   * @returns void
+   */
+  async isExpectedNetwork() {
+
+    // Don't validate if expected network is: any.
+    if (this.config.network.id === '*') return
+
+    try {
+      const netId = await this.web3.eth.net.getId()
+      if (netId.toString() === this.config.network.id) {
+        this.network = 'ok'
+        this.logToDom('Network ID is ok.')
+      }
+      else {
+        this.network = 'error'
+        this.logToDom(`Network ID is invalid. Expected ${this.config.network.label} (id: ${this.config.network.id})`, true)
+      }
+    }
+    catch (err) {
+      this.logToDom('There was an error getting networks.', true)
+      window.console.log(err)
+    }
   }
 
   /**
@@ -138,17 +190,30 @@ module.exports = class MascaraWrapper {
    * Update ui Icon.
   */
   updateStatus() {
+
+    window.console.log(typeof(window.mist) !== "undefined", 'typeof(mist)')
+
+
     if (this.provider !== 'mascara') {
+      // Detect Metamask
       if (this.web3.currentProvider.isMetaMask === true) {
         this.provider = 'metamask'
-        // @todo How to detect Mist and Others?
+      }
+      // Detect Mist browser
+      // https://ethereum.stackexchange.com/questions/11046/how-to-check-if-the-browser-is-mist
+      if (typeof(window.mist) !== 'undefined') {
+        this.provider = 'mist'
       }
     }
+
+
 
     this.status.update({
       isLocked: !(this._account && this._account.length),
       provider: this.provider,
+      network: this.network,
     })
+    this.tryInitDapp()
   }
 
   /**
@@ -158,28 +223,36 @@ module.exports = class MascaraWrapper {
   get web3() {
     return this._web3
   }
-  /**
-   * Getters and setters allow to act on changing properties.
-   * @returns {*}
-   */
   set web3(val) {
     this._web3 = val
     this.onPropertyChanged('web3', val)
   }
-  /**
-   * Getters and setters allow to act on changing properties.
-   * @returns {*}
-   */
   get account() {
     return this._account
   }
-  /**
-   * Getters and setters allow to act on changing properties.
-   * @returns void
-   */
   set account(val) {
     this._account = val
     this.onPropertyChanged('account', val)
+  }
+
+  getAccountStatus() {
+    return !this.config.requireUnlocked ||
+        (this.config.requireUnlocked && this.account && this.account.length === 42)
+  }
+
+  get network() {
+    return this._network
+  }
+  set network(val) {
+    this._network = val
+    this.onPropertyChanged('network', val)
+  }
+
+  getNetworkStatus() {
+    window.console.log('getNetworkStatus()', this.network === 'unknown')
+
+    return this.network === 'ok' ||
+          (this.network === 'unknown' && this.config.network.id === '*')
   }
 
   /**
@@ -196,8 +269,36 @@ module.exports = class MascaraWrapper {
    * web3Changed()
    */
   web3Changed() {
+    window.console.log('web3Changed()')
     this.updateStatus()
+    this.isExpectedNetwork()
     this.isAccountUnlocked()
+  }
+
+  /**
+   * web3Changed()
+   */
+  networkChanged() {
+    window.console.log('networkChanged()')
+    this.updateStatus()
+  }
+
+  /**
+   * tryInitDapp()
+   */
+  tryInitDapp() {
+    window.console.log('Try initialize dapp.')
+    if (this.getNetworkStatus() && this.getAccountStatus()) {
+
+      // @todo Mascara TX trigger is bound to window object.
+      // In node_modules/metamascara/mascara.js the popup trigger is bound to window object
+      // window.addEventListener('click', maybeTriggerPopup)
+      // For now we just add an empty button to visualize that we can now trigger the TX call.
+      // It also only works once. So if you didn't sign on right away,
+      // you need to reload the page :?
+      this.logToDom('Dapp init success.')
+      this.config.initApp(this.web3, this.account)
+    }
   }
 
   /**
@@ -205,24 +306,27 @@ module.exports = class MascaraWrapper {
    */
   accountChanged() {
     if (this.account) {
-      this.logToDom('Account is unlocked.')
-      // @todo Mascara TX trigger is bound to window object.
-      // In node_modules/metamascara/mascara.js the popup trigger is bound to window object
-      // window.addEventListener('click', maybeTriggerPopup)
-      // For now we just add an empty button to visualize that we can now trigger the TX call.
-      // It also only works once. So if you didn't sign on right away,
-      // you need to reload the page :?
-      this.addActionButton(false, 'Call your TX')
-      this.callback(this.account, this.web3)
-    }
+      this.logToDom('Account is unlocked.')}
     this.updateStatus()
   }
 
+
+  /**
+   * This is required to open Mascara.
+   *
+   * Currently it is not possible to trigger Metamask open,
+   * But to open a Mascara TX popup you require a click by the user.
+   *
+   * @todo This should be smartly combined.
+   *
+   * @param bindEvent
+   * @param text
+   */
   addActionButton(bindEvent = false, text = 'Open Mascara') {
     const button = document.createElement('button')
     button.setAttribute('id', 'mascara-action')
     button.innerHTML = text
-    this.wrapper.insertBefore(button, this.wrapper.childNodes[1])
+    this.wrapper.insertBefore(button, this.wrapper.childNodes[2])
     if (bindEvent) {
       button.addEventListener('click', this.openMascara)
     }

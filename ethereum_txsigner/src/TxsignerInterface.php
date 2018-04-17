@@ -8,4 +8,10 @@ use Drupal\Core\Config\Entity\ConfigEntityInterface;
 */
 interface TxsignerInterface extends ConfigEntityInterface {
 // Add get/set methods for your configuration properties here.
+
+  /**
+   * @return string
+   */
+  public function jsFilePath();
+
 }

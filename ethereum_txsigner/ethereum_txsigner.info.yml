@@ -5,3 +5,6 @@ core: 8.x
 name: Ethereum TX-signer
 configure: entity.txsigner.collection
 package: ethereum
+dependencies:
+- block
+
