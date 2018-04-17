@@ -1,8 +1,8 @@
 {
-  "name": "drupal_mascara",
+  "name": "drupal_mascara_wrapper",
   "version": "1.0.0",
-  "description": "**Reinitialize Mascara**",
-  "main": "srx/metamask.js",
+  "description": "Web3 dapp launcher supporting Metamask Mascara.",
+  "main": "src/mascara/index.js",
   "scripts": {
     "build": "browserify src/index.js -o built/mascara.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/mascara.min.js -- ./built/mascara.js",
     "dev": " watchify --debug  src/index.js -o built/mascara.js -v",
@@ -15,21 +15,23 @@
   "dependencies": {
     "iframe": "^1.0.0",
     "metamascara": "^2.2.1",
-    "web3": "^1.0.0-beta.33"
+    "web3": "^1.0.0-beta.34",
+    "web3-core": "^1.0.0-beta.34",
+    "web3-core-requestmanager": "^1.0.0-beta.34",
+    "web3-eth-personal": "^1.0.0-beta.34"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babelify": "^8.0.0",
     "browserify": "^16.1.1",
-    "browserify-css": "^0.14.0",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.9.0",
     "eslint-plugin-jsx-a11y": "^6.0.3",
     "eslint-plugin-react": "^7.7.0",
     "eslint-plugin-standard": "^3.0.1",
-    "uglify-es": "^3.3.9"
+    "uglify-es": "^3.3.10"
   },
   "browserify": {
     "transform": [

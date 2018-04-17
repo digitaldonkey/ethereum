@@ -63,9 +63,11 @@ window.addEventListener('load', () => {
 
 **Build**
 
+This job creates a minified version.
+
 ```
 npm install --global browserify
-cd ethereum/ethereum_txsigner/js/metamask
+cd js/metamask
 npm install
 npm run build
 ```
@@ -74,7 +76,7 @@ npm run build
 
 ```
 npm install --global watchify
-cd ethereum/ethereum_txsigner/js/metamask
+cd js/metamask
 npm install
 npm run dev
 ```
@@ -88,9 +90,9 @@ You might force to recreate Mascara by unregistering the Service Worker and dele
 In Firefox `about:debugging#workers`
 In Chrome dev tools go to Application>Service Workers
 
-**Support**
+**Supported Browsers**
 
 * Any web3 browser (including Metamask extension)
 * Websockets supporting browsers by Chrome, Chromium, Firefox (Suporting Metamask Mascara)
-*  In next Safari IOS and OSX supports websockets too, but Metamask [Mascara](https://github.com/MetaMask/mascara/) has still issues. 
+*  In next IOS and OSX Safari will support websockets. Looking ahead. 
 

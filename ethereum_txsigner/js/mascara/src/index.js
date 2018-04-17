@@ -14,13 +14,11 @@ const myApp = {
     // Run a example TX
     // Add button to trigger popup if <div id="testAppWrap"> exists.
     const testAppWrap = document.getElementById('testAppWrap')
-    if (testAppWrap) {
 
-      // Create some action button.
+    if (testAppWrap && testAppWrap.children.length === 0) {
       const b = document.createElement('button')
       b.setAttribute('id', 'app-action')
       b.innerHTML = 'Start my dapp call'
-
       testAppWrap.append(b)
       b.addEventListener('click', myApp.testCallTx)
     }
@@ -65,6 +63,7 @@ window.addEventListener('load', () => {
   *          // Your code....
   *          // If requireUnlocked is false account might be null.
   *       }
+  *     },
   */
   new MascaraWrapper('web3status', myApp)
 
