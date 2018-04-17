@@ -19,7 +19,46 @@ Gol is to mplement transaction signers (web3 providers) and fall back to [Metama
 	* Network id check
 * Optimize, minimize JS. Enhance browser support.
 
+**How Mascara wrapper looks?**
+
+A tiny UI showing the web3 account and network status. It should look like one of the following lines.
+
+![Mascara wrapper ui](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/doc-assets/mascara-wrapper-ui.gif)
  
+**What it does?**
+ 
+![Maskara wrapper current state](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/doc-assets/mascara-wrapper-UML.gif)
+
+**How to launch my app?**
+
+Short version here. Please check out the [example code](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/src/index.js). 
+
+```
+const myApp = {
+	network: {
+		 // Ethereum Network Id. use '*' bypass network validation.
+		id: '42',
+		label: 'Kovan test net.',
+	},
+	requireUnlocked: true,
+	initApp: (web3, account) => {
+	 // Your code....
+	 // If requireUnlocked is false account might be null.
+	}
+};
+
+window.addEventListener('load', () => {
+	/**
+	*  Initialize MascaraWrapper
+	*
+	*  @param string
+	*    Dom Id where the icon, actions and feedback are appended to.
+	*  @param settings App
+	*/
+	new MascaraWrapper('web3status', myApp)
+}
+```
+
 ## Development
 
 **Build**
