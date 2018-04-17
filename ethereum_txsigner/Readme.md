@@ -1,10 +1,9 @@
 # Ethereum Transaction Signer
 
-
 Provide transaction signers to let users and admins interact with Ethereum using their browser. 
 
-Currently only web3 browsers and Metamasks "mascara" are supported. 
+Currently there is only one TX signer: **Metamask Mascara** default provider is using web3 if provided by the browser (Metamask Browser extension or Mist browser) or fall back on [Mascara](https://github.com/MetaMask/mascara).
 
-The **Metamask** default provider is using web3 if provided by the browser (Metamask Browser extension or Mist browser) or fall back on [Mascara](https://github.com/MetaMask/mascara).
+Read more in the [Mascara Readme](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/Readme.md).
 
-Browser support for mascara depends on [serviceworkers](https://caniuse.com/#feat=serviceworkers).
+Note: Browser support for Mascara depends on [serviceworkers](https://caniuse.com/#feat=serviceworkers). Currently Firefox and Chrom(ium), but Safari should work with next release.
