@@ -24,5 +24,11 @@ It shows a prove of concept how to set up a "unpayed paywall" using this module.
   * restful get update_ethereum_address
   * restful get validate_ethereum_account
   
-  
+UPDATE 
+* ~Non annonymus registration?~ We will do this in ethereum_signup module after it's merged
+*   Use custom display settings for the following form modes in admin/config/people/accounts/form-display and make sure that the fields **Ethereum Account status** and **Ethereum Address** are visible in user Edit, but not in Register form. 	
+
+
+*   Only email? https://www.drupal.org/project/email_registration
+
  

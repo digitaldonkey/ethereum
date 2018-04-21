@@ -97,6 +97,15 @@ class UpdateEthereumAddress extends ResourceBase {
   public function get($address) {
 
     // @todo Add setting for allow anonymous signup?
+    // This requires a different storage mechanism for the Hash.
+    // If the user is not authenticated we can just temporarily store the
+    // Hash somewhere. On verify we would make sure that if the user was
+    // not registered yet and we have a submitted Hash.
+    // Thinking more about that when we have EcRecover
+    // (see branch feature-ethereum_signup) merged. Think with EcRecover signup
+    // is easier and we can submit to the registry after.
+
+
     if ($this->currentUser->isAuthenticated()) {
 
       $address = strtolower(Xss::filter($address));
