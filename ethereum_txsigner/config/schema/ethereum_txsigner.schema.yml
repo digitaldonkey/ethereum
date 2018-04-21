@@ -1,0 +1,16 @@
+ethereum_txsigner.txsigner.*:
+  type: config_entity
+  label: 'TX-Signer config'
+  mapping:
+    id:
+      type: string
+      label: 'ID'
+    label:
+      type: label
+      label: 'Label'
+    jsFilePath:
+      type: string
+      label: 'Javascript file path relative to drupal root.'
+    cssFilePath:
+      type: string
+      label: 'CSS file path relative to drupal root.'

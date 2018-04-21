@@ -1,0 +1,6 @@
+id: localhost_ganache
+label: 'Localhost Ganache development'
+url: 'http://127.0.0.1:7545'
+network_id: '*'
+status: true
+description: 'Ganache is a local development client (http://truffleframework.com/ganache)'

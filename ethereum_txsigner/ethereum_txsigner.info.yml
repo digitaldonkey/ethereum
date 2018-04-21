@@ -1,0 +1,10 @@
+name: Transaction Signers (web3)
+type: module
+description: Transaction signers enable Ethereum interaction in the browser.
+core: 8.x
+name: Ethereum TX-signer
+configure: entity.txsigner.collection
+package: ethereum
+dependencies:
+- block
+

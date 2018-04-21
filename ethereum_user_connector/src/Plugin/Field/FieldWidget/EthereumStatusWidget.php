@@ -2,14 +2,15 @@
 
 namespace Drupal\ethereum_user_connector\Plugin\Field\FieldWidget;
 
-use Drupal;
+use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Plugin implementation of the 'ethereu_status_widget' widget.
+ * Plugin implementation of the 'ethereum_status_widget' widget.
  *
  * @FieldWidget(
  *   id = "ethereum_status_widget",
@@ -19,21 +20,52 @@ use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
  *   }
  * )
  */
-class EthereumStatusWidget extends WidgetBase {
+class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * {@inheritdoc}
+   * The Ethereum JsonRPC client.
+   *
+   * @var \Ethereum\Ethereum
    */
-  public static function defaultSettings() {
-    return parent::defaultSettings();
+  protected $client;
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $configFactory;
+
+  /**
+   * Constructs a EthereumStatusWidget object.
+   *
+   * @param string $plugin_id
+   *   The plugin_id for the widget.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Field\FieldDefinitionInterface $field_definition
+   *   The definition of the field to which the widget is associated.
+   * @param array $settings
+   *   The widget settings.
+   * @param array $third_party_settings
+   *   Any third party settings.
+   */
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
   }
 
   /**
    * {@inheritdoc}
    */
-  public function settingsForm(array $form, FormStateInterface $form_state) {
-    $elements = [];
-    return $elements;
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    // @see \Drupal\Core\Field\WidgetPluginManager::createInstance().
+    return new static(
+      $plugin_id,
+      $plugin_definition,
+      $configuration['field_definition'],
+      $configuration['settings'],
+      $configuration['third_party_settings']
+    );
   }
 
   /**
@@ -55,11 +87,10 @@ class EthereumStatusWidget extends WidgetBase {
     $entity = $items->getEntity();
     $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
 
-    $connector = new EthereumUserConnectorController();
-    $client = $connector->client;
+    // @todo This block needs to clear cache on ethereum->"ETHEREUM DEFAULT NETWORK" change!
 
-    // Module settings.
-    $config = Drupal::config('ethereum_user_connector.settings');
+    // getContractById($id)
+    $contract =  \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
@@ -75,11 +106,11 @@ class EthereumStatusWidget extends WidgetBase {
         ),
         'drupalSettings' => array(
           'ethereumUserConnector' => array(
-            'contractAddress' => $connector->getContractAddress(),
+            'contractAddress' => $contract->getCurrentNetworkAddress(),
             'userEthereumAddress' => $entity->field_ethereum_address->value,
             'drupalHash' => $entity->field_ethereum_drupal_hash->value,
-            'validateContractCall' => $client->ensureHexPrefix($config->get('contract_contractExists_call')),
-            'contractNewUserCall' => $client->ensureHexPrefix($config->get('contract_newUser_call')),
+            'validateContractCall' => $contract->getFunctionHash('contractExists()'),
+            'contractNewUserCall' => $contract->getFunctionHash('newUser(bytes32)'),
             'verificationUrl' => $base_path . 'ethereum/validate/',
             'updateAccountUrl' => $base_path . 'ethereum/update-account/',
           ),

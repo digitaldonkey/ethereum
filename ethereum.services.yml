@@ -1,0 +1,7 @@
+services:
+  ethereum.client:
+    class: Ethereum\Ethereum
+    factory: ethereum.client_factory:get
+  ethereum.client_factory:
+    class: Drupal\ethereum\EthereumClientFactory
+    arguments: ['@config.factory']

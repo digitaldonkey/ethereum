@@ -28,33 +28,39 @@ function ethereum_user_connector_default_status() {
  *  - Adds/remove Role authorized_ethereum_user depending on status.
  *
  * @param $user User
+ *
+ * @throws \Drupal\Core\TypedData\Exception\MissingDataException
  */
 function ethereum_user_connector_user_presave(User $user) {
   global $base_url;
 
-  $original_entity = $user->original;
-  $last_address = $original_entity->field_ethereum_address->value;
-  $last_hash = $original_entity->field_ethereum_drupal_hash->value;
-  $curr_address = strtolower($user->field_ethereum_address->getValue()[0]['value']);
-  $curr_contract = UserConnector::getContractAddress();
+  if (!empty($user->field_ethereum_address->getValue())) {
+    $last_address = null;
 
-  // Generate a hash of this Drupal instance, Smart Contract and User address.
-  $hash = md5($base_url . $curr_address . $curr_contract);
+    if ($user->original) {
+      $last_address = $user->original->field_ethereum_address->getValue()[0]['value'];
+      $last_hash = $user->original->field_ethereum_drupal_hash->getValue()[0]['value'];
+    }
 
-  if (is_null($last_address) || $last_hash !== $hash) {
-    $user->field_ethereum_drupal_hash->set(0, $hash);
-    $user->field_ethereum_account_status->set(0, 1);
+    $curr_address = strtolower($user->field_ethereum_address->getValue()[0]['value']);
+    $curr_contract = UserConnector::getContractAddress();
+
+    // Generate a hash of this Drupal instance, Smart Contract and User address.
+    $hash = md5($base_url . $curr_address . $curr_contract);
+    if (is_null($last_address) || $last_hash !== $hash) {
+      $user->field_ethereum_drupal_hash->set(0, $hash);
+      $user->field_ethereum_account_status->set(0, 1);
+    }
+
+    // Add/remove authorized_ethereum_user role.
+    $account_status = $user->field_ethereum_account_status->getValue()[0]['value'];
+    if ($account_status == "2") {
+      $user->addRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
+    }
+    else {
+      $user->removeRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
+    }
   }
-
-  // Add/remove authorized_ethereum_user role.
-  $account_status = $user->field_ethereum_account_status->getValue()[0]['value'];
-  if ($account_status == "2") {
-    $user->addRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
-  }
-  else {
-    $user->removeRole(ETHEREUM_USER_CONNECTOR_AUTH_ROLE);
-  }
-
 }
 
 /**

@@ -1,0 +1,14 @@
+{
+  "name": "drupal/ethereum_txsigner",
+  "type": "drupal-module",
+  "description": "Provides transaction signers to let users interact with Ethereum Blockchain.",
+  "keywords": ["Drupal"],
+  "license": "GPL-2.0+",
+  "homepage": "https://www.drupal.org/project/ethereum",
+  "minimum-stability": "dev",
+  "support": {
+    "issues": "https://www.drupal.org/project/issues/ethereum",
+    "source": "http://cgit.drupalcode.org/ethereum"
+  },
+  "require": { }
+}

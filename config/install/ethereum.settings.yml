@@ -1,5 +1,1 @@
-current_server: testnet
-ropsten: 'https://ropsten.infura.io/drupal'
-kovan: 'https://kovan.infura.io/drupal'
-mainnet: 'https://mainnet.infura.io/drupal'
-custom: 'http://localhost:8545'
+current_server: infura_ropsten

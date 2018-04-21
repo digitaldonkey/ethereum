@@ -1,4 +1,0 @@
-id: drupal_ethereum_account_validation
-label: 'Drupal Ethereum account validation'
-contract_src: ../register_drupal_ethereum/build/contracts/RegisterDrupal.sol.js
-contract_js: ../register_drupal_ethereum//contracts/RegisterDrupal.sol

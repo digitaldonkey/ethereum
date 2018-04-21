@@ -5,6 +5,9 @@ use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Entity\Query\QueryFactory;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\ethereum\Controller\EthereumController;
+use Ethereum\EthereumStatic;
+
 
 /**
 * Form handler for the SmartContract add and edit forms.
@@ -34,9 +37,13 @@ class SmartContractForm extends EntityForm {
   * {@inheritdoc}
   */
   public function form(array $form, FormStateInterface $form_state) {
+    global $base_url;
+
     $form = parent::form($form, $form_state);
 
     $contract= $this->entity;
+
+    $form['#attached']['library'][] = 'ethereum_smartcontract/smartcontract-entity-form';
 
     $form['label'] = array(
       '#type' => 'textfield',
@@ -59,25 +66,96 @@ class SmartContractForm extends EntityForm {
     $form['contract_src'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('contract_src'),
-      '#default_value' => $contract->contract_src,
+      '#default_value' => $contract->getSrc(),
       '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
+      '#rows' => 20,
     );
 
-    $form['contract_json'] = array(
-      '#type' => 'textarea',
-      '#title' => $this->t('contract_json'),
-      '#default_value' => $contract->contract_json,
-      '#description' => $this->t("Compiler Input and Output JSON Description."),
-      '#required' => TRUE,
+    $form['abi'] = array(
+        '#type' => 'details',
+        '#title' => t('Smart contract ABI'),
+        '#description' => $this->t("Smart contract ABI is currently compiled by Javascript using solc compiler. It is created from the contract_src field and updated on every submit."),
+        '#open' => FALSE, // Controls the HTML5 'open' attribute. Defaults to FALSE.
     );
 
-    // You will need additional form elements for your custom properties.
+    $form['abi']['contract_js'] = [
+        '#type' => 'markup',
+        '#markup' => '<div id="abi"><img src="' . $base_url .'/core/misc/throbber-active.gif" alt="loading..."/></div>',
+    ];
+
+    $form['abi']['contract_compiled_json'] = array(
+        '#type' => 'hidden',
+        '#default_value' => '',
+    );
+
+    // Deployment by network.
+    // UI-Table with contract deploy address per network.
+    $form['networks'] = array(
+      '#type' => 'table',
+      '#header' => [
+        'Network ID',
+        'Network',
+        'Contract address',
+      ],
+    );
+    foreach (EthereumController::getNetworks() as $net) {
+      $form['networks'][$net['id']]['id'] = array(
+        '#markup' => '<b>' . $net['id'] . '</b>',
+      );
+      $form['networks'][$net['id']]['net'] = array(
+        '#markup' => $net['label'] . '<br/>'.
+        '<small>' . $net['description'] . '</small>',
+      );
+      $val = isset($contract->getNetworks()[$net['id']]) ? $contract->getNetworks()[$net['id']] : '';
+      $form['networks'][$net['id']]['contract'] = array(
+        '#type' => 'textfield',
+        '#title' => $this->t('Name'),
+        '#title_display' => 'invisible',
+        '#default_value' => $val,
+      );
+    }
     return $form;
   }
 
 
-  // TODO VALIDATE.
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+
+      $contract_src = trim($form_state->getValue('contract_src'));
+      if (!$contract_src) {
+        $form_state->setErrorByName('contract_src', $this->t('Contract source code is required.'));
+      }
+
+      $contract_src = trim($form_state->getValue('contract_compiled_json'));
+      if (!$contract_src) {
+          $form_state->setErrorByName('contract_compiled_json', $this->t('Contract compiled ABI is required. Your browser must have javascript enabled to use this form.'));
+      }
+
+      $networks = [];
+      foreach ($form_state->getValue('networks') as $netId => $net) {
+          $val = trim($net['contract']);
+          // Only validate if value is set
+          if ($val) {
+              // @todo We might add a network based validation which checks if
+              //    the contract is actually deployed at this address.
+              if (!EthereumStatic::isValidAddress($val)) {
+                  $form_state->setError($form['networks'][$netId],
+                    $this->t('@address is not a formally valid Ethereum contract address.',
+                      ['@address' => $val]
+                    )
+                  );
+              }
+              else {
+                  $networks[$netId] = $val;
+              }
+          }
+      }
+      $form_state->setValueForElement($form['networks'], $networks);
+
+  }
 
   /**
   * {@inheritdoc}

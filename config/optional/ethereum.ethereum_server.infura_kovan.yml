@@ -1,0 +1,6 @@
+id: infura_kovan
+label: 'Infura Kovan Test Node'
+url: 'https://kovan.infura.io/drupal'
+network_id: '42'
+status: true
+description: 'Infura (https://www.infura.io) provides access to Ethereum Nodes, so that you don''t require to host you own.'

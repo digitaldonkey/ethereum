@@ -1,33 +1,41 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\ethereum\Controller\EthereumController.
- */
-
 namespace Drupal\ethereum_user_connector\Controller;
 
-use Drupal;
 use Drupal\ethereum\Controller\EthereumController;
-use Ethereum\CallTransaction;
-use Ethereum\EthD;
-use Ethereum\EthD20;
-use Ethereum\EthS;
+use Drupal\ethereum_smartcontract\SmartContractInterface;
+use Drupal\ethereum_smartcontract\Entity\SmartContract;
+use Ethereum\DataType\EthS;
 
 /**
- * Controller routines for Ethereum routes.
+ * Controller routines for Ethereum User Connector routes.
  */
 class EthereumUserConnectorController extends EthereumController {
 
+  protected $registerDrupal;
+
   /**
    * Get the contract_address.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Exception
    *
    * @return string
    *   Address of the currently active contract.
    */
   public static function getContractAddress() {
-    $current = Drupal::config('ethereum.settings')->get('current_server');
-    return Drupal::config('ethereum_user_connector.settings')->get($current);
+    return self::getContractEntity()->getCurrentNetworkAddress();
+  }
+
+  /**
+   * Get SmartContract config entity.
+   *
+   * @return SmartContractInterface
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   */
+  public static function getContractEntity() {
+    return \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');
   }
 
   /**
@@ -43,43 +51,23 @@ class EthereumUserConnectorController extends EthereumController {
    */
   public function verifyUserByHash($hash) {
 
+
     try {
-      //
-      // CONTRACT FUNCTION CALL SIGNATURE
-      //
-      // You may validate signatures by putting the contract solidity code in
-      // http://ethereum.github.io/browser-solidity.
-      //
-      // TODO:
-      // REPLACE HARDCODED SIGNATURE WITH SIGNATURE FROM SMART-CONTRACT MODULE.
-      //
-      // Note: You may generate a function signature usung Ethereum. E.g:
-      // $s = $this->client->getMethodSignature('validateUserByHash(bytes32)');
-      // Using Signature stored in settings.
 
-      $hash_string = new EthS($hash);
-      $hash_val = $this->client->removeHexPrefix($hash_string->hexVal());
+      // @todo: Now actually the SmartContract entity could use the service?! --> So we wouldn't need a param here
 
-      $call = new EthD($this->client->ensureHexPrefix($this->config('ethereum_user_connector.settings')->get('contract_validateUserByHash_call')) . $hash_val);
+      // Callable Smart contract of type: \Ethereum\SmartContract.
+      $contract = $this->getContractEntity()->getCallable();
 
-      $contract_address = new EthD20($this->client->ensureHexPrefix($this->getContractAddress()));
+      // Call contract function.
+      $user_address = $contract->validateUserByHash(new EthS($hash));
 
-      // This would empty the clients debug cache.
-      // $this->debug(TRUE);
-      //
-      $user_address = $this->client->eth_call(new CallTransaction($contract_address, NULL, NULL, NULL, NULL, $call));
-      //
-      // This would set a message debugging all parameters of the eth_call.
-      // $this->debug();
-      //
-      $user_address = $user_address->convertTo('D20');
-
-      if (!$user_address->val() === 0) {
+      if ($user_address->val() === 0) {
         throw new \Exception('No Ethereum address found in login smart contract registry for drupal hash: ' . $hash);
       }
 
       // Check if User Exists
-      $query = Drupal::service('entity.query')
+      $query = \Drupal::service('entity.query')
         ->get('user')
         ->condition('field_ethereum_drupal_hash', $hash)
         ->condition('field_ethereum_address', $user_address->hexVal());
@@ -91,7 +79,7 @@ class EthereumUserConnectorController extends EthereumController {
 
       // Update User's ethereum_account_status field.
       $uid = reset($entity_ids);
-      $user = Drupal::entityTypeManager()->getStorage('user')->load($uid);
+      $user = \Drupal::entityTypeManager()->getStorage('user')->load($uid);
       $user->field_ethereum_account_status->setValue('2');
       if ($user->save() !== SAVED_UPDATED) {
         throw new \Exception('Error updating user Ethereum status for UID: ' . $uid);

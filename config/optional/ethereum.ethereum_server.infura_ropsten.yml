@@ -1,0 +1,6 @@
+id: infura_ropsten
+label: 'Infura Ropsten Test Node'
+url: 'https://ropsten.infura.io/drupal'
+network_id: '3'
+status: true
+description: 'Infura (https://www.infura.io) provides access to Ethereum Nodes, so that you don''t require to host you own.'

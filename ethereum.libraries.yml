@@ -1,0 +1,8 @@
+ethereum-admin-form:
+  version: VERSION
+  js:
+    js/ethereum-admin-form.js: {}
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/jquery.once

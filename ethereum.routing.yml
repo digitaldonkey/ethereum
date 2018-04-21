@@ -17,7 +17,31 @@ ethereum.admin_index:
 ethereum.settings:
   path: '/admin/config/ethereum/network'
   defaults:
-    _form: '\Drupal\ethereum\Form\AdminForm'
+    _form: '\Drupal\ethereum\Form\EthereumSettingsForm'
     _title: 'Configure Ethereum connection'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ethereum_server.add_server_form:
+  path: '/admin/config/ethereum/network/server/add'
+  defaults:
+    _entity_form: 'ethereum_server.add'
+    _title: 'Add Ethereum Server Node'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ethereum_server.edit_form:
+  path: '/admin/config/ethereum/network/server/{ethereum_server}/edit'
+  defaults:
+    _entity_form: 'ethereum_server.edit'
+    _title: 'Edit Ethereum Server Node'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.ethereum_server.delete_form:
+  path: '/admin/config/ethereum/network/server/{ethereum_server}/delete'
+  defaults:
+    _entity_form: 'ethereum_server.delete'
+    _title: 'Delete Ethereum Server Node'
   requirements:
     _permission: 'administer site configuration'

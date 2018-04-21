@@ -1,0 +1,5 @@
+entity.ethereum_server.add_server_form:
+  route_name: 'entity.ethereum_server.add_server_form'
+  title: 'Add Ethereum node'
+  appears_on:
+    - ethereum.settings

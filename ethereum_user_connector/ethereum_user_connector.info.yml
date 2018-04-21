@@ -3,11 +3,11 @@ type: module
 description: Drupal user connector enables Drupal users to verify an Ethereum account address using a smart contract.
 core: 8.x
 package: ethereum
-version: 8.x-1-alpha1
 dependencies:
   - ethereum
-  - ethereum_address_field
   - rest
+  - ethereum_smartcontract
+  - ethereum_txsigner
 configure: ethereum.settings.user_connector
 test_dependencies:
  - restui
