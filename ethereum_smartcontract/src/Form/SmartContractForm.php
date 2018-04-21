@@ -66,7 +66,7 @@ class SmartContractForm extends EntityForm {
     $form['contract_src'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('contract_src'),
-      '#default_value' => $contract->contract_src,
+      '#default_value' => $contract->getSrc(),
       '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
       '#rows' => 20,
@@ -107,7 +107,7 @@ class SmartContractForm extends EntityForm {
         '#markup' => $net['label'] . '<br/>'.
         '<small>' . $net['description'] . '</small>',
       );
-      $val = isset($contract->networks[$net['id']]) ? $contract->networks[$net['id']] : '';
+      $val = isset($contract->getNetworks()[$net['id']]) ? $contract->getNetworks()[$net['id']] : '';
       $form['networks'][$net['id']]['contract'] = array(
         '#type' => 'textfield',
         '#title' => $this->t('Name'),

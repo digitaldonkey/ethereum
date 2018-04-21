@@ -4,7 +4,9 @@ namespace Drupal\ethereum\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\EthereumServerInterface;
+use Ethereum\Ethereum;
 
 /**
  * Defines the EthereumServer entity.
@@ -67,7 +69,7 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   /**
    * The server address (including the port).
    *
-   * @var string|uri
+   * @var string
    */
   protected $url;
 
@@ -105,13 +107,17 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    * {@inheritdoc}
    */
   public function validateConnection() {
-    $return = ['error' => FALSE, 'message' => ''];
+    $return = [
+      'error' => FALSE,
+      'message' => 'Server ' . $this->id . ' (' . $this->url .') is up and on listening on Ethereum network id ' . $this->network_id
+    ];
     try {
-      /** @var \Ethereum\Ethereum $client */
-      $client = \Drupal::service('ethereum.client_factory')->get($this->getUrl());
+      /** @var \Ethereum\Ethereum $web3 */
+       $web3 = new Ethereum($this->url);
+      // @todo How to load the \Drupal::service('ethereum.client') with a updated url?
 
       // Try to connect.
-      $networkVersion = $client->net_version()->val();
+      $networkVersion = $web3->net_version()->val();
       if (!is_string($networkVersion)) {
         throw new \Exception('eth_protocolVersion return is not valid.');
       }
@@ -129,8 +135,53 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
         ]),
       ];
     }
-
     return $return;
   }
 
+  /**
+   * Server info as render Array Table.
+   *
+   * @return array
+   *    Table render array.
+   */
+  public function getServerInfoAsTable() {
+
+    $networks = EthereumController::getNetworks();
+    $currentNet = $networks[$this->network_id];
+
+    $formElement = array(
+      '#type' => 'table',
+    );
+    $formElement['info'] = [
+      'label' => array('#markup' => 'Node info'),
+      'content' => [
+        '#markup' => $this->label . '<br />' . '<small>' . $this->description. '</small>',
+      ],
+    ];
+    $formElement['config_id'] = [
+      'label' => array('#markup' => 'Config name'),
+      'content' => [
+        '#markup' =>  $this->id,
+      ],
+    ];
+    $formElement['url'] = [
+      'label' => array('#markup' => 'RPC Url'),
+      'content' => ['#markup' => $this->url],
+    ];
+    $formElement['network'] = [
+      'label' => array('#markup' => 'Network info'),
+      'content' => [
+        '#markup' =>
+           '<strong>' .  $currentNet['label'] . ' (Ethereum Network Id: ' .  $currentNet['id'] . ')</strong><br />'
+           . $currentNet['description'] . '<br />'
+      ],
+    ];
+    $formElement['explorer'] = [
+      'label' => array('#markup' => 'Blockchain Explorer'),
+      'content' => [
+        '#markup' => $currentNet['link_to_address']
+      ]
+    ];
+    return $formElement;
+  }
 }
