@@ -72,8 +72,8 @@ function ethereum_signup_form_alter(&$form, FormStateInterface $form_state, $for
 
   // Remove Passwords for Ethereum Signup Accounts.
   if ($form_id === 'user_form') {
-    $user = $form_state->getStorage()['user'];
-    if (EthereumSignupController::isEthereumSignupUser($user)) {
+    $user = $form_state->getStorage();
+    if (isset($user['user']) && EthereumSignupController::isEthereumSignupUser($user['user'])) {
       unset($form['account']['pass']);
     }
   }

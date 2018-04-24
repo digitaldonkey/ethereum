@@ -8,7 +8,6 @@ use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Psr\Log\LoggerInterface;
-use Drupal\Ethereum;
 use Drupal\Component\Utility\Xss;
 use Drupal\ethereum_signup\Controller\EthereumSignupController;
 use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
@@ -97,9 +96,10 @@ class Auth extends ResourceBase {
    *   "address": "0x4097752d39b5fb5c9b2490d53fb3d50f355dad7a",
    *  }
    *
-   *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    *   Throws exception expected.
+   *
+   * @throws \Exception
    *
    * @return ResourceResponse
    *   With validated data.
@@ -126,7 +126,6 @@ class Auth extends ResourceBase {
       $ethSign = new EthereumSignupController();
       $response = $ethSign->verifyLogin($address, $signature);
     }
-
 
     if ($response) {
       $return = new ResourceResponse($response);

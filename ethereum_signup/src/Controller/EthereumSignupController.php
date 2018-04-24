@@ -9,13 +9,13 @@ namespace Drupal\ethereum_signup\Controller;
 
 use Drupal;
 use Drupal\ethereum\Controller\EthereumController;
-use Ethereum\EthD;
-use Ethereum\EthD32;
+use Ethereum\DataType\EthD;
 use Drupal\externalauth\Authmap;
 use Drupal\externalauth\ExternalAuth;
 use Drupal\Core\Database\Database;
 use Drupal\user\RoleInterface;
 use Drupal\user\Entity\User;
+use Ethereum\DataType\EthD20;
 
 /**
  * Controller routines for Ethereum routes.
@@ -35,8 +35,8 @@ class EthereumSignupController extends EthereumController {
   /**
    * @inheritdoc
    */
-  public function __construct($host = FALSE) {
-    parent::__construct($host);
+  public function __construct($web3 = null) {
+    parent::__construct($web3);
     global $base_url;
 
     $cnf = $this->config('ethereum_signup.settings');
@@ -60,15 +60,23 @@ class EthereumSignupController extends EthereumController {
     $challenge_text = str_replace('#date', $date, $this->welcome_text);
     $store = Drupal::service('user.shared_tempstore')->get(self::PROVIDER);
     $store->set($address, $challenge_text);
-
-    $challenge_text = $store->get($address);
-
     return array(
       'success' => TRUE,
       'challenge' => $challenge_text,
     );
   }
 
+  /**
+   * @param string $address
+   *    Ethereum Address Hex format.
+   * @param $signature
+   *    Ethereum personal_sign signature
+   *    See: https://web3js.readthedocs.io/en/1.0/web3-eth-personal.html#sign
+   *
+   * @throws \Exception
+   *
+   * @return array
+   */
   public function verifyLogin($address, $signature) {
     $error = NULL;
     $store = Drupal::service('user.shared_tempstore')->get(self::PROVIDER);
@@ -76,7 +84,7 @@ class EthereumSignupController extends EthereumController {
     $challenge_text = $store->get($address);
     $store->delete($address);
 
-    $restored_address = $this->restoreAddress($challenge_text, $signature);
+    $restored_address = $this->web3->personal_EcRecover($this->terms_text, new EthD($signature));
 
     // Authmap load / Account exists?
     if ($restored_address === $address) {
@@ -113,21 +121,6 @@ class EthereumSignupController extends EthereumController {
     $authmap = new Authmap(Database::getConnection());
     return (bool) $authmap->get($user->id(), self::PROVIDER);
   }
-  /**
-   * Restore Ethereum address from text and Signature.
-   *
-   * @param string $text
-   *   Text signed with web3.personalSign() by user (Utf-8)
-   * @param string $signature
-   *   Signature (Hex)
-   *
-   * @return string Ethereum address (Hex with 0x-prefix, 42 letters).
-   */
-  public function restoreAddress($text, $signature) {
-    $message_hash = $this->client->phpKeccak256($this->client->personalSignAddHeader($text));
-    $sig = $this->client->parseSignature(new EthD($signature));
-    return $this->client->phpEcRecover(new EthD32($message_hash), $sig['v'], $sig['r'], $sig['s']);
-  }
 
   /**
    * Verify User by Drupal hash.
@@ -154,14 +147,11 @@ class EthereumSignupController extends EthereumController {
       'success' => FALSE,
       'account_exists' => NULL,
       'error' => NULL,
-      // TODO The last two are actually not required. Consider removing to KISS.
-      'uid' => NULL,
       'ethereum_address' => $address,
     );
 
     // Verify signature.
-    $restored_addr = $this->restoreAddress($this->terms_text, $signature);
-    $signature_verified = ($address === $restored_addr);
+    $signature_verified = $this->web3->personalVerifyEcRecover($this->terms_text, new EthD($signature), new EthD20($address));;
 
     if(!$signature_verified) {
       $resp->error = $this->t('Signature verification failed for ' . $address);
@@ -221,7 +211,6 @@ class EthereumSignupController extends EthereumController {
         }
       }
       if ((!$require_email || ($require_email && $email)) && $email !== 'email_in_use') {
-
 
         $new_user = $auth->register($address, self::PROVIDER, $account_data, $authmap_data);
 

@@ -6596,7 +6596,7 @@ function hasOwnProperty(obj, prop) {
     };
 
     postRequest({
-      url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
+      url: settings.ethereum_signup.api + '?_format=json&XDEBUG_SESSION_START=PHPSTORM',
       data: JSON.stringify(data),
       success: function (data, textStatus) {
         liveLog('Got challenge asking for signature...');
@@ -6689,7 +6689,7 @@ function hasOwnProperty(obj, prop) {
     };
 
     postRequest({
-      url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
+      url: settings.ethereum_signup.api + '?_format=json&XDEBUG_SESSION_START=PHPSTORM',
       data: JSON.stringify(data),
       success: function (data, textStatus) {
         finalizeLogin(data, textStatus, web3, wrapper, settings);
@@ -6779,7 +6779,7 @@ function hasOwnProperty(obj, prop) {
     }
 
     postRequest({
-      url: settings.ethereum_signup.api + '?_format=hal_json&XDEBUG_SESSION_START=PHPSTORM',
+      url: settings.ethereum_signup.api + '?_format=json&XDEBUG_SESSION_START=PHPSTORM',
       data: JSON.stringify(data),
       success: function (data, textStatus) {
         verifySignupSuccess(web3, wrapper, settings, data, textStatus);

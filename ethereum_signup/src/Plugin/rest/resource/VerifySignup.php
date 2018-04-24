@@ -34,7 +34,6 @@ class VerifySignup extends ResourceBase {
    *
    * @var \Drupal\Core\Session\AccountProxyInterface
    */
-  protected $currentUser;
   public $require_mail;
 
 
@@ -62,10 +61,6 @@ class VerifySignup extends ResourceBase {
     LoggerInterface $logger,
     AccountProxyInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-
-    // TODO Maybe not required?
-    $this->currentUser = $current_user;
-
     $cnf = Drupal::config('ethereum_signup.settings');
     $this->require_mail = ($cnf->get('require_mail') || $cnf->get('require_mail_confirm'));
   }
@@ -74,7 +69,6 @@ class VerifySignup extends ResourceBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-
     return new static(
       $configuration,
       $plugin_id,
@@ -86,6 +80,7 @@ class VerifySignup extends ResourceBase {
   }
 
   /**
+
    * Responds to GET requests.
    *
    * Returns a list of bundles for specified entity.
@@ -103,8 +98,7 @@ class VerifySignup extends ResourceBase {
    * This signature is valid if the settings register_terms_text is:
    * 'I want to create a Account on this website. By I signing this text (using Ethereum personal_sign) I agree to the following conditions.'
    *
-   * @throws \Symfony\Component\HttpKernel\Exception\HttpException
-   *   Throws exception expected.
+   * @throws \Exception
    *
    * @return ResourceResponse
    *   With validated data.
@@ -115,17 +109,13 @@ class VerifySignup extends ResourceBase {
     $data = $this->validateSignupParams($data);
 
     if (is_array($data)) {
-
-      // 0x627c13c55329e7eb3b377930e00b1186bf3115a9b4a45218eb8530caefbf125502edfaeb33a4c5f848b55ad5438c6e50160397bd47811f70df2173e536b4dd2c1b
-      // 0x4097752D39b5fB5C9b2490d53fB3d50f355DaD7A
-
       $ethSign = new EthereumSignupController();
       $response = $ethSign->verifyRegistration($data['address'], $data['signature'], $data['email'], $this->require_mail);
 
       if (isset($response['success']) && $response['success']) {
         $message = $this->t('Successfully validated account ' . $response['ethereum_address'] . ' with hash signature ' . $data['signature']);
         Drupal::logger('ethereum_signup')->notice($message);
-        // TODO Maybe log failing attempts with IP.
+        // @todo Maybe log failing attempts with IP.
       }
       $return = new ResourceResponse($response);
       $return->addCacheableDependency(FALSE);
@@ -133,7 +123,7 @@ class VerifySignup extends ResourceBase {
     }
     else {
       // If tha params are wrong, somebody may try to cheat.
-      // TODO Maybe log failing attempts with IP. Here: Wrong params.
+      // @todo Maybe log failing attempts with IP. Here: Wrong params.
       // throw new AccessDeniedHttpException();
       throw new InvalidArgumentException();
     }
@@ -173,8 +163,6 @@ class VerifySignup extends ResourceBase {
       $signature = Xss::filter($data['signature']);
       if (substr($signature, 0, 2) === '0x' &&
         strlen($signature) >= 132 &&
-        // TODO What is the length of a signature?
-        // strlen($signature) <= 132 &&
         !ctype_xdigit(substr($signature, 2))
       ) {
         throw new \Exception('Invalid param signature: ' . $signature);
