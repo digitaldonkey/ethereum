@@ -84,7 +84,7 @@ class EthereumSignupController extends EthereumController {
     $challenge_text = $store->get($address);
     $store->delete($address);
 
-    $restored_address = $this->web3->personal_EcRecover($this->terms_text, new EthD($signature));
+    $restored_address = $this->web3->personalEcRecover($challenge_text, new EthD($signature));
 
     // Authmap load / Account exists?
     if ($restored_address === $address) {
