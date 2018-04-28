@@ -32,11 +32,16 @@ class TxSignerBlock extends BlockBase {
       '#attached' => [
         'library' => [
           'ethereum_txsigner/txsigners',
+          // Required ot ethereum_smartcontract_library_info_build will not fire.
+          'ethereum_smartcontract/contracts',
         ],
         'drupalSettings' => [
-          'ethereumNetwork' => [
-            'networkId' => $activeServer->getNetworkId(),
-            'label' => $activeServer->label()
+          'ethereum' => [
+            'network' => [
+              'id' => $activeServer->getNetworkId(),
+              'name' => $activeServer->label(),
+            ],
+            'apps' => [],
           ]
         ]
       ],

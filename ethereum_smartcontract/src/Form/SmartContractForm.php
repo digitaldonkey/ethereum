@@ -63,6 +63,13 @@ class SmartContractForm extends EntityForm {
       '#disabled' => !$contract->isNew(),
     );
 
+    $form['status'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable this contract'),
+      '#description' => $this->t('If a contract is enabled it\'s ABI  will be loaded as javascript setting in <code>drupalSettings.ethereum.contracts["id" => {...}]</code>'),
+      '#default_value' => $this->entity->status(),
+    );
+
     $form['contract_src'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('contract_src'),

@@ -32,6 +32,7 @@ use Drupal\Core\Link;
 *     "contract_src" = "contract_src",
 *     "contract_compiled_json" = "contract_compiled_json",
 *     "networks" = "networks",
+*     "status" = "status",
 *   },
 *   links = {
 *     "edit-form" = "/admin/config/ethereum/smartcontracts/{smartcontract}",
@@ -111,6 +112,17 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
    */
   public function getAbi() {
     return json_decode(json_decode($this->contract_compiled_json)->interface);
+  }
+
+  /**
+   * @return object
+   * @throws \Exception
+   */
+  public function getJsObject () {
+    return (object) array (
+      'address' => $this->getCurrentNetworkAddress(),
+      'jsonInterface' => $this->getAbi(),
+    );
   }
 
   /**
@@ -207,5 +219,6 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
     }
     return $formElement;
   }
+
 }
 
