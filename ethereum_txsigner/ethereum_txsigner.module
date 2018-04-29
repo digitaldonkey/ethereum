@@ -35,7 +35,10 @@ function ethereum_txsigner_library_info_build() {
   $libraries = array();
 
   $libraries['txsigners'] = [
-    'version' => 'VERSION',
+    'version' => '1.x',
+    'dependencies' => [
+      0 => 'core/drupalSettings'
+    ],
     'type' => 'file',
     'js' => [],
     'css' => []
@@ -54,19 +57,5 @@ function ethereum_txsigner_library_info_build() {
       $libraries['txsigners']['css']['theme']['js/' . $txsigner->cssFilePath()] = [];
     }
   }
-
-//  $activeServerId = \Drupal::config('ethereum.settings')->get('current_server');
-//  $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
-//
-//  $libraries['drupalSettings']['ethereum_network']['cuddlySlider']['foo'] = 'bar';
-//  $libraries['ethereum_network'] = [
-//    'type' => 'setting',
-//    'data' => array('ethereum_network' => [
-//      'network_id' => $activeServer->get('network_id'),
-//      'label' => $activeServer->label()
-//    ]),
-//  ];
-
-
   return $libraries;
 }

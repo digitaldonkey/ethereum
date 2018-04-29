@@ -47,15 +47,22 @@ window.addEventListener('load', () => {
    *
    *  @param settings App.settings
    *    {
-  *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
-  *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
-  *    }
+   *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
+   *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
+   *    }
    */
-  const web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum.network)
+  window.web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum.network)
+})
 
-  web3Runner.runWhenReady(myAnyNetworkApp)
-  web3Runner.runWhenReady(myAccountOnAnyNetwork)
-  web3Runner.runWhenReady(myAccountlessApp)
-  web3Runner.runWhenReady(myAccountApp)
+window.addEventListener('web3Ready', () => {
+  window.console.log('web3Ready')
 
+  window.console.log(window.drupalSettings.ethereum.apps, 'window.drupalSettings.ethereum.apps')
+  window.drupalSettings.ethereum.apps.forEach((app) => {
+    window.web3Runner.runWhenReady(app)
+  })
+  // window.web3Runner.runWhenReady(myAnyNetworkApp)
+  // window.web3Runner.runWhenReady(myAccountOnAnyNetwork)
+  // window.web3Runner.runWhenReady(myAccountlessApp)
+  // window.web3Runner.runWhenReady(myAccountApp)
 })

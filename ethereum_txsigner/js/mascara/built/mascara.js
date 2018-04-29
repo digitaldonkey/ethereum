@@ -51421,16 +51421,24 @@ window.addEventListener('load', () => {
    *
    *  @param settings App.settings
    *    {
-  *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
-  *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
-  *    }
+   *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
+   *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
+   *    }
    */
-  const web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum.network);
+  window.web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum.network);
+});
 
-  web3Runner.runWhenReady(myAnyNetworkApp);
-  web3Runner.runWhenReady(myAccountOnAnyNetwork);
-  web3Runner.runWhenReady(myAccountlessApp);
-  web3Runner.runWhenReady(myAccountApp);
+window.addEventListener('web3Ready', () => {
+  window.console.log('web3Ready');
+
+  window.console.log(window.drupalSettings.ethereum.apps, 'window.drupalSettings.ethereum.apps');
+  window.drupalSettings.ethereum.apps.forEach(app => {
+    window.web3Runner.runWhenReady(app);
+  });
+  // window.web3Runner.runWhenReady(myAnyNetworkApp)
+  // window.web3Runner.runWhenReady(myAccountOnAnyNetwork)
+  // window.web3Runner.runWhenReady(myAccountlessApp)
+  // window.web3Runner.runWhenReady(myAccountApp)
 });
 
 },{"./mascara":283}],283:[function(require,module,exports){
@@ -51440,7 +51448,6 @@ const Web3StatusIndicator = require('../web3status');
 
 // Holds the popup window reference.
 let mascaraPopup = null;
-let web3Runner = null;
 
 // Url for Mascara wallet.
 const MASCARA_URL = 'https://wallet.metamask.io';
@@ -51466,8 +51473,8 @@ module.exports = class MascaraWrapper {
   constructor(contextId, expectedNetwork) {
 
     // Limit to one instance.
-    if (web3Runner) {
-      return web3Runner;
+    if (window.web3Runner) {
+      return window.web3Runner;
     }
 
     this.expectedNetwork = expectedNetwork;
@@ -51478,7 +51485,7 @@ module.exports = class MascaraWrapper {
     this.debugMode = false;
     this.wrapper = this.getWrapper(contextId);
     this._web3 = null;
-    this._account = null;
+    this._account = 'undefined';
     this.provider = 'unknown';
     this.status = new Web3StatusIndicator(this.wrapper);
 
@@ -51499,7 +51506,8 @@ module.exports = class MascaraWrapper {
       this.logToDom('Your browser does not support web3.', true);
       this.logIt('Note that firefox does not support ServiceWorkers in private browsing/incognito mode.');
     }
-    web3Runner = this;
+    window.web3Runner = this;
+    window.dispatchEvent(new Event('web3Ready'));
   }
 
   /**
@@ -51530,7 +51538,6 @@ module.exports = class MascaraWrapper {
     if (this.account !== accounts[0]) {
       this.account = accounts[0];
       this.updateStatus();
-      this.logToDom('Account has changed. Reloading...');
     }
     await this.waitFor(POLL_INTERVAL);
     this.checkAccount();
@@ -51573,7 +51580,6 @@ module.exports = class MascaraWrapper {
       this.logToDom('Network ID is ok.');
     } else {
       this.networkState = 'error';
-      this.logToDom(`Network ID is invalid. Expected ${this.expectedNetwork.name} (id: ${this.expectedNetwork.id})`, true);
       this.logToDom(`Network ID is invalid. Expected ${this.expectedNetwork.name} (id: ${this.expectedNetwork.id})`, true);
     }
   }
@@ -51719,7 +51725,6 @@ module.exports = class MascaraWrapper {
         if (config.requireAccount && !this.getAccountStatus(config)) {
           return;
         }
-        this.logToDom(`Dapp ${index} init success.`);
         config.run(this.web3, this.account);
       }
     });
