@@ -4,6 +4,7 @@ const Web3StatusIndicator = require('../web3status')
 
 // Holds the popup window reference.
 let mascaraPopup = null
+let web3Runner = null
 
 // Url for Mascara wallet.
 const MASCARA_URL = 'https://wallet.metamask.io'
@@ -15,22 +16,33 @@ const MASCARA_URL = 'https://wallet.metamask.io'
  */
 module.exports = class MascaraWrapper {
 
-  // EXAMPLE init config see mascara/src/index.js
-
   /**
+   * constructor(contextId, expectedNetwork)
    *
    * @param contextId
-   *   Dom Id for the Web3 user feedback.
-   * @param config
-   *   Config. See above.
+   *    Dom Id, to w attach the wrapperto.
+   *
+   * @param expectedNetwork
+   *    Ethereum Network Id
+   *
+   * @returns {*}
    */
-  constructor(contextId, config) {
-    this.config = config
-    this.debugMode = true
+  constructor(contextId, expectedNetwork) {
+
+    // Limit to one instance.
+    if (web3Runner) {
+      return web3Runner
+    }
+
+    this.expectedNetwork = expectedNetwork
+    this.networkState = 'unknown'
+    this._clientNetworkId = null
+
+    this.apps = []
+    this.debugMode = false
     this.wrapper = this.getWrapper(contextId)
     this._web3 = null
     this._account = null
-    this._network = 'unknown'
     this.provider = 'unknown'
     this.status = new Web3StatusIndicator(this.wrapper)
 
@@ -53,25 +65,16 @@ module.exports = class MascaraWrapper {
       this.logToDom('Your browser does not support web3.', true)
       this.logIt('Note that firefox does not support ServiceWorkers in private browsing/incognito mode.')
     }
-
+    web3Runner = this
   }
 
- /**
-  * Main wrapper for Mascara
-  *
-  * Create inside <div id="mascaraStatus"> inside <div id="contextId">.
-  *
-  * @param contextId
-  * @returns {Node}
-  */
-  getWrapper(contextId) {
-    const wrapper = document.getElementById('mascaraStatus')
-    if (!wrapper) {
-      const div = document.createElement('span')
-      div.setAttribute('id', 'mascara-status')
-      return document.getElementById(contextId).appendChild(div)
-    }
-    return wrapper
+  /**
+   * @param config
+   * @returns {Promise<void>}
+   */
+  runWhenReady(config) {
+    this.apps.push(config)
+    this.tryInitDapps()
   }
 
   /**
@@ -92,12 +95,18 @@ module.exports = class MascaraWrapper {
 
     if (this.account !== accounts[0]) {
       this.account = accounts[0]
+      this.updateStatus()
       this.logToDom('Account has changed. Reloading...')
     }
     await this.waitFor(POLL_INTERVAL)
     this.checkAccount()
   }
 
+  /**
+   *
+   * @param ms
+   * @returns {*}
+   */
   waitFor(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
   }
@@ -106,26 +115,51 @@ module.exports = class MascaraWrapper {
    *
    * @returns void
    */
-  async isExpectedNetwork() {
-
-    // Don't validate if expected network is: any.
-    if (this.config.network.id === '*') return
+  async updateClientNetworkId() {
 
     try {
       const netId = await this.web3.eth.net.getId()
-      if (netId.toString() === this.config.network.id) {
-        this.network = 'ok'
-        this.logToDom('Network ID is ok.')
-      }
-      else {
-        this.network = 'error'
-        this.logToDom(`Network ID is invalid. Expected ${this.config.network.label} (id: ${this.config.network.id})`, true)
-      }
+      this.clientNetworkId = netId.toString()
     }
     catch (err) {
       this.logToDom('There was an error getting networks.', true)
       this.logIt(err)
     }
+  }
+
+  /**
+   *
+   * @returns void
+   */
+  isExpectedNetwork() {
+    // Don't validate if expected network is: any.
+    if (this.expectedNetwork.id === '*') {
+      this.networkState = 'unknown'
+    }
+    else if (this.expectedNetwork.id === this.clientNetworkId) {
+      this.networkState = 'ok'
+      this.logToDom('Network ID is ok.')
+    }
+    else {
+      this.networkState = 'error'
+      this.logToDom(`Network ID is invalid. Expected ${this.expectedNetwork.name} (id: ${this.expectedNetwork.id})`, true)
+      this.logToDom(`Network ID is invalid. Expected ${this.expectedNetwork.name} (id: ${this.expectedNetwork.id})`, true)
+    }
+  }
+
+  /**
+   *
+   * @param config
+   * @returns {boolean}
+   */
+  verifyAppNetwork(config) {
+
+    if (this.clientNetworkId) {
+      const networkOkAndConfigMatch = (this.clientNetworkId === config.networkId)
+      const networkOkAndConfigAny = (this.clientNetworkId && config.networkId === '*')
+      return networkOkAndConfigMatch || networkOkAndConfigAny
+    }
+    return false
   }
 
   /**
@@ -218,7 +252,7 @@ module.exports = class MascaraWrapper {
   /**
    * Update ui Icon.
   */
-  updateStatus() {
+  async updateStatus() {
     if (this.provider !== 'mascara') {
       // Detect Metamask
       if (this.web3.currentProvider.isMetaMask === true) {
@@ -232,11 +266,46 @@ module.exports = class MascaraWrapper {
     }
 
     this.status.update({
-      isLocked: !(this._account && this._account.length),
+      isLocked: !(this.account && this.account.length),
       provider: this.provider,
-      network: this.network,
+      network: this.networkState,
     })
-    this.tryInitDapp()
+
+    if (this.web3) {
+      this.tryInitDapps()
+    }
+  }
+
+
+  /**
+   * tryInitDapps()
+   */
+  tryInitDapps() {
+    this.apps.forEach((config, index) => {
+
+      if (!this.web3) return
+
+      // Network required? Right network in browser available?
+      if (this.verifyAppNetwork(config)) {
+
+        // Account unlock required?
+        if (config.requireAccount && !this.getAccountStatus(config)) {
+          return
+        }
+        this.logToDom(`Dapp ${index} init success.`)
+        config.run(this.web3, this.account)
+      }
+    })
+  }
+
+  /**
+   *
+   * @param config
+   * @returns {boolean|*}
+   */
+  getAccountStatus(config) {
+    return !config.requireAccount ||
+        (config.requireAccount && this.account && this.account.length === 42)
   }
 
   /**
@@ -258,22 +327,12 @@ module.exports = class MascaraWrapper {
     this.onPropertyChanged('account', val)
   }
 
-  getAccountStatus() {
-    return !this.config.requireUnlocked ||
-        (this.config.requireUnlocked && this.account && this.account.length === 42)
+  get clientNetworkId() {
+    return this._clientNetworkId
   }
-
-  get network() {
-    return this._network
-  }
-  set network(val) {
-    this._network = val
-    this.onPropertyChanged('network', val)
-  }
-
-  getNetworkStatus() {
-    return this.network === 'ok' ||
-          (this.network === 'unknown' && this.config.network.id === '*')
+  set clientNetworkId(val) {
+    this._clientNetworkId = val
+    this.onPropertyChanged('clientNetworkId', val)
   }
 
   /**
@@ -291,33 +350,16 @@ module.exports = class MascaraWrapper {
    */
   web3Changed() {
     this.updateStatus()
-    this.isExpectedNetwork()
+    this.updateClientNetworkId()
     this.isAccountUnlocked()
   }
 
   /**
-   * web3Changed()
+   * clientNetworkIdChanged()
    */
-  networkChanged() {
+  clientNetworkIdChanged() {
+    this.isExpectedNetwork()
     this.updateStatus()
-  }
-
-  /**
-   * tryInitDapp()
-   */
-  tryInitDapp() {
-    this.logIt('Try initialize dapp.')
-    if (this.getNetworkStatus() && this.getAccountStatus()) {
-
-      // @todo Mascara TX trigger is bound to window object.
-      // In node_modules/metamascara/mascara.js the popup trigger is bound to window object
-      // window.addEventListener('click', maybeTriggerPopup)
-      // For now we just add an empty button to visualize that we can now trigger the TX call.
-      // It also only works once. So if you didn't sign on right away,
-      // you need to reload the page :?
-      this.logToDom('Dapp init success.')
-      this.config.initApp(this.web3, this.account)
-    }
   }
 
   /**
@@ -352,6 +394,30 @@ module.exports = class MascaraWrapper {
     }
   }
 
+  /**
+   * Main wrapper for Mascara
+   *
+   * Create inside <div id="mascaraStatus"> inside <div id="contextId">.
+   *
+   * @param contextId
+   * @returns {Node}
+   */
+  getWrapper(contextId) {
+    const wrapper = document.getElementById('mascaraStatus')
+    if (!wrapper) {
+      const div = document.createElement('span')
+      div.setAttribute('id', 'mascara-status')
+      return document.getElementById(contextId).appendChild(div)
+    }
+    return wrapper
+  }
+
+  /**
+   * logIt() Debug wrapper.
+   *
+   * @param a
+   * @param b
+   */
   logIt(a, b = null) {
     if (this.debugMode && b) {
       window.console.log(a, b)
