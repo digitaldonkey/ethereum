@@ -36,8 +36,6 @@ const myAccountApp = {
   },
 }
 
-
-
 window.addEventListener('load', () => {
   /**
    *  Initialize Web3
