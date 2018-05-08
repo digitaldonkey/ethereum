@@ -15,7 +15,7 @@ use Drupal\Core\Link;
 *
 * @ConfigEntityType(
 *   id = "smartcontract",
-*   label = @Translation("Smart Contract"),
+*   label = @Translation("Ethereum Smart Contract"),
 *   handlers = {
 *     "list_builder" = "Drupal\ethereum_smartcontract\Controller\SmartContractListBuilder",
 *     "form" = {
@@ -207,7 +207,7 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
         '#markup' => $net['contract_address'],
       );
       // Provide link to contract.
-      if (isset($net['link_to_address'])) {
+      if (isset($net['link_to_address']) && $net['link_to_address']) {
         $addr = str_replace('@address', $net['contract_address'] ,$net['link_to_address']);
         $url = Url::fromUri($addr);
         $linkText = substr($addr, 0, 47) . '...';
