@@ -29,6 +29,13 @@ class TxSignerBlock extends BlockBase {
     $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
 
     return [
+      '#type' => 'markup',
+      '#markup' => '<div id="web3status"></div>',
+      '#cache' => [
+        'tags' => [
+          'config:ethereum.settings',
+        ],
+      ],
       '#attached' => [
         'library' => [
           'ethereum_txsigner/txsigners',
@@ -44,9 +51,7 @@ class TxSignerBlock extends BlockBase {
             'apps' => [],
           ]
         ]
-      ],
-      '#type' => 'markup',
-      '#markup' => '<div id="web3status"></div>',
+      ]
     ];
   }
 }

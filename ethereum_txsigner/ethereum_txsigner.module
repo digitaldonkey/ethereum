@@ -10,6 +10,11 @@ use Drupal\ethereum_txsigner\Entity as TxSignerEntity;
 
 /**
  * Implements hook_help().
+ *
+ * @param $route_name
+ * @param \Drupal\Core\Routing\RouteMatchInterface $route_match
+ *
+ * @return string
  */
 function ethereum_txsigner_help($route_name, RouteMatchInterface $route_match) {
   switch ($route_name) {

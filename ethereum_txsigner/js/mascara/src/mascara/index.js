@@ -70,7 +70,6 @@ module.exports = class MascaraWrapper {
 
   /**
    * @param config
-   * @returns {Promise<void>}
    */
   runWhenReady(config) {
     this.apps.push(config)
@@ -93,7 +92,7 @@ module.exports = class MascaraWrapper {
 
     const accounts = await this.web3.eth.getAccounts()
 
-    if (this.account !== accounts[0]) {
+    if (accounts && this.account !== accounts[0]) {
       this.account = accounts[0]
       this.updateStatus()
     }
