@@ -54,6 +54,7 @@ function ethereum_field_formatter_info_alter(array &$info) {
 function ethereum_js_settings_alter(&$settings, AttachedAssetsInterface $assets) {
   // Provide the URL of the current server in drupalSettings to allow JavaScript
   // code to rely on an instantiated Web3 object.
-  $current_server = \Drupal::config('ethereum.settings')->get('current_server');
-  $settings['ethereum']['currentServerHost'] = EthereumServer::load($current_server)->getUrl();
+  $ethereum_settings = \Drupal::config('ethereum.settings');
+  $frontend_server = $ethereum_settings->get('frontend_server') ? $ethereum_settings->get('frontend_server') : $ethereum_settings->get('current_server');
+  $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)->getUrl();
 }

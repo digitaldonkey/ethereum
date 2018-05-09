@@ -50,13 +50,23 @@ class EthereumSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Ethereum Default Network'),
     ];
 
+    $enabled_servers = EthereumController::getServerOptionsArray(TRUE);
     $form['default_network']['current_server'] = [
       '#type' => 'select',
-      '#title' => $this->t("Default Server"),
+      '#title' => $this->t('Backend server'),
       '#required' => TRUE,
-      '#description' => $this->t("Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected."),
-      '#options' => EthereumController::getServerOptionsArray(TRUE),
+      '#description' => $this->t('Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected.'),
+      '#options' => $enabled_servers,
       '#default_value' => $config->get('current_server'),
+    ];
+
+    $form['default_network']['frontend_server'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Frontend server'),
+      '#description' => $this->t('Select a default Ethereum Node to connect Drupal frontend to. Only enabled servers can be selected.'),
+      '#empty_option' => $this->t('Same as backend'),
+      '#options' => $enabled_servers,
+      '#default_value' => $config->get('frontend_server'),
     ];
 
     $form['default_network']['infura_note'] = [
