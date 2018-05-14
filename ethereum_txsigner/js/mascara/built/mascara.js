@@ -20425,21 +20425,27 @@ utils.intFromLE = intFromLE;
 
 },{"bn.js":20,"minimalistic-assert":134,"minimalistic-crypto-utils":135}],87:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@^6.2.3",
+  "_args": [
+    [
+      "elliptic@6.4.0",
+      "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara"
+    ]
+  ],
+  "_from": "elliptic@6.4.0",
   "_id": "elliptic@6.4.0",
   "_inBundle": false,
   "_integrity": "sha1-ysmvh2LIWDYYcAPI3+GT5eLq5d8=",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@^6.2.3",
+    "raw": "elliptic@6.4.0",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": "^6.2.3",
+    "rawSpec": "6.4.0",
     "saveSpec": null,
-    "fetchSpec": "^6.2.3"
+    "fetchSpec": "6.4.0"
   },
   "_requiredBy": [
     "/browserify-sign",
@@ -20449,9 +20455,8 @@ module.exports={
     "/web3-eth-accounts/eth-lib"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
-  "_shasum": "cac9af8762c85836187003c8dfe193e5e2eae5df",
-  "_spec": "elliptic@^6.2.3",
-  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara/node_modules/secp256k1",
+  "_spec": "6.4.0",
+  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -20459,7 +20464,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.4.0",
     "brorand": "^1.0.1",
@@ -20469,7 +20473,6 @@ module.exports={
     "minimalistic-assert": "^1.0.0",
     "minimalistic-crypto-utils": "^1.0.0"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^1.4.3",
@@ -50837,7 +50840,7 @@ module.exports = require('../package.json').version;
 
 },{"../package.json":272}],272:[function(require,module,exports){
 module.exports={
-  "_from": "git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
+  "_from": "websocket@git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
   "_id": "websocket@1.0.24",
   "_inBundle": false,
   "_integrity": "",
@@ -50845,20 +50848,20 @@ module.exports={
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "websocket@git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
+    "raw": "websocket@git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
     "name": "websocket",
     "escapedName": "websocket",
-    "rawSpec": "git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
-    "saveSpec": "git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
+    "rawSpec": "git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
+    "saveSpec": "git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
     "fetchSpec": "git://github.com/frozeman/WebSocket-Node.git",
-    "gitCommittish": "browserifyCompatible"
+    "gitCommittish": "7004c39c42ac98875ab61126e5b4a925430f592c"
   },
   "_requiredBy": [
     "/web3-providers-ws"
   ],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
-  "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#browserifyCompatible",
-  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara/node_modules/web3-providers-ws",
+  "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#7004c39c42ac98875ab61126e5b4a925430f592c",
+  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -51377,75 +51380,68 @@ function extend() {
 }
 
 },{}],282:[function(require,module,exports){
-var _this = this;
-
 const MascaraWrapper = require('./mascara');
 
-const myApp = {
-  network: {
-    id: '42',
-    label: 'Kovan test net.'
-  },
-  requireUnlocked: true,
-  initApp: (web3, account) => {
+// Should run if Web3 is available on ANY network
+const myAnyNetworkApp = {
+  requireAccount: false,
+  networkId: '*',
+  run: (web3, account = null) => {
+    window.console.log('SUCCESS myAnyNetworkApp', [web3, account]);
+  }
 
-    _this.web3 = web3;
-    _this.account = account;
+  // Should run if Web3 is available on EXPECTED networkId
+};const myAccountlessApp = {
+  requireAccount: false,
+  networkId: drupalSettings.ethereum.network.id,
+  run: (web3, account = null) => {
+    window.console.log('SUCCESS myAccountlessApp', [web3, account]);
+  }
 
-    // Run a example TX
-    // Add button to trigger popup if <div id="testAppWrap"> exists.
-    const testAppWrap = document.getElementById('testAppWrap');
+  // Should run if Web3 is available and account is unlocked on ANY network
+};const myAccountOnAnyNetwork = {
+  requireAccount: true,
+  networkId: '*',
+  run: (web3, account = null) => {
+    window.console.log('SUCCESS myAccountApp', [web3, account]);
+  }
 
-    if (testAppWrap && testAppWrap.children.length === 0) {
-      const b = document.createElement('button');
-      b.setAttribute('id', 'app-action');
-      b.innerHTML = 'Start my dapp call';
-      testAppWrap.append(b);
-      b.addEventListener('click', myApp.testCallTx);
-    }
-  },
-  testCallTx: async () => {
-    try {
-      // E.g: Ask the user to send money to himself.
-      const txHash = await _this.web3.eth.sendTransaction({
-        from: _this.account,
-        to: _this.account,
-        data: ''
-      });
-      window.console.log(txHash, 'testCallTx: success');
-    } catch (error) {
-      window.console.log('Catch errors from testCallTx()');
-      if (error.message.includes('User denied transaction')) {
-        // @todo handle User rejected your transaction.
-        window.console.log('User denied transaction', error.message.includes('User denied transaction'));
-      }
-    }
+  // Should run if Web3 is available and account is unlocked on EXPECTED networkId
+};const myAccountApp = {
+  requireAccount: true,
+  networkId: drupalSettings.ethereum.network.id,
+  run: (web3, account = null) => {
+    window.console.log('SUCCESS myAccountApp', [web3, account]);
   }
 };
 
 window.addEventListener('load', () => {
   /**
-  *  Initialize Web3
-  *
-  *  @param string
-  *    Dom Id where the icon, actions and feedback are appended to.
-  *
-  *  @param settings App
-  *    Function to run when web3 is ready (and unlocked if required)
-  *    {
-  *       network: {
-  *          // Ethereum Network Id. use '*' bypass network validation.
-  *         id: '42',
-  *         label: 'Kovan test net.',
-  *       },
-  *       requireUnlocked: true,
-  *       initApp: (web3, account) => {
-  *          // Your code....
-  *          // If requireUnlocked is false account might be null.
-  *       }
-  *     },
-  */
-  new MascaraWrapper('web3status', myApp);
+   *  Initialize Web3
+   *
+   *  @param string
+   *    Dom Id where the icon, actions and feedback are appended to.
+   *
+   *  @param settings App.settings
+   *    {
+   *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
+   *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
+   *    }
+   */
+  window.web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum.network);
+});
+
+window.addEventListener('web3Ready', () => {
+  window.console.log('web3Ready');
+
+  window.console.log(window.drupalSettings.ethereum.apps, 'window.drupalSettings.ethereum.apps');
+  window.drupalSettings.ethereum.apps.forEach(app => {
+    window.web3Runner.runWhenReady(app);
+  });
+  // window.web3Runner.runWhenReady(myAnyNetworkApp)
+  // window.web3Runner.runWhenReady(myAccountOnAnyNetwork)
+  // window.web3Runner.runWhenReady(myAccountlessApp)
+  // window.web3Runner.runWhenReady(myAccountApp)
 });
 
 },{"./mascara":283}],283:[function(require,module,exports){
@@ -51466,22 +51462,33 @@ const MASCARA_URL = 'https://wallet.metamask.io';
  */
 module.exports = class MascaraWrapper {
 
-  // EXAMPLE init config see mascara/src/index.js
-
   /**
+   * constructor(contextId, expectedNetwork)
    *
    * @param contextId
-   *   Dom Id for the Web3 user feedback.
-   * @param config
-   *   Config. See above.
+   *    Dom Id, to w attach the wrapperto.
+   *
+   * @param expectedNetwork
+   *    Ethereum Network Id
+   *
+   * @returns {*}
    */
-  constructor(contextId, config) {
-    this.config = config;
-    this.debugMode = true;
+  constructor(contextId, expectedNetwork) {
+
+    // Limit to one instance.
+    if (window.web3Runner) {
+      return window.web3Runner;
+    }
+
+    this.expectedNetwork = expectedNetwork;
+    this.networkState = 'unknown';
+    this._clientNetworkId = null;
+
+    this.apps = [];
+    this.debugMode = false;
     this.wrapper = this.getWrapper(contextId);
     this._web3 = null;
-    this._account = null;
-    this._network = 'unknown';
+    this._account = 'undefined';
     this.provider = 'unknown';
     this.status = new Web3StatusIndicator(this.wrapper);
 
@@ -51502,24 +51509,16 @@ module.exports = class MascaraWrapper {
       this.logToDom('Your browser does not support web3.', true);
       this.logIt('Note that firefox does not support ServiceWorkers in private browsing/incognito mode.');
     }
+    window.web3Runner = this;
+    window.dispatchEvent(new Event('web3Ready'));
   }
 
   /**
-   * Main wrapper for Mascara
-   *
-   * Create inside <div id="mascaraStatus"> inside <div id="contextId">.
-   *
-   * @param contextId
-   * @returns {Node}
+   * @param config
    */
-  getWrapper(contextId) {
-    const wrapper = document.getElementById('mascaraStatus');
-    if (!wrapper) {
-      const div = document.createElement('span');
-      div.setAttribute('id', 'mascara-status');
-      return document.getElementById(contextId).appendChild(div);
-    }
-    return wrapper;
+  runWhenReady(config) {
+    this.apps.push(config);
+    this.tryInitDapps();
   }
 
   /**
@@ -51538,14 +51537,19 @@ module.exports = class MascaraWrapper {
 
     const accounts = await this.web3.eth.getAccounts();
 
-    if (this.account !== accounts[0]) {
+    if (accounts && this.account !== accounts[0]) {
       this.account = accounts[0];
-      this.logToDom('Account has changed. Reloading...');
+      this.updateStatus();
     }
     await this.waitFor(POLL_INTERVAL);
     this.checkAccount();
   }
 
+  /**
+   *
+   * @param ms
+   * @returns {*}
+   */
   waitFor(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -51554,24 +51558,47 @@ module.exports = class MascaraWrapper {
    *
    * @returns void
    */
-  async isExpectedNetwork() {
-
-    // Don't validate if expected network is: any.
-    if (this.config.network.id === '*') return;
+  async updateClientNetworkId() {
 
     try {
       const netId = await this.web3.eth.net.getId();
-      if (netId.toString() === this.config.network.id) {
-        this.network = 'ok';
-        this.logToDom('Network ID is ok.');
-      } else {
-        this.network = 'error';
-        this.logToDom(`Network ID is invalid. Expected ${this.config.network.label} (id: ${this.config.network.id})`, true);
-      }
+      this.clientNetworkId = netId.toString();
     } catch (err) {
       this.logToDom('There was an error getting networks.', true);
       this.logIt(err);
     }
+  }
+
+  /**
+   *
+   * @returns void
+   */
+  isExpectedNetwork() {
+    // Don't validate if expected network is: any.
+    if (this.expectedNetwork.id === '*') {
+      this.networkState = 'unknown';
+    } else if (this.expectedNetwork.id === this.clientNetworkId) {
+      this.networkState = 'ok';
+      this.logToDom('Network ID is ok.');
+    } else {
+      this.networkState = 'error';
+      this.logToDom(`Network ID is invalid. Expected ${this.expectedNetwork.name} (id: ${this.expectedNetwork.id})`, true);
+    }
+  }
+
+  /**
+   *
+   * @param config
+   * @returns {boolean}
+   */
+  verifyAppNetwork(config) {
+
+    if (this.clientNetworkId) {
+      const networkOkAndConfigMatch = this.clientNetworkId === config.networkId;
+      const networkOkAndConfigAny = this.clientNetworkId && config.networkId === '*';
+      return networkOkAndConfigMatch || networkOkAndConfigAny;
+    }
+    return false;
   }
 
   /**
@@ -51661,7 +51688,7 @@ module.exports = class MascaraWrapper {
   /**
    * Update ui Icon.
   */
-  updateStatus() {
+  async updateStatus() {
     if (this.provider !== 'mascara') {
       // Detect Metamask
       if (this.web3.currentProvider.isMetaMask === true) {
@@ -51675,11 +51702,43 @@ module.exports = class MascaraWrapper {
     }
 
     this.status.update({
-      isLocked: !(this._account && this._account.length),
+      isLocked: !(this.account && this.account.length),
       provider: this.provider,
-      network: this.network
+      network: this.networkState
     });
-    this.tryInitDapp();
+
+    if (this.web3) {
+      this.tryInitDapps();
+    }
+  }
+
+  /**
+   * tryInitDapps()
+   */
+  tryInitDapps() {
+    this.apps.forEach((config, index) => {
+
+      if (!this.web3) return;
+
+      // Network required? Right network in browser available?
+      if (this.verifyAppNetwork(config)) {
+
+        // Account unlock required?
+        if (config.requireAccount && !this.getAccountStatus(config)) {
+          return;
+        }
+        config.run(this.web3, this.account);
+      }
+    });
+  }
+
+  /**
+   *
+   * @param config
+   * @returns {boolean|*}
+   */
+  getAccountStatus(config) {
+    return !config.requireAccount || config.requireAccount && this.account && this.account.length === 42;
   }
 
   /**
@@ -51701,20 +51760,12 @@ module.exports = class MascaraWrapper {
     this.onPropertyChanged('account', val);
   }
 
-  getAccountStatus() {
-    return !this.config.requireUnlocked || this.config.requireUnlocked && this.account && this.account.length === 42;
+  get clientNetworkId() {
+    return this._clientNetworkId;
   }
-
-  get network() {
-    return this._network;
-  }
-  set network(val) {
-    this._network = val;
-    this.onPropertyChanged('network', val);
-  }
-
-  getNetworkStatus() {
-    return this.network === 'ok' || this.network === 'unknown' && this.config.network.id === '*';
+  set clientNetworkId(val) {
+    this._clientNetworkId = val;
+    this.onPropertyChanged('clientNetworkId', val);
   }
 
   /**
@@ -51732,33 +51783,16 @@ module.exports = class MascaraWrapper {
    */
   web3Changed() {
     this.updateStatus();
-    this.isExpectedNetwork();
+    this.updateClientNetworkId();
     this.isAccountUnlocked();
   }
 
   /**
-   * web3Changed()
+   * clientNetworkIdChanged()
    */
-  networkChanged() {
+  clientNetworkIdChanged() {
+    this.isExpectedNetwork();
     this.updateStatus();
-  }
-
-  /**
-   * tryInitDapp()
-   */
-  tryInitDapp() {
-    this.logIt('Try initialize dapp.');
-    if (this.getNetworkStatus() && this.getAccountStatus()) {
-
-      // @todo Mascara TX trigger is bound to window object.
-      // In node_modules/metamascara/mascara.js the popup trigger is bound to window object
-      // window.addEventListener('click', maybeTriggerPopup)
-      // For now we just add an empty button to visualize that we can now trigger the TX call.
-      // It also only works once. So if you didn't sign on right away,
-      // you need to reload the page :?
-      this.logToDom('Dapp init success.');
-      this.config.initApp(this.web3, this.account);
-    }
   }
 
   /**
@@ -51792,6 +51826,30 @@ module.exports = class MascaraWrapper {
     }
   }
 
+  /**
+   * Main wrapper for Mascara
+   *
+   * Create inside <div id="mascaraStatus"> inside <div id="contextId">.
+   *
+   * @param contextId
+   * @returns {Node}
+   */
+  getWrapper(contextId) {
+    const wrapper = document.getElementById('mascaraStatus');
+    if (!wrapper) {
+      const div = document.createElement('span');
+      div.setAttribute('id', 'mascara-status');
+      return document.getElementById(contextId).appendChild(div);
+    }
+    return wrapper;
+  }
+
+  /**
+   * logIt() Debug wrapper.
+   *
+   * @param a
+   * @param b
+   */
   logIt(a, b = null) {
     if (this.debugMode && b) {
       window.console.log(a, b);

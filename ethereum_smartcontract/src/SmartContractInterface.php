@@ -46,4 +46,26 @@ interface SmartContractInterface extends ConfigEntityInterface {
    */
   public function getDeployed();
 
+  /**
+   * Get Contract ABI (jsonInterface).
+   *
+   * The web3.eth.abi functions let you de- and encode parameters to ABI
+   * (Application Binary Interface) for function calls to the EVM (Ethereum
+   * Virtual Machine).
+   * @see https://web3js.readthedocs.io/en/1.0/web3-eth-abi.html#web3-eth-abi
+   *
+   * @return array
+   *    Eth ABI
+   */
+  public function getAbi();
+
+  /**
+   * Provide Web3 new Contract compatible settings Object.
+   *
+   * Should work when used with:
+   *    new web3.eth.Contract(obj.jsonInterface, obj.address][, options])
+   *
+   */
+  public function getJsObject();
+
 }

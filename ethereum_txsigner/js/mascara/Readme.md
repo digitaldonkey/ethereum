@@ -34,29 +34,23 @@ A tiny UI showing the web3 account and network status. It should look like one o
 Short version here. Please check out the [example code](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/src/index.js). 
 
 ```
-const myApp = {
-	network: {
-		 // Ethereum Network Id. use '*' bypass network validation.
-		id: '42',
-		label: 'Kovan test net.',
-	},
-	requireUnlocked: true,
-	initApp: (web3, account) => {
-	 // Your code....
-	 // If requireUnlocked is false account might be null.
-	}
-};
+const myAccountApp = {
+  requireAccount: true,
+  networkId: drupalSettings.ethereum.network.id,
+  run: (web3, account = null) => {
+    window.console.log('SUCCESS myAccountApp', [web3, account])
+  },
+}
 
 window.addEventListener('load', () => {
-	/**
-	*  Initialize MascaraWrapper
-	*
-	*  @param string
-	*    Dom Id where the icon, actions and feedback are appended to.
-	*  @param settings App
-	*/
-	new MascaraWrapper('web3status', myApp)
-}
+  const net = {id: '42', name: 'kovan test net'};
+  window.web3Runner = new MascaraWrapper('web3status', net)
+})
+
+window.addEventListener('web3Ready', () => {
+  window.console.log('web3Ready')
+  window.web3Runner.runWhenReady(myAccountApp)
+})
 ```
 
 ## Development

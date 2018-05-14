@@ -23,13 +23,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginInterface {
 
   /**
-   * The Ethereum JsonRPC client.
-   *
-   * @var \Ethereum\Ethereum
-   */
-  protected $client;
-
-  /**
    * The config factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -84,33 +77,34 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
 
     global $base_path;
 
-    $entity = $items->getEntity();
-    $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
-
-    // @todo This block needs to clear cache on ethereum->"ETHEREUM DEFAULT NETWORK" change!
-
-    // getContractById($id)
-    $contract =  \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');
+    $user = $items->getEntity();
+    $status_map = $user->field_ethereum_account_status->getSettings()['allowed_values'];
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
+      '#cache' => [
+        // @todo This cache setup does not seem to work.
+        'tags' => [
+          'config:ethereum_smartcontract.contract.register_drupal',
+          'config:ethereum.settings',
+        ],
+        'contexts' => ['user']
+      ],
       '#children' => $items,
-      '#user_ethereum_address' => $entity->field_ethereum_address->value,
-      '#status_number' => $entity->field_ethereum_account_status->value,
+      '#user_ethereum_address' => $user->field_ethereum_address->getString(),
+      '#status_number' => $user->field_ethereum_account_status->getString(),
       '#status_map' => json_encode($status_map),
-      '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
-      '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
+      '#status' => isset($status_map[$user->field_ethereum_account_status->getString()]) ? $status_map[$user->field_ethereum_account_status->getString()] : $status_map[0],
+      '#ethereum_drupal_hash' => $user->field_ethereum_drupal_hash->getString(),
       '#attached' => array(
         'library' => array(
           'ethereum_user_connector/ethereum-user-connector',
+          // Add register_drupal (Currently actually all active contracts).
+          'ethereum_smartcontract/contracts'
         ),
         'drupalSettings' => array(
           'ethereumUserConnector' => array(
-            'contractAddress' => $contract->getCurrentNetworkAddress(),
-            'userEthereumAddress' => $entity->field_ethereum_address->value,
-            'drupalHash' => $entity->field_ethereum_drupal_hash->value,
-            'validateContractCall' => $contract->getFunctionHash('contractExists()'),
-            'contractNewUserCall' => $contract->getFunctionHash('newUser(bytes32)'),
+            'drupalHash' => $user->field_ethereum_drupal_hash->getString(),
             'verificationUrl' => $base_path . 'ethereum/validate/',
             'updateAccountUrl' => $base_path . 'ethereum/update-account/',
           ),
@@ -119,5 +113,4 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
     ];
     return $element;
   }
-
 }

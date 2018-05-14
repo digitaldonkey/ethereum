@@ -17,6 +17,44 @@
 
 
   /**
+   * updateAbiField()
+   *
+   * @param compiled string
+   *   Json, Solc compiler output.
+   */
+  function updateAbiField(compiled) {
+
+    if (compiled) {
+      var abi = JSON.parse(compiled.interface);
+
+      $('input[name="contract_compiled_json"]').val(JSON.stringify(compiled));
+
+      document.getElementById('abi').innerHTML = Drupal.theme.prototype.abiTable(abi);
+      document.getElementById('edit-submit').disabled = false;
+    }
+  }
+
+  Drupal.theme.prototype.abiTable = function (abi) {
+    var html = '<table>';
+
+    html += '<tr>' +
+        '<th>function</th>' +
+        '<th>return type</th>' +
+        '<th>type</th>' +
+        '<th>constant</th>' +
+        '<th>payable</th>' +
+        '<th>stateMutability</th>' +
+        '</tr>';
+    abi.forEach(function (elm) {
+      html += '<tr>';
+      html += Drupal.theme.prototype.abiTableRow(elm);
+      html += '</tr>'
+    });
+    html += '</table>';
+    return html;
+  };
+
+  /**
    *
    * We are compiling the contract source using Javascript based solc compiler.
    * @see https://github.com/ericxtang/browser-solc.
@@ -31,7 +69,7 @@
 
     var settings = $.extend({
       // These are the defaults.
-      version: '0.4.20',
+      version: '0.4.23',
       optimize: 1
     }, options);
 
@@ -44,6 +82,7 @@
           $.solc.setCompiler();
         },
         setCompiler: function () {
+          // @todo We should get solc version from the contract!!
           window.BrowserSolc.loadVersion($.solc.soljsonReleases[this.settings.version], $.solc.compileReady);
         },
         compileReady: function (solc) {
@@ -54,7 +93,7 @@
           // @see https://regex101.com/r/c0qwPf/1
           var reg = new RegExp(/contract[\s]*([a-zA-Z].*)[\s]+{/g);
           var res = reg.exec(src);
-          // log(res[1], 'contractName @ contractName');
+          //log(res[1], 'contractName @ contractName');
           return res ? res[1] : null;
         },
         compileFromSrc: function (source, cb) {
@@ -63,7 +102,13 @@
             log('No compiler available.');
           }
           if (contractId) {
-            cb(this.compiler.compile(source, this.optimize).contracts[':' + contractId]);
+            var compiled = this.compiler.compile(source, this.optimize)
+            log('ERROR: solc compile failed. Check your contract code with Solc compiler version '
+                + this.settings.version
+                + '. You might change compiler version or test and debug at http://remix.ethereum.org'
+                , compiled.errors
+            );
+            cb(compiled.contracts[':' + contractId]);
           }
           else {
             log('Could not determine contract class name from sourcecode.');
@@ -89,50 +134,16 @@
     // Set up a change listener.
     contractSrc.bind('input propertychange', function() {
       if(this.value.length){
-        // log('Contract source changed');
+        log('Contract source changed');
         $.solc.compileFromSrc(this.value, updateAbiField);
       }
     });
-    if(contractSrc.length){
+    if(contractSrc.length) {
       $.solc.compileFromSrc(contractSrc.val(), updateAbiField);
     }
   }
 
-  /**
-   * updateAbiField()
-   *
-   * @param compiled string
-   *   Json, Solc compiler output.
-   */
-  function updateAbiField(compiled) {
 
-    var abi = JSON.parse(compiled.interface);
-
-    $('input[name="contract_compiled_json"]').val(JSON.stringify(compiled));
-
-    document.getElementById('abi').innerHTML = Drupal.theme.prototype.abiTable(abi);
-    document.getElementById('edit-submit').disabled = false;
-  }
-
-  Drupal.theme.prototype.abiTable = function (abi) {
-    var html = '<table>';
-
-    html += '<tr>' +
-        '<th>function</th>' +
-        '<th>return type</th>' +
-        '<th>type</th>' +
-        '<th>constant</th>' +
-        '<th>payable</th>' +
-        '<th>stateMutability</th>' +
-        '</tr>';
-    abi.forEach(function (elm) {
-      html += '<tr>';
-      html += Drupal.theme.prototype.abiTableRow(elm);
-      html += '</tr>'
-    });
-    html += '</table>';
-    return html;
-  };
 
   Drupal.theme.prototype.abiTableRow = function (elm) {
     // log(elm, 'elm');

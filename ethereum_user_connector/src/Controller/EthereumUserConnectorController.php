@@ -5,7 +5,8 @@ namespace Drupal\ethereum_user_connector\Controller;
 use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum_smartcontract\SmartContractInterface;
 use Drupal\ethereum_smartcontract\Entity\SmartContract;
-use Ethereum\DataType\EthS;
+use Ethereum\DataType\EthD;
+use Ethereum\EthereumStatic;
 
 /**
  * Controller routines for Ethereum User Connector routes.
@@ -50,19 +51,14 @@ class EthereumUserConnectorController extends EthereumController {
    * @throws \Exception
    */
   public function verifyUserByHash($hash) {
-
-
     try {
-
-      // @todo: Now actually the SmartContract entity could use the service?! --> So we wouldn't need a param here
-
       // Callable Smart contract of type: \Ethereum\SmartContract.
       $contract = $this->getContractEntity()->getCallable();
 
       // Call contract function.
-      $user_address = $contract->validateUserByHash(new EthS($hash));
+      $user_address = $contract->validateUserByHash(new EthD(EthereumStatic::ensureHexPrefix($hash)));
 
-      if ($user_address->val() === 0) {
+      if (!$user_address->isNotNull()) {
         throw new \Exception('No Ethereum address found in login smart contract registry for drupal hash: ' . $hash);
       }
 
@@ -74,7 +70,7 @@ class EthereumUserConnectorController extends EthereumController {
       $entity_ids = $query->execute();
 
       if (empty($entity_ids) || count($entity_ids) !== 1) {
-        throw new \Exception('No Drupal user found for Ethereum address and drupal hash. Address: ' . $user_address . ' Hash: ' . $hash);
+        throw new \Exception('No Drupal user found for Ethereum address and drupal hash. Address: ' . $user_address->hexVal() . ' Hash: ' . $hash);
       }
 
       // Update User's ethereum_account_status field.

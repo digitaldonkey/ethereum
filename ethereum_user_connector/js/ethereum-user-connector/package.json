@@ -1,0 +1,36 @@
+{
+  "name": "ethereum_user_connector",
+  "version": "1.0.0",
+  "description": "ethereum-user-connector",
+  "main": "src/ethereum-user-connector/index.js",
+  "scripts": {
+    "build": "browserify src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js -- ./built/ethereum-user-connector.js",
+    "dev": "watchify --debug  src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js -v",
+    "production": "browserify src/index.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js",
+    "minify-only": "./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js -- ./built/ethereum-user-connector.js",
+    "build-only": "browserify src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js"
+  },
+  "author": "Thorsten Krug",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babelify": "^8.0.0",
+    "browserify": "^16.1.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.9.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "uglify-es": "^3.3.10"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify"
+      ]
+    ]
+  }
+}

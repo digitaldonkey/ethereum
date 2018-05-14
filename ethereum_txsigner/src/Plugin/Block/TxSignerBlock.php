@@ -29,19 +29,29 @@ class TxSignerBlock extends BlockBase {
     $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
 
     return [
+      '#type' => 'markup',
+      '#markup' => '<div id="web3status"></div>',
+      '#cache' => [
+        'tags' => [
+          'config:ethereum.settings',
+        ],
+      ],
       '#attached' => [
         'library' => [
           'ethereum_txsigner/txsigners',
+          // Required ot ethereum_smartcontract_library_info_build will not fire.
+          'ethereum_smartcontract/contracts',
         ],
         'drupalSettings' => [
-          'ethereumNetwork' => [
-            'networkId' => $activeServer->getNetworkId(),
-            'label' => $activeServer->label()
+          'ethereum' => [
+            'network' => [
+              'id' => $activeServer->getNetworkId(),
+              'name' => $activeServer->label(),
+            ],
+            'apps' => [],
           ]
         ]
-      ],
-      '#type' => 'markup',
-      '#markup' => '<div id="web3status"></div>',
+      ]
     ];
   }
 }

@@ -35,6 +35,10 @@ class EthereumAddressWidget extends StringTextfieldWidget {
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
 
+    if ($element['value']['#default_value']) {
+      $element['value']['#attributes']['data-original-value'] = $element['value']['#default_value'];
+    }
+
     // Set a custom validation pattern.
     // @see https://www.w3schools.com/code/tryit.asp?filename=FEBTROZXKYL9
     $element['value']['#pattern'] = '0[x,X]{1}[0-9,a-f,A-F]{40}';
