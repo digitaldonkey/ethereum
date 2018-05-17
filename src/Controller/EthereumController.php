@@ -30,22 +30,23 @@ class EthereumController extends ControllerBase {
   /**
    * Constructs a new EthereumController.
    *
-   * @param \Ethereum\Ethereum $web3
+   * @param string|NULL $host
+   *    Ethereum node url.
+   *
+   * @throws \Exception
    */
-  public function __construct(Ethereum $web3 = NULL) {
-    if (!$web3) {
-      $web3 = \Drupal::service('ethereum.client');
+  public function __construct(string $host = null) {
+    if (!$host) {
+      $host = $this->getDefaultServer()->get('url');
     }
-    $this->web3 = $web3;
+    $this->web3 = new Ethereum($host);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('ethereum.client')
-    );
+    return new static(self::getDefaultServer()->getUrl());
   }
 
   /**

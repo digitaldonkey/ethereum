@@ -112,8 +112,7 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
     ];
     try {
       /** @var \Ethereum\Ethereum $web3 */
-       $web3 = new Ethereum($this->url);
-      // @todo How to load the \Drupal::service('ethereum.client') with a updated url?
+       $web3 = \Drupal::service('ethereum.client_factory')->get($this->getUrl());
 
       // Try to connect.
       $networkVersion = $web3->net_version()->val();
