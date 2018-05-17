@@ -176,49 +176,5 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
     return $deployed;
   }
 
-  /**
-   * Contract Network Info Table.
-   *
-   * @return array
-   *    Table render array.
-   */
-  public function getDeployedAsTable() {
-
-    $deployed = $this->getDeployed();
-
-    $formElement = array(
-      '#type' => 'table',
-      '#header' => [
-        'Network ID',
-        'Network',
-        'Contract address',
-        'Block Explorer',
-      ],
-    );
-    foreach ($deployed as $id => $net) {
-      $formElement[$id]['id'] = array(
-        '#markup' => '<b>' . $net['id'] . '</b>',
-      );
-      $formElement[$id]['net'] = array(
-        '#markup' => $net['label'] . '<br/>'.
-          '<small>' . $net['description'] . '</small>',
-      );
-      $formElement[$id]['contract'] = array(
-        '#markup' => $net['contract_address'],
-      );
-      // Provide link to contract.
-      if (isset($net['link_to_address']) && $net['link_to_address']) {
-        $addr = str_replace('@address', $net['contract_address'] ,$net['link_to_address']);
-        $url = Url::fromUri($addr);
-        $linkText = substr($addr, 0, 47) . '...';
-        $link = Link::fromTextAndUrl($linkText, $url);
-        $formElement[$id]['explorer'] = array(
-          '#markup' => $link->toString(),
-        );
-      }
-    }
-    return $formElement;
-  }
-
 }
 

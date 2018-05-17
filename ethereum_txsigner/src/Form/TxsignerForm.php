@@ -111,12 +111,12 @@ class TxsignerForm extends EntityForm {
     $status = $this->entity->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the %label Transaction signer.', array(
+      \Drupal::messenger()->addStatus($this->t('Saved the %label Transaction signer.', array(
         '%label' => $this->entity->label(),
       )));
     }
     else {
-      drupal_set_message($this->t('The %label was not saved.', array(
+      \Drupal::messenger()->addStatus($this->t('The %label was not saved.', array(
         '%label' => $this->entity->label(),
       )));
     }

@@ -36,13 +36,6 @@ use Drupal\ethereum_txsigner\Controller\TxsignerListBuilder;
 class Txsigner extends ConfigEntityBase implements TxsignerInterface {
 
   /**
-  * The ID.
-  *
-  * @var string
-  */
-  protected $id;
-
-  /**
   * The label.
   *
   * @var string

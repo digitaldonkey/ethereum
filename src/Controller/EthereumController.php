@@ -2,7 +2,6 @@
 
 namespace Drupal\ethereum\Controller;
 
-use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
 
 use Ethereum\Ethereum;
@@ -23,8 +22,9 @@ class EthereumController extends ControllerBase {
    *
    * @var \Ethereum\Ethereum
    */
-  public $client;
+  protected $web3;
 
+  // @todo Doesn't seem to be propagetad to the library anymore.
   private $debug = TRUE;
 
   /**
@@ -36,7 +36,7 @@ class EthereumController extends ControllerBase {
     if (!$web3) {
       $web3 = \Drupal::service('ethereum.client');
     }
-    $this->client = $web3;
+    $this->web3 = $web3;
   }
 
   /**
@@ -51,16 +51,10 @@ class EthereumController extends ControllerBase {
   /**
    * Returns Ethereum Networks.
    *
-   * @param $detailed bool
-   *  By default we will return a Array keyed by Network ID (short version).
-   *   ID => Name - Description.
-   *  If $detailed = TRUE
-   *   Long version is [] = [id, label, description]
-   *
    * @return array
    *   Array of Ethereum Networks containing ID, Name, Description.
    */
-  public static function getNetworksAsOptions($detailed = FALSE) {
+  public static function getNetworksAsOptions() {
     $networks = [];
       foreach (self::getNetworks() as $k => $item) {
         $networks[$item['id']] = $item['label'] . ' (' . $item['id'] . ')  - ' . $item['description'];
@@ -105,12 +99,11 @@ class EthereumController extends ControllerBase {
    * Returns Ethereum Servers.
    *
    * @param bool $filter_enabled
-   *    Restrict to enabled servers. Defaults to FALSE (optional).
+   *    (optional) Restrict to enabled servers. Defaults to FALSE.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    *
-   * @return array of \Drupal\ethereum\Entity\EthereumServer
-   *   An array of Ethereum server entities.
+   * @return \Drupal\ethereum\EthereumServerInterface[]
    */
   public static function getServers($filter_enabled = FALSE) {
     $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
@@ -135,7 +128,7 @@ class EthereumController extends ControllerBase {
     $current = \Drupal::config('ethereum.settings')->get('current_server');
     $server = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($current);
     if (!$server) {
-      throw new \Exception('Current default server (' . $current . ')does not exist.');
+      throw new \Exception('Current default server (' . $current . ') does not exist.');
     }
     if (!$server->status()) {
       throw new \Exception('Current default server is not enabled.');
@@ -154,12 +147,12 @@ class EthereumController extends ControllerBase {
    *   You may use to debug a single call.
    */
   public function debug($clear = FALSE) {
-    $html = $this->client->debugHtml;
-    $this->client->debugHtml = '';
+    $html = $this->web3->debugHtml;
+    $this->web3->debugHtml = '';
     if (!$clear && $this->debug) {
       // Remove last HR Tag.
       $html = strrev(implode('', explode(strrev('<hr />'), strrev($html), 2)));
-      drupal_set_message(Markup::create($html), 'warning');
+      $this->messenger()->addMessage(Markup::create($html), 'warning');
     }
   }
 
@@ -180,47 +173,49 @@ class EthereumController extends ControllerBase {
 
     // Validate active server.
     $liveStatus = $server->validateConnection();
-    drupal_set_message(
-      $liveStatus['message'],
-      ($liveStatus['error']) ? 'error' : 'status'
+    $this->messenger()->addMessage(
+      $liveStatus['message'], ($liveStatus['error']) ? 'error' : 'status'
     );
 
     // Config info.
     $serverInfo = [
       '#type' => 'fieldset',
       '#title' => $this->t('Ethereum connection'),
-      'current_server' => $server->getServerInfoAsTable(),
+      'current_server' => $this->getServerInfoAsTable($server),
     ];
 
     // Get Live status.
-    $status_rows[] = [$this->t("Client version (web3_clientVersion)"), $this->client->web3_clientVersion()->val()];
-    $status_rows[] = [$this->t("Listening (net_listening)"), $this->client->net_listening()->val() ? '✔' : '✘'];
-    $status_rows[] = [$this->t("Peers (net_peerCount)"), $this->client->net_peerCount()->val()];
-    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->client->eth_protocolVersion()->val()];
-    $status_rows[] = [$this->t("Network version (net_version)"), $this->client->net_version()->val()];
-    $status_rows[] = [$this->t("Syncing (eth_syncing)"), $this->client->eth_syncing()->val() ? '✔' : '✘'];
+    $status_rows[] = [$this->t("Client version (web3_clientVersion)"), $this->web3->web3_clientVersion()->val()];
+    $status_rows[] = [$this->t("Listening (net_listening)"), $this->web3->net_listening()->val() ? '✔' : '✘'];
+    $status_rows[] = [$this->t("Peers (net_peerCount)"), $this->web3->net_peerCount()->val()];
+
+    // @todo This creates a RLP error :?
+    //    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->web3->eth_protocolVersion()->val()];
+
+    $status_rows[] = [$this->t("Network version (net_version)"), $this->web3->net_version()->val()];
+    $status_rows[] = [$this->t("Syncing (eth_syncing)"), $this->web3->eth_syncing()->val() ? '✔' : '✘'];
 
     // Mining and Hashrate.
-    $status_rows[] = [$this->t("Mining (eth_mining)"), $this->client->eth_mining()->val() ? '✔' : '✘'];
+    $status_rows[] = [$this->t("Mining (eth_mining)"), $this->web3->eth_mining()->val() ? '✔' : '✘'];
 
-    $hash_rate = $this->client->eth_hashrate();
+    $hash_rate = $this->web3->eth_hashrate();
     $mining = is_a($hash_rate, 'EthQ') ? ((int) ($hash_rate->val() / 1000) . ' KH/s') : '✘';
     $status_rows[] = [$this->t("Mining hashrate (eth_hashrate)"), $mining];
 
     // Gas price is returned in WEI. See: http://ether.fund/tool/converter.
-    $price = $this->client->eth_gasPrice()->val();
+    $price = $this->web3->eth_gasPrice()->val();
     $price = $price . 'wei ( ≡ ' . number_format(($price / 1000000000000000000), 8, '.', '') . ' Ether)';
     $status_rows[] = [$this->t("Current price per gas in wei (eth_gasPrice)"), $price];
 
     // Accounts.
     $status_rows[] = [$this->t("<b>Accounts info</b>"), ''];
-    $coin_base = $this->client->eth_coinbase()->hexVal();
+    $coin_base = $this->web3->eth_coinbase()->hexVal();
     if ($coin_base === '0x0000000000000000000000000000000000000000') {
       $coin_base = 'No coinbase available at this network node.';
     }
     $status_rows[] = [$this->t("Coinbase (eth_coinbase)"), $coin_base];
     $address = array();
-    foreach ($this->client->eth_accounts() as $addr) {
+    foreach ($this->web3->eth_accounts() as $addr) {
       $address[] = $addr->hexVal();
     }
     $status_rows[] = [$this->t("Accounts (eth_accounts)"), implode(', ', $address)];
@@ -243,7 +238,7 @@ class EthereumController extends ControllerBase {
 
     // Blocks.
     $random_rows[] = [$this->t("<b>Block info</b>"), ''];
-    $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
+    $block_latest = $this->web3->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
     $random_rows[] = [
       $this->t("Latest block age"),
       \Drupal::service('date.formatter')->format($block_latest->getProperty('timestamp'), 'html_datetime'),
@@ -251,27 +246,27 @@ class EthereumController extends ControllerBase {
 
     // Testing_only.
 
-    $block_earliest = $this->client->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
+    $block_earliest = $this->web3->eth_getBlockByNumber(new EthBlockParam('earliest'), new EthB(FALSE));
     $random_rows[] = [
       $this->t("Age of 'earliest' block<br/><small>The 'earliest' block has no timestamp on many networks.</small>"),
       \Drupal::service('date.formatter')->format($block_earliest->getProperty('timestamp'), 'html_datetime'),
     ];
     $random_rows[] = [
       $this->t("Client first (eth_getBlockByNumber('earliest'))"),
-      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_earliest) . '</div>'),
+      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->web3->debug('', $block_earliest) . '</div>'),
     ];
 
     // Second param will return TX hashes instead of full TX.
-    $block_latest = $this->client->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
+    $block_latest = $this->web3->eth_getBlockByNumber(new EthBlockParam('latest'), new EthB(FALSE));
     $random_rows[] = [
       $this->t("Client first (eth_getBlockByNumber('latest'))"),
-      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest) . '</div>'),
+      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->web3->debug('', $block_latest) . '</div>'),
     ];
     $random_rows[] = [
       $this->t("Uncles of latest block"),
-      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->client->debug('', $block_latest->getProperty('uncles')) . '</div>'),
+      Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->web3->debug('', $block_latest->getProperty('uncles')) . '</div>'),
     ];
-    $high_block = $this->client->eth_getBlockByNumber(new EthBlockParam(999999999), new EthB(FALSE));
+    $high_block = $this->web3->eth_getBlockByNumber(new EthBlockParam(999999999), new EthB(FALSE));
     $random_rows[] = [
       $this->t("Get hash of a high block number<br /><small>Might be empty</small>"),
       $high_block->getProperty('hash'),
@@ -284,12 +279,12 @@ class EthereumController extends ControllerBase {
     //
     $random_rows[] = [
       $this->t("web3_sha3('Hello World')"),
-      $this->client->web3_sha3(new EthS('Hello World'))->hexVal(),
+      $this->web3->web3_sha3(new EthS('Hello World'))->hexVal(),
     ];
 
     // NON standard JsonRPC-API Methods below.
     $random_rows[] = [$this->t('<b>Non standard methods</b>'), $this->t('PHP Ethereum controller API provides additional methods. They are part of the <a href="https://github.com/digitaldonkey/ethereum-php">Ethereum PHP library</a>, but not part of JsonRPC-API standard.')];
-    $random_rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)')"), $this->client->getMethodSignature('validateUserByHash(bytes32)')];
+    $random_rows[] = [$this->t("getMethodSignature('validateUserByHash(bytes32)')"), $this->web3->getMethodSignature('validateUserByHash(bytes32)')];
 
     $serverRandomRows = [
       '#type' => 'fieldset',
@@ -313,4 +308,53 @@ class EthereumController extends ControllerBase {
     ];
   }
 
+  /**
+   * Server info as render Array Table.
+   *
+   * @param $server EthereumServerInterface
+   *    Server config entity.
+   *
+   * @return array
+   *    Table render array.
+   */
+  public function getServerInfoAsTable(EthereumServerInterface $server) {
+
+    $networks = EthereumController::getNetworks();
+    $currentNet = $networks[$server->get('network_id')];
+
+    $formElement = array(
+      '#type' => 'table',
+    );
+    $formElement['info'] = [
+      'label' => array('#markup' => 'Node info'),
+      'content' => [
+        '#markup' => $server->label() . '<br />' . '<small>' . $server->get('description'). '</small>',
+      ],
+    ];
+    $formElement['config_id'] = [
+      'label' => array('#markup' => 'Config name'),
+      'content' => [
+        '#markup' =>  $server->id(),
+      ],
+    ];
+    $formElement['url'] = [
+      'label' => array('#markup' => 'RPC Url'),
+      'content' => ['#markup' => $server->get('url')],
+    ];
+    $formElement['network'] = [
+      'label' => array('#markup' => 'Network info'),
+      'content' => [
+        '#markup' =>
+          '<strong>' .  $currentNet['label'] . ' (Ethereum Network Id: ' .  $currentNet['id'] . ')</strong><br />'
+          . $currentNet['description'] . '<br />'
+      ],
+    ];
+    $formElement['explorer'] = [
+      'label' => array('#markup' => 'Blockchain Explorer'),
+      'content' => [
+        '#markup' => $currentNet['link_to_address']
+      ]
+    ];
+    return $formElement;
+  }
 }

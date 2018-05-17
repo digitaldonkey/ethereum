@@ -4,7 +4,6 @@ namespace Drupal\ethereum\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\EthereumServerInterface;
 use Ethereum\Ethereum;
 
@@ -138,50 +137,4 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
     return $return;
   }
 
-  /**
-   * Server info as render Array Table.
-   *
-   * @return array
-   *    Table render array.
-   */
-  public function getServerInfoAsTable() {
-
-    $networks = EthereumController::getNetworks();
-    $currentNet = $networks[$this->network_id];
-
-    $formElement = array(
-      '#type' => 'table',
-    );
-    $formElement['info'] = [
-      'label' => array('#markup' => 'Node info'),
-      'content' => [
-        '#markup' => $this->label . '<br />' . '<small>' . $this->description. '</small>',
-      ],
-    ];
-    $formElement['config_id'] = [
-      'label' => array('#markup' => 'Config name'),
-      'content' => [
-        '#markup' =>  $this->id,
-      ],
-    ];
-    $formElement['url'] = [
-      'label' => array('#markup' => 'RPC Url'),
-      'content' => ['#markup' => $this->url],
-    ];
-    $formElement['network'] = [
-      'label' => array('#markup' => 'Network info'),
-      'content' => [
-        '#markup' =>
-           '<strong>' .  $currentNet['label'] . ' (Ethereum Network Id: ' .  $currentNet['id'] . ')</strong><br />'
-           . $currentNet['description'] . '<br />'
-      ],
-    ];
-    $formElement['explorer'] = [
-      'label' => array('#markup' => 'Blockchain Explorer'),
-      'content' => [
-        '#markup' => $currentNet['link_to_address']
-      ]
-    ];
-    return $formElement;
-  }
 }

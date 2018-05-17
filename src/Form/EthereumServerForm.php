@@ -85,10 +85,10 @@ class EthereumServerForm extends EntityForm {
     $server = $this->entity;
     $status = $server->save();
     if ($status == SAVED_UPDATED) {
-      drupal_set_message($this->t('The server %label has been updated.', ['%label' => $server->label()]));
+      \Drupal::messenger()->addStatus($this->t('The server %label has been updated.', ['%label' => $server->label()]));
     }
     elseif ($status == SAVED_NEW) {
-      drupal_set_message($this->t('The server %label has been added.', ['%label' => $server->label()]));
+      \Drupal::messenger()->addStatus($this->t('The server %label has been added.', ['%label' => $server->label()]));
     }
     $form_state->setRedirect('ethereum.settings');
   }
