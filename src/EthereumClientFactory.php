@@ -3,6 +3,7 @@
 namespace Drupal\ethereum;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\Entity\EthereumServer;
 use Ethereum\Ethereum;
 
@@ -36,13 +37,15 @@ class EthereumClientFactory {
    *
    * @return \Ethereum\Ethereum
    *   The Ethereum client.
+   *
+   * @return \Ethereum\Ethereum
+   *
+   * @throws \Exception
    */
   public function get($host = NULL) {
     if (!$host) {
-      $current_server = $this->configFactory->get('ethereum.settings')->get('current_server');
-      $host = EthereumServer::load($current_server)->getUrl();
+      $host = EthereumController::getDefaultServer()->getUrl();
     }
-
     return new Ethereum($host);
   }
 

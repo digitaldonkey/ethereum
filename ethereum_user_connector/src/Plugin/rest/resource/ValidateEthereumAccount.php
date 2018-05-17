@@ -71,7 +71,7 @@ class ValidateEthereumAccount extends ResourceBase {
       $plugin_id,
       $plugin_definition,
       $container->getParameter('serializer.formats'),
-      $container->get('logger.factory')->get('ethereum_user_connectorethereum_user_connector'),
+      $container->get('logger.factory')->get('ethereum_user_connector'),
       $container->get('current_user')
     );
   }
@@ -86,16 +86,16 @@ class ValidateEthereumAccount extends ResourceBase {
    *
    * @throws \Symfony\Component\HttpKernel\Exception\HttpException
    *   Throws exception expected.
+   * @throws \Exception
    *
-   * @return ResourceResponse
+   * @return \Drupal\rest\ResourceResponse
    *   With validated data.
    *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function get($hash) {
-
     if ($this->currentUser->isAuthenticated()) {
-      $eth = new EthereumUserConnectorController();
-      $validation = $eth->verifyUserByHash(Xss::filter($hash));
+      $controller = \Drupal::service('class_resolver')->getInstanceFromDefinition(EthereumUserConnectorController::class);
+      $validation = $controller->verifyUserByHash(Xss::filter($hash));
       if (is_array($validation) && $validation['success']) {
         $message = $this->t('Successfully validated account ' . $validation['ethereum_address'] . ' with hash ' . $validation['ethereum_drupal_hash']);
         Drupal::logger('ethereum_user_connector')->notice($message);

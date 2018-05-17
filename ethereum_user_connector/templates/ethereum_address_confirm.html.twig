@@ -15,12 +15,13 @@
         <div id="ethereum-status"
              class="{{ status_css[status_id] }}"
              style="display: inline-block; padding: .3em; margin: 0;"
-             data-status--val="{{ status_id }}"
-             data-status--valid-address = "{{ address }}"
-             data-status--map='{{ status_map }}'
-             data-status--css-map='{{ status_css|json_encode() }}'>
-            <code class="ethereum-status--address">{{ address|lower }}</code>
-            (<span class="ethereum-status--message">{{ status }}</span>)
+             data-val="{{ status_id }}"
+             data-valid-address = "{{ address }}"
+             data-map='{{ status_map }}'
+             data-css-map='{{ status_css|json_encode() }}'
+        >
+            <code id="ethereum-status-address">{{ address|lower }}</code>
+            (<span id="ethereum-status-message">{{ status }}</span>)
         </div>
 
         <span id="ethereum-verify" class="ethereum-user-connector" {{ (status_id != 2) ? '' : 'style="display: none" ' }}>

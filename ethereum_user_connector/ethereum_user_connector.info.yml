@@ -6,6 +6,8 @@ package: ethereum
 dependencies:
   - ethereum
   - rest
+  - ethereum_smartcontract
+  - ethereum_txsigner
 configure: ethereum.settings.user_connector
 test_dependencies:
  - restui

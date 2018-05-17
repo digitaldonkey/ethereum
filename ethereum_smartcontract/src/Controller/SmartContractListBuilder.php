@@ -13,6 +13,7 @@ class SmartContractListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildHeader() {
+    $header['status'] = $this->t('Active');
     $header['label'] = $this->t('SmartContract');
     $header['id'] = $this->t('Machine name');
     return $header + parent::buildHeader();
@@ -22,11 +23,9 @@ class SmartContractListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
+    $row['status'] = $entity->status() ? '✔' : '✖';
     $row['label'] = $this->getLabel($entity);
     $row['id'] = $entity->id();
-
-    // You probably want a few more properties here...
-
     return $row + parent::buildRow($entity);
   }
 

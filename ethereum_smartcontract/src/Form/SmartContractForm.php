@@ -63,10 +63,17 @@ class SmartContractForm extends EntityForm {
       '#disabled' => !$contract->isNew(),
     );
 
+    $form['status'] = array(
+      '#type' => 'checkbox',
+      '#title' => $this->t('Enable this contract'),
+      '#description' => $this->t('If a contract is enabled it\'s ABI  will be loaded as javascript setting in <code>drupalSettings.ethereum.contracts["id" => {...}]</code>'),
+      '#default_value' => $this->entity->status(),
+    );
+
     $form['contract_src'] = array(
       '#type' => 'textarea',
       '#title' => $this->t('contract_src'),
-      '#default_value' => $contract->contract_src,
+      '#default_value' => $contract->getSrc(),
       '#description' => $this->t("contract_src for smart contract ."),
       '#required' => TRUE,
       '#rows' => 20,
@@ -107,7 +114,7 @@ class SmartContractForm extends EntityForm {
         '#markup' => $net['label'] . '<br/>'.
         '<small>' . $net['description'] . '</small>',
       );
-      $val = isset($contract->networks[$net['id']]) ? $contract->networks[$net['id']] : '';
+      $val = isset($contract->getNetworks()[$net['id']]) ? $contract->getNetworks()[$net['id']] : '';
       $form['networks'][$net['id']]['contract'] = array(
         '#type' => 'textfield',
         '#title' => $this->t('Name'),
@@ -165,12 +172,12 @@ class SmartContractForm extends EntityForm {
     $status = $contract->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the %label SmartContract.', array(
+      \Drupal::messenger()->addStatus($this->t('Saved the %label SmartContract.', array(
         '%label' => $contract->label(),
       )));
     }
     else {
-      drupal_set_message($this->t('The %label SmartContract was not saved.', array(
+      \Drupal::messenger()->addStatus($this->t('The %label SmartContract was not saved.', array(
         '%label' => $contract->label(),
       )));
     }
@@ -178,8 +185,12 @@ class SmartContractForm extends EntityForm {
   }
 
   /**
-  * Helper function to check whether an SmartContract configuration entity exists.
-  */
+   * Check whether an SmartContract config entity exists.
+   *
+   * @param $id
+   *
+   * @return bool
+   */
   public function exist($id) {
     $entity = $this->entityQuery->get('smartcontract')
     ->condition('id', $id)

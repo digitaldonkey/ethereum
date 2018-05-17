@@ -1,5 +1,5 @@
 id: infura_ropsten
-label: 'Infura Ropsten test network'
+label: 'Infura Ropsten Test Node'
 url: 'https://ropsten.infura.io/drupal'
 network_id: '3'
 status: true
