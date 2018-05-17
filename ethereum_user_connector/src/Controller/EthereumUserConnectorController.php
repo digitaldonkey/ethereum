@@ -4,7 +4,6 @@ namespace Drupal\ethereum_user_connector\Controller;
 
 use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum_smartcontract\SmartContractInterface;
-use Drupal\ethereum_smartcontract\Entity\SmartContract;
 use Ethereum\DataType\EthD;
 use Ethereum\EthereumStatic;
 

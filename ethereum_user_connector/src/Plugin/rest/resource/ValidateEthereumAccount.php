@@ -93,11 +93,8 @@ class ValidateEthereumAccount extends ResourceBase {
    *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function get($hash) {
-
     if ($this->currentUser->isAuthenticated()) {
-
-      $controller = new EthereumUserConnectorController();
-
+      $controller = \Drupal::service('class_resolver')->getInstanceFromDefinition(EthereumUserConnectorController::class);
       $validation = $controller->verifyUserByHash(Xss::filter($hash));
       if (is_array($validation) && $validation['success']) {
         $message = $this->t('Successfully validated account ' . $validation['ethereum_address'] . ' with hash ' . $validation['ethereum_drupal_hash']);

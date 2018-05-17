@@ -7,15 +7,12 @@ use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum\Controller\EthereumController;
-use Ethereum\DataType\CallTransaction;
-use Ethereum\DataType\EthBlockParam;
-use Ethereum\DataType\EthD;
-use Ethereum\DataType\EthD20;
 use Ethereum\Ethereum;
-use Masterminds\HTML5\Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
+use Drupal\ethereum_smartcontract\SmartContractInterface;
 
 /**
 * Defines a form to configure maintenance settings for this site.
@@ -31,6 +28,9 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
 
   /**
    * Constructs a new AdminForm.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * @param \Ethereum\Ethereum $web3
    */
   public function __construct(ConfigFactoryInterface $config_factory, Ethereum $web3) {
     parent::__construct($config_factory);
@@ -88,7 +88,7 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
       ),
     ];
 
-    $form['deployed'] = $contract->getDeployedAsTable();
+    $form['deployed'] = $this->getDeployedAsTable($contract);
 
     $form['actions'] = array(
       '#type' => 'fieldset',
@@ -121,13 +121,13 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
       $contract_exists = $register_drupal->contractExists()->val();
 
       if ($contract_exists) {
-        drupal_set_message($this->t(
-            'Sucessfully called contractExtists at: @address',
+        \Drupal::messenger()->addMessage($this->t(
+            'Successfully called contractExtists at: @address',
             array('@address' => $address))
         );
       }
       else {
-        drupal_set_message($this->t(
+        \Drupal::messenger()->addMessage($this->t(
           'Unable to verify that contract exists at address: @address',
           array('@address' => $address))
         );
@@ -149,4 +149,51 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
     //    parent::submitForm($form, $form_state);
   }
 
+
+  /**
+   * Contract Network Info Table.
+   *
+   * @param $contract SmartContractInterface
+   *    Smart contract config entity.
+   *
+   * @return array
+   *    Table render array.
+   */
+  protected function getDeployedAsTable(SmartContractInterface $contract) {
+
+    $deployed = $contract->getDeployed();
+
+    $formElement = array(
+      '#type' => 'table',
+      '#header' => [
+        'Network ID',
+        'Network',
+        'Contract address',
+        'Block Explorer',
+      ],
+    );
+    foreach ($deployed as $id => $net) {
+      $formElement[$id]['id'] = array(
+        '#markup' => '<b>' . $net['id'] . '</b>',
+      );
+      $formElement[$id]['net'] = array(
+        '#markup' => $net['label'] . '<br/>'.
+          '<small>' . $net['description'] . '</small>',
+      );
+      $formElement[$id]['contract'] = array(
+        '#markup' => $net['contract_address'],
+      );
+      // Provide link to contract.
+      if (isset($net['link_to_address']) && $net['link_to_address']) {
+        $addr = str_replace('@address', $net['contract_address'] ,$net['link_to_address']);
+        $url = Url::fromUri($addr);
+        $linkText = substr($addr, 0, 47) . '...';
+        $link = Link::fromTextAndUrl($linkText, $url);
+        $formElement[$id]['explorer'] = array(
+          '#markup' => $link->toString(),
+        );
+      }
+    }
+    return $formElement;
+  }
 }

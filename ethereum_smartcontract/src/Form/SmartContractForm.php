@@ -172,12 +172,12 @@ class SmartContractForm extends EntityForm {
     $status = $contract->save();
 
     if ($status) {
-      drupal_set_message($this->t('Saved the %label SmartContract.', array(
+      \Drupal::messenger()->addStatus($this->t('Saved the %label SmartContract.', array(
         '%label' => $contract->label(),
       )));
     }
     else {
-      drupal_set_message($this->t('The %label SmartContract was not saved.', array(
+      \Drupal::messenger()->addStatus($this->t('The %label SmartContract was not saved.', array(
         '%label' => $contract->label(),
       )));
     }
@@ -185,8 +185,12 @@ class SmartContractForm extends EntityForm {
   }
 
   /**
-  * Helper function to check whether an SmartContract configuration entity exists.
-  */
+   * Check whether an SmartContract config entity exists.
+   *
+   * @param $id
+   *
+   * @return bool
+   */
   public function exist($id) {
     $entity = $this->entityQuery->get('smartcontract')
     ->condition('id', $id)

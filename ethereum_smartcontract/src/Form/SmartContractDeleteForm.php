@@ -38,8 +38,9 @@ class SmartContractDeleteForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->entity->delete();
-    drupal_set_message($this->t('Category %label has been deleted.', array('%label' => $this->entity->label())));
-
+    \Drupal::messenger()->addStatus(
+      $this->t('Category %label has been deleted.', array('%label' => $this->entity->label()))
+    );
     $form_state->setRedirectUrl($this->getCancelUrl());
   }
 }

@@ -9,12 +9,6 @@ use Ethereum\Ethereum;
 */
 interface SmartContractInterface extends ConfigEntityInterface {
 
-
-  /**
-   * @inheritdoc
-   */
-  public function status();
-
   /**
    * Get the Contract address
    * using current Ethereum default Server.

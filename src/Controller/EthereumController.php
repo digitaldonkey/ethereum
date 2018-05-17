@@ -2,7 +2,6 @@
 
 namespace Drupal\ethereum\Controller;
 
-use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Controller\ControllerBase;
 
 use Ethereum\Ethereum;
@@ -23,44 +22,40 @@ class EthereumController extends ControllerBase {
    *
    * @var \Ethereum\Ethereum
    */
-  public $web3;
+  protected $web3;
 
+  // @todo Doesn't seem to be propagetad to the library anymore.
   private $debug = TRUE;
 
   /**
    * Constructs a new EthereumController.
    *
-   * @param \Ethereum\Ethereum $web3
+   * @param string|NULL $host
+   *    Ethereum node url.
+   *
+   * @throws \Exception
    */
-  public function __construct(Ethereum $web3 = NULL) {
-    if (!$web3) {
-      $web3 = \Drupal::service('ethereum.client');
+  public function __construct(string $host = null) {
+    if (!$host) {
+      $host = $this->getDefaultServer()->get('url');
     }
-    $this->web3 = $web3;
+    $this->web3 = new Ethereum($host);
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('ethereum.client')
-    );
+    return new static(self::getDefaultServer()->getUrl());
   }
 
   /**
    * Returns Ethereum Networks.
    *
-   * @param $detailed bool
-   *  By default we will return a Array keyed by Network ID (short version).
-   *   ID => Name - Description.
-   *  If $detailed = TRUE
-   *   Long version is [] = [id, label, description]
-   *
    * @return array
    *   Array of Ethereum Networks containing ID, Name, Description.
    */
-  public static function getNetworksAsOptions($detailed = FALSE) {
+  public static function getNetworksAsOptions() {
     $networks = [];
       foreach (self::getNetworks() as $k => $item) {
         $networks[$item['id']] = $item['label'] . ' (' . $item['id'] . ')  - ' . $item['description'];
@@ -105,12 +100,11 @@ class EthereumController extends ControllerBase {
    * Returns Ethereum Servers.
    *
    * @param bool $filter_enabled
-   *    Restrict to enabled servers. Defaults to FALSE (optional).
+   *    (optional) Restrict to enabled servers. Defaults to FALSE.
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    *
-   * @return array of \Drupal\ethereum\Entity\EthereumServer
-   *   An array of Ethereum server entities.
+   * @return \Drupal\ethereum\EthereumServerInterface[]
    */
   public static function getServers($filter_enabled = FALSE) {
     $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
@@ -135,7 +129,7 @@ class EthereumController extends ControllerBase {
     $current = \Drupal::config('ethereum.settings')->get('current_server');
     $server = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($current);
     if (!$server) {
-      throw new \Exception('Current default server (' . $current . ')does not exist.');
+      throw new \Exception('Current default server (' . $current . ') does not exist.');
     }
     if (!$server->status()) {
       throw new \Exception('Current default server is not enabled.');
@@ -159,7 +153,7 @@ class EthereumController extends ControllerBase {
     if (!$clear && $this->debug) {
       // Remove last HR Tag.
       $html = strrev(implode('', explode(strrev('<hr />'), strrev($html), 2)));
-      drupal_set_message(Markup::create($html), 'warning');
+      $this->messenger()->addMessage(Markup::create($html), 'warning');
     }
   }
 
@@ -180,16 +174,15 @@ class EthereumController extends ControllerBase {
 
     // Validate active server.
     $liveStatus = $server->validateConnection();
-    drupal_set_message(
-      $liveStatus['message'],
-      ($liveStatus['error']) ? 'error' : 'status'
+    $this->messenger()->addMessage(
+      $liveStatus['message'], ($liveStatus['error']) ? 'error' : 'status'
     );
 
     // Config info.
     $serverInfo = [
       '#type' => 'fieldset',
       '#title' => $this->t('Ethereum connection'),
-      'current_server' => $server->getServerInfoAsTable(),
+      'current_server' => $this->getServerInfoAsTable($server),
     ];
 
     // Get Live status.
@@ -197,9 +190,9 @@ class EthereumController extends ControllerBase {
     $status_rows[] = [$this->t("Listening (net_listening)"), $this->web3->net_listening()->val() ? '✔' : '✘'];
     $status_rows[] = [$this->t("Peers (net_peerCount)"), $this->web3->net_peerCount()->val()];
 
-    // @todo Error on Geth/v1.8.3-stable/linux-amd64/go1.10 ?
-//    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->web3->eth_protocolVersion()->val()];
 
+    // @todo This creates a RLP error :?
+    //    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->web3->eth_protocolVersion()->val()];
 
     $status_rows[] = [$this->t("Network version (net_version)"), $this->web3->net_version()->val()];
     $status_rows[] = [$this->t("Syncing (eth_syncing)"), $this->web3->eth_syncing()->val() ? '✔' : '✘'];
@@ -284,11 +277,11 @@ class EthereumController extends ControllerBase {
 
     // More.
 
-    // @todo This might be wrong.Check if web3_sha3 expects a UTF8 string.
-    //
+    // Ethereum sha3 != standardized sha3, but a "Keccak-256"
+    // @see https://ethereum.stackexchange.com/a/554/852
     $random_rows[] = [
-      $this->t("web3_sha3('Hello World')"),
-      $this->web3->web3_sha3(new EthS('Hello World'))->hexVal(),
+      $this->t("web3_sha3('testing')"),
+      $this->web3->sha3('testing'),
     ];
 
     // NON standard JsonRPC-API Methods below.
@@ -317,4 +310,53 @@ class EthereumController extends ControllerBase {
     ];
   }
 
+  /**
+   * Server info as render Array Table.
+   *
+   * @param $server EthereumServerInterface
+   *    Server config entity.
+   *
+   * @return array
+   *    Table render array.
+   */
+  public function getServerInfoAsTable(EthereumServerInterface $server) {
+
+    $networks = EthereumController::getNetworks();
+    $currentNet = $networks[$server->get('network_id')];
+
+    $formElement = array(
+      '#type' => 'table',
+    );
+    $formElement['info'] = [
+      'label' => array('#markup' => 'Node info'),
+      'content' => [
+        '#markup' => $server->label() . '<br />' . '<small>' . $server->get('description'). '</small>',
+      ],
+    ];
+    $formElement['config_id'] = [
+      'label' => array('#markup' => 'Config name'),
+      'content' => [
+        '#markup' =>  $server->id(),
+      ],
+    ];
+    $formElement['url'] = [
+      'label' => array('#markup' => 'RPC Url'),
+      'content' => ['#markup' => $server->get('url')],
+    ];
+    $formElement['network'] = [
+      'label' => array('#markup' => 'Network info'),
+      'content' => [
+        '#markup' =>
+          '<strong>' .  $currentNet['label'] . ' (Ethereum Network Id: ' .  $currentNet['id'] . ')</strong><br />'
+          . $currentNet['description'] . '<br />'
+      ],
+    ];
+    $formElement['explorer'] = [
+      'label' => array('#markup' => 'Blockchain Explorer'),
+      'content' => [
+        '#markup' => $currentNet['link_to_address']
+      ]
+    ];
+    return $formElement;
+  }
 }
