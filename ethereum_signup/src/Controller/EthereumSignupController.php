@@ -151,9 +151,9 @@ class EthereumSignupController extends EthereumController {
     );
 
     // Verify signature.
-    $signature_verified = $this->web3->personalVerifyEcRecover($this->terms_text, new EthD($signature), new EthD20($address));;
+    $recoveredAddress = $this->web3->personalEcRecover($this->terms_text, new EthD($signature));
 
-    if(!$signature_verified) {
+    if($address !== $recoveredAddress) {
       $resp->error = $this->t('Signature verification failed for ' . $address);
     }
 
