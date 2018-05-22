@@ -153,7 +153,8 @@ class EthereumSignupController extends EthereumController {
     // Verify signature.
     $recoveredAddress = $this->web3->personalEcRecover($this->terms_text, new EthD($signature));
 
-    if($address !== $recoveredAddress) {
+    $signatureIsVerified = ($address === $recoveredAddress);
+    if(!$signatureIsVerified) {
       $resp->error = $this->t('Signature verification failed for ' . $address);
     }
 
@@ -172,7 +173,7 @@ class EthereumSignupController extends EthereumController {
     }
 
     // Create new User.
-    if (!$resp->account_exists && $signature_verified ) {
+    if (!$resp->account_exists && $signatureIsVerified ) {
 
       $auth = new ExternalAuth(
         Drupal::entityManager(),
