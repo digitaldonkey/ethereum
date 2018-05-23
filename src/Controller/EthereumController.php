@@ -189,10 +189,7 @@ class EthereumController extends ControllerBase {
     $status_rows[] = [$this->t("Client version (web3_clientVersion)"), $this->web3->web3_clientVersion()->val()];
     $status_rows[] = [$this->t("Listening (net_listening)"), $this->web3->net_listening()->val() ? '✔' : '✘'];
     $status_rows[] = [$this->t("Peers (net_peerCount)"), $this->web3->net_peerCount()->val()];
-
-
-    // @todo This creates a RLP error :?
-    //    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->web3->eth_protocolVersion()->val()];
+    $status_rows[] = [$this->t("Protocol version (eth_protocolVersion)"), $this->web3->eth_protocolVersion()->val()];
 
     $status_rows[] = [$this->t("Network version (net_version)"), $this->web3->net_version()->val()];
     $status_rows[] = [$this->t("Syncing (eth_syncing)"), $this->web3->eth_syncing()->val() ? '✔' : '✘'];
