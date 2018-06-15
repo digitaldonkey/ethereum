@@ -1,6 +1,6 @@
 name: Ethereum User Connector
 type: module
-description: Drupal user connector enables Drupal users to verify an Ethereum account address using a smart contract.
+description: Drupal user connector enables Users to verify an Ethereum account address using a smart contract.
 core: 8.x
 package: ethereum
 dependencies:
