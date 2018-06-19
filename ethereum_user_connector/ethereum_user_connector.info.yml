@@ -1,6 +1,6 @@
 name: Ethereum User Connector
 type: module
-description: Drupal user connector enables Users to verify an Ethereum account address using a smart contract.
+description: Drupal user connector allows a Drupal user to submit his account to a simple registry smart contract. If the submission is sucessful the user gets a new role. This is an example POC of a paywall system.
 core: 8.x
 package: ethereum
 dependencies:
