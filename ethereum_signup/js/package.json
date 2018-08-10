@@ -5,8 +5,8 @@
   "main": "ethereum-signup.js",
   "dependencies": {},
   "devDependencies": {
-    "eth-sig-util": "^1.2.1",
-    "ethereumjs-util": "^5.1.2"
+    "eth-sig-util": "^1.4.2",
+    "ethereumjs-util": "^5.2.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
