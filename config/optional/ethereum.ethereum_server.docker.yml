@@ -1,0 +1,6 @@
+id: docker
+label: 'Docker development'
+url: 'http://192.168.99.100:8545'
+network_id: '5777'
+status: true
+description: 'TestRPC docker (nice for persistent test-chains https://github.com/digitaldonkey/ganache-cli-docker-compose)'
