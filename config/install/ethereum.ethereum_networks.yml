@@ -34,6 +34,11 @@
   description: 'Public POA Network main network'
   link_to_address: 'https://poaexplorer.com/address/search/@address'
 -
+  id: '5777'
+  label: 'TestRPC'
+  description: ''
+  link_to_address: ''
+-
   id: '*'
   label: 'ANY'
   description: 'Local test clients without network Id restriction'
