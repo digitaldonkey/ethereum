@@ -1,0 +1,4 @@
+services:
+  plugin.manager.smartcontract:
+    class: Drupal\ethereum_smartcontract\SmartContractManager
+    parent: default_plugin_manager

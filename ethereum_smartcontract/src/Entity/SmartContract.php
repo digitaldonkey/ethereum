@@ -10,6 +10,7 @@ use Drupal\ethereum\Controller\EthereumController;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 
+
 /**
 * Defines the SmartContract entity.
 *
@@ -138,11 +139,25 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
     if (!$web3) {
       $web3 = \Drupal::service('ethereum.client');
     }
-    return new Web3Contract(
-      $this->getAbi(),
-      $this->getCurrentNetworkAddress(),
-      $web3
-    );
+
+    /* @var $manager \Drupal\ethereum_smartcontract\SmartContractManager */
+    $manager = \Drupal::service('plugin.manager.smartcontract');
+
+      if ($manager->getDefinition($this->id, FALSE)) {
+          return $manager->createInstance($this->id, [
+            $this->getAbi(),
+            $this->getCurrentNetworkAddress(),
+            $web3
+          ]);
+      }
+      else {
+        // Fall back on default contract class if no plugin defined.
+        return new Web3Contract(
+            $this->getAbi(),
+            $this->getCurrentNetworkAddress(),
+            $web3
+          );
+      }
   }
 
   /**
@@ -159,6 +174,24 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
     return $hashes[$fktSignature];
   }
 
+
+    /**
+     * getSolidityClassName().
+     *
+     * @see https://regex101.com/r/pjfNb9/2
+     *
+     * @return string
+     *   Solidity Contract class name.
+     * @throws \Exception
+     */
+  protected function getSolidityClassName() {
+    $matches = [];
+    preg_match_all("/contract\s*(?'classname'\w*)\s*\{/", $this->contract_src, $matches, PREG_SET_ORDER, 0);
+    if (!isset($matches[0]['classname']) || strlen($matches[0]['classname']) <= 1) {
+        throw new \Exception('Can not determine contract name from Solidity source.');
+    }
+    return $matches[0]['classname'];
+  }
 
   /**
    * Get all deployed contracts
