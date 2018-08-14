@@ -13,7 +13,7 @@ use Drupal\Component\Annotation\Plugin;
  *
  * Plugin Namespace: Plugin\ethereum_smartcontract\SmartContract
  *
- * @see \Drupal\ethereum_smartcontract\SmartContractManager
+ * @see \Drupal\ethereum_smartcontract\SmartContractLoader
  * @see plugin_api
  *
  * @Annotation

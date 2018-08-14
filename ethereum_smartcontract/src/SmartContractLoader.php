@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains SmartContractManager.
+ * Contains SmartContractLoader.
  */
 
 namespace Drupal\ethereum_smartcontract;
@@ -22,10 +22,10 @@ use Drupal\Core\Plugin\DefaultPluginManager;
  * @see ethereum_user_connector/src/Plugin/SmartContract/RegisterDrupal.php
  *
  */
-class SmartContractManager extends DefaultPluginManager {
+class SmartContractLoader extends DefaultPluginManager {
 
   /**
-   * Constructs an SmartContractManager object.
+   * Constructs an SmartContractLoader object.
    *
    * @param \Traversable $namespaces
    *   An object that implements \Traversable which contains the root paths

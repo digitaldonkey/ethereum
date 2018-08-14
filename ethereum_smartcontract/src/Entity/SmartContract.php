@@ -140,7 +140,7 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
       $web3 = \Drupal::service('ethereum.client');
     }
 
-    /* @var $manager \Drupal\ethereum_smartcontract\SmartContractManager */
+    /* @var $manager \Drupal\ethereum_smartcontract\SmartContractLoader */
     $manager = \Drupal::service('plugin.manager.smartcontract');
 
       if ($manager->getDefinition($this->id, FALSE)) {
