@@ -119,7 +119,7 @@ class EventProcessor extends ResourceBase {
    *   Throws exception expected.
    */
   public function get($tx_hash = NULL) {
-    $cached = FALSE; // Helpful for development, but should be off in Production.
+    $cached = TRUE; // Default: TRUE - Helpful for development.
     $resp = NULL;
 
     $tx_hash = strtolower(Xss::filter($tx_hash));
