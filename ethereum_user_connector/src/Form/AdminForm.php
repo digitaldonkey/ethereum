@@ -119,9 +119,6 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
       // Callable instance od the deployed contract.
       $register_drupal = $contract->getCallable();
 
-      // YAY we have our Method imported by plugin.
-      $XXX = method_exists($register_drupal, 'onAccountCreated');
-
       $contract_exists = $register_drupal->contractExists()->val();
 
       if ($contract_exists) {

@@ -3,6 +3,7 @@
 namespace Drupal\ethereum_user_connector\Plugin\SmartContract;
 
 use Ethereum\SmartContract;
+use Ethereum\EmittedEvent;
 
 /**
  * @SmartContract(
@@ -11,10 +12,18 @@ use Ethereum\SmartContract;
  */
 class RegisterDrupal extends SmartContract {
 
-  public function onAccountCreated($args) {
+  public function onAccountCreated(EmittedEvent $event) {
+
     // You can implement any EventHandler here.
     // The method name must be "on" + NameOfSolidityEvent
-    $X = FALSE;
+    // you MUST take care that your event values are only processed once,
+    // this handler might get called multiple times with the same Event.
+
+    \Drupal::logger('ethereum_user_connector')->info(
+      'Account "@emitter" was added to the registry contract at "@contract".', [
+        '@emitter' => $event->getEmitter(),
+        '@contract' => $event->getContract(),
+      ]);
   }
 
 }
