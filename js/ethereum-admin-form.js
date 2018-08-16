@@ -27,36 +27,30 @@
 
         // This will throw an unavoidable net::ERR_INTERNET_DISCONNECTED error
         // in console if server is not reachable.
-        server.isConnected = web3.isConnected();
-
-        if (server.isConnected) {
-          updateItem(server, elm);
-
-          web3.version.getNetwork(function (error, result) {
-            if (!error) {
-              server.netVersion = result;
-              updateItem(server, elm);
-            }
-            else {
-              log('Error getting Network version', error);
-            }
+        web3.eth.net.isListening()
+          .then(function (result) {
+            server.isConnected = result;
+            updateItem(server, elm);
+          }, function(error) {
+            // No connection.
+            updateItem(server, elm);
           });
 
-          web3.version.getEthereum(function (error, result) {
-            if (!error) {
-              server.nodeVersion = result;
-              updateItem(server, elm);
-            }
-            else {
-              log('Error getting Ethereum version', error);
-            }
-
+        web3.eth.net.getId()
+          .then(function (result) {
+            server.netVersion = result;
+            updateItem(server, elm);
+          }, function(error) {
+            log('Error getting Network version', error);
           });
-        }
-        else {
-          // No connection.
-          updateItem(server, elm);
-        }
+
+        web3.eth.getProtocolVersion()
+          .then(function (result) {
+            server.nodeVersion = result;
+            updateItem(server, elm);
+          }, function(error) {
+            log('Error getting Ethereum version', error);
+          });
       });
     },
     updateItem: function (server, context) {
