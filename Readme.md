@@ -99,10 +99,10 @@ Add the following to the "repositories" section of your root `composer.json` fil
     "type": "package",
     "package": {
         "name": "ethereum/web3.js",
-        "version": "1.0.0-beta.34",
+        "version": "1.0.0-beta.35",
         "type": "drupal-library",
         "dist": {
-            "url": "https://github.com/ethereum/web3.js/archive/v1.0.0-beta.34.zip",
+            "url": "https://github.com/ethereum/web3.js/archive/v1.0.0-beta.35.zip",
             "type": "zip"
         }
     }

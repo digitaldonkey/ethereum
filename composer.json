@@ -11,6 +11,6 @@
   "require": {
     "digitaldonkey/ethereum-php": "dev-dev",
     "league/commonmark": "~0.15",
-    "ethereum/web3.js": "1.0.0-beta.34"
+    "ethereum/web3.js": "1.0.0-beta.35"
   }
 }
