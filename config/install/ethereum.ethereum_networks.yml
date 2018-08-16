@@ -1,40 +1,40 @@
 -
-  id: '0'
-  label: 'Olympic'
-  description: 'Olympic,Ethereum public pre-release testnet'
--
   id: '1'
   label: 'Main'
   description: 'Public Ethereum main network (Frontier, Homestead, Metropolis, ...)'
--
-  id: '2'
-  label: 'Morden'
-  description: 'Public Ethereum testnet,now Ethereum Classic testnet'
+  link_to_address: 'https://etherscan.io/address/@address'
 -
   id: '3'
   label: 'Ropsten'
   description: 'Public Morden testnet'
+  link_to_address: 'https://ropsten.etherscan.io/address/@address'
 -
   id: '4'
   label: 'Rinkeby'
   description: 'Public Geth PoA testnet'
+  link_to_address: 'https://rinkeby.etherscan.io/address/@address'
 -
   id: '8'
   label: 'Ubiq'
   description: 'Public Gubiq main network with flux difficulty chain'
+  link_to_address: ''
 -
   id: '42'
   label: 'Kovan'
   description: 'Public Parity PoA test network'
+  link_to_address: 'https://kovan.etherscan.io/address/@address'
 -
   id: '77'
   label: 'Sokol'
   description: 'Public POA Network test network'
+  link_to_address: 'https://explorer-sokol.poa.network/en/addresses/@address/transactions'
 -
   id: '99'
   label: 'Core'
   description: 'Public POA Network main network'
+  link_to_address: 'https://poaexplorer.com/address/search/@address'
 -
   id: '*'
   label: 'ANY'
   description: 'Local test clients without network Id restriction'
+  link_to_address: ''

@@ -2,40 +2,47 @@ Drupal Ethereum
 ===============
  
 
-**Features**
+**Introduction**
 
-Drupal Ethereum Module enhances the Drupal ecosystem with Ethereum functionality.
-The module is the base and includes submodules like the [Ethereum User connector](https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/ethereum_user_connector/Readme.md).
+Drupal Ethereum Module enhances the Drupal ecosystem with Ethereum functionality. 
 
-In the mid term scope the module will be a "framework" for configurable applications consisting of deploy-able _Smart Contracts_ and connected Drupal functionality. 
+The basic **Ethereum module** provides a basic framework to interact with the Blockchain via the [Ethereum-PHP](https://github.com/digitaldonkey/ethereum-php) library and is prepared to talk to different Ethereum network nodes (like development, testing, live).
 
+<small>This module provides a List of networks (ethereum.ethereum_networks.yml) and a current server setting (ethereum.settings.yml).</small>
 
+[**Ethereum Smartcontract**](https://github.com/digitaldonkey/ethereum/tree/8.x-1.x/ethereum_smartcontract) submodule allows you to manage smart contracts and use Drupal configuration to connect to the contract depending on the Network the contract has been deployed to. 
 
-**Quick set-up**
+<small>This module provides a schema to manage smart contracts (ethereum_smartcontract.schema.yml)</small>
 
-* To get all required dependencies you need to run `composer install`  
-* Make sure Drupal has a Ethereum Node to read from by configuring *Configure Ethereum connection* (/admin/config/ethereum/network). **Saving the form settings** will validate the current settings and let you know if something is wrong. 
-* There are 3 different network settings provided. Default Ethereum node is set to Infura.io <a href="kovan.etherscan.io">Kovan test-network</a>.
-* You may set up you own Ethereum node as described below. 
- 
-More below at "Drupal Ethereum Getting started" and in the <a href="https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/ethereum_user_connector/Readme.md">user connector Readme</a>. 
- 
-**Dependencies** 
+[**Ethereum TXsigner**](to be merged) module is responsible for the frontend part of user interaction. It is currently limited to Web3 enabled Browsers, like [Metamask](https://metamask.io/) browser extension, [Brave Browser](https://brave.com/), [Mist browser](https://github.com/ethereum/mist/releases), but also supports [Metamask Mascara](https://github.com/MetaMask/mascara) (but Mascara is early Alpha by now). 
 
-<a href="https://en.wikipedia.org/wiki/Ethereum">Ethereum</a> is a blockchain based, decentralized ledger system developed by the <a href="https://www.ethereum.org/">Ethereum foundation</a>. In order to connect to the Ethereum network you may use a service or set up you own network node.
+<small>This module provides a web3 instance so you will have the same Web3 version and not depend what is injected by whichever browser/extension is used.</small>
 
-If you used composer to install Drupal core and the Ethereum module everything should work out of the box using <a href="infura.io">Infura's free service</a> to connect to the Ethereum network. 
+[**Ethereum User connector**](https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/ethereum_user_connector/Readme.md) is a submodule providing a very simple registry contract (See the [Prove of concept (POC) video](https://www.youtube.com/watch?v=Y5Sa7QtpXSE). This is a early example how the actual applications would be Able to use the infrastructure provided by Drupal Ethereum module.
 
-<a href="https://www.lullabot.com/articles/goodbye-drush-make-hello-composer">Don't know composer</a>? You should. 
+<small>This module is an example of a Smartcontract. Currently refactoring to match the post POC infrastructure described above.</small>
 
- 
+**Community**
+
+* [Gitter](https://gitter.im/drupal_ethereum)
+* [Issues](https://github.com/digitaldonkey/ethereum/issues)
+* [Drupal page](https://www.drupal.org/project/ethereum)
+* [Drupal Ethereum user group](https://groups.drupal.org/ethereum)
+* [PHP Library Issues](https://github.com/digitaldonkey/ethereum-php/issues)
+
+You might watch my Drupal conference talks from [Vienna](https://events.drupal.org/vienna2017/sessions/drupal-and-ethereum-blockchain) or [Baltimore](https://events.drupal.org/baltimore2017/sessions/drupal-and-ethereum-blockchain).
  
 ## Drupal Ethereum Getting started
 
-You may checkout the <a href="https://www.youtube.com/watch?v=Y5Sa7QtpXSE">POC video and transcript</a> describing how to do a paywall with Drupal and Drupal Ethereum including all steps.
+**TLDR; Quick set-up**
 
+* Run `composer install` to get all required dependencies
+* Make sure Drupal has a Ethereum Node to read from by configuring *Configure Ethereum connection* (/admin/config/ethereum/network). **Saving the form settings** will validate the current settings and let you know if something is wrong. 
+* You can start testing with Infura networks provided, run a test client like [Ganache](http://truffleframework.com/ganache) (former [testrpc](http://truffleframework.com/ganache/)) or set up you own Ethereum node.
 
-**Install Drupal** 
+If you used [composer](https://www.lullabot.com/articles/goodbye-drush-make-hello-composer) to install Drupal core and the Ethereum module everything should work out of the box using <a href="infura.io">Infura's free service</a> to connect to the Ethereum network. 
+ 
+### Long version
 
 The quickest way to do this is to follow the steps below. You will need PHP [Composer](https://getcomposer.org/) and [drush](http://www.drush.org/en/master/) installed on your system. Alternatively, you can <a href="https://www.drupal.org/docs/8/install">install Drupal manually</a>. 
 
@@ -149,27 +156,4 @@ truffle migrate
 truffle serve
 ```  
 
-##Add Drupal Ethereum Module (Old Sandbox version)
-
-
-Until there is a dev release we need to manually add the dependencies to the composer.json file. 
-
-Edit drupal/composer.json and add the 3 modules and PHP library repositories. 
-
-```
-"repositories": [
-    {
-        "type": "composer",
-        "url": "https://packages.drupal.org/8"
-    },
-    {
-        "type": "git",
-        "url": "https://github.com/digitaldonkey/ethereum.git"
-    },
-    {
-        "type": "git",
-        "url": "https://github.com/digitaldonkey/ethereum-php.git"
-    }
-```
-
-
+## Development and testing

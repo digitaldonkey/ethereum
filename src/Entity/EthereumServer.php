@@ -5,6 +5,7 @@ namespace Drupal\ethereum\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\ethereum\EthereumServerInterface;
+use Ethereum\Ethereum;
 
 /**
  * Defines the EthereumServer entity.
@@ -67,7 +68,7 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   /**
    * The server address (including the port).
    *
-   * @var string|uri
+   * @var string
    */
   protected $url;
 
@@ -105,13 +106,16 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    * {@inheritdoc}
    */
   public function validateConnection() {
-    $return = ['error' => FALSE, 'message' => ''];
+    $return = [
+      'error' => FALSE,
+      'message' => 'Server ' . $this->id . ' (' . $this->url .') is up and on listening on Ethereum network id ' . $this->network_id
+    ];
     try {
-      /** @var \Ethereum\Ethereum $client */
-      $client = \Drupal::service('ethereum.client_factory')->get($this->getUrl());
+      /** @var \Ethereum\Ethereum $web3 */
+       $web3 = \Drupal::service('ethereum.client_factory')->get($this->getUrl());
 
       // Try to connect.
-      $networkVersion = $client->net_version()->val();
+      $networkVersion = $web3->net_version()->val();
       if (!is_string($networkVersion)) {
         throw new \Exception('eth_protocolVersion return is not valid.');
       }
@@ -129,7 +133,6 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
         ]),
       ];
     }
-
     return $return;
   }
 

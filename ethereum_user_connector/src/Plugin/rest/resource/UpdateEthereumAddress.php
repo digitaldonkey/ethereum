@@ -97,25 +97,33 @@ class UpdateEthereumAddress extends ResourceBase {
   public function get($address) {
 
     // @todo Add setting for allow anonymous signup?
+    // This requires a different storage mechanism for the Hash.
+    // If the user is not authenticated we can just temporarily store the
+    // Hash somewhere. On verify we would make sure that if the user was
+    // not registered yet and we have a submitted Hash.
+    // Thinking more about that when we have EcRecover
+    // (see branch feature-ethereum_signup) merged. Think with EcRecover signup
+    // is easier and we can submit to the registry after.
+
     if ($this->currentUser->isAuthenticated()) {
 
       $address = strtolower(Xss::filter($address));
+
       if (EthereumStatic::isValidAddress($address)) {
 
         $user = User::load($this->currentUser->id());
-        $address_field = $user->get('field_ethereum_address');
-        $old_address = $address_field->getValue()[0]['value'];
-
+        $old_address = $user->get('field_ethereum_address')->getString();
         if ($old_address !== $address) {
           // Drupal Hash and validation status will be updated hook_pre_save.
           $user->set('field_ethereum_address', $address);
           if ($user->save() !== SAVED_UPDATED) {
             throw new \Exception('Error updating user Ethereum status for UID: ' . $user->id());
           }
+          $message = $this->t('Successfully updated account address @old with @new.', array('@old' => $old_address, '@new' => $address));
+          Drupal::logger('ethereum_user_connector')->notice($message);
         }
-        $hash = $user->get('field_ethereum_drupal_hash')->getValue()[0]['value'];
-        $message = $this->t('Successfully updated account address @old with @new.', array('@old' => $old_address, '@new' => $address));
-        Drupal::logger('ethereum_user_connector')->notice($message);
+        $hash = $user->get('field_ethereum_drupal_hash')->getString();
+
         $response = new ResourceResponse(array('hash' => $hash));
         $response->addCacheableDependency($user);
         return $response;

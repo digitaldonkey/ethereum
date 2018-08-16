@@ -1,5 +1,5 @@
 id: infura_kovan
-label: 'Infura Kovan Test Network'
+label: 'Infura Kovan Test Node'
 url: 'https://kovan.infura.io/drupal'
 network_id: '42'
 status: true

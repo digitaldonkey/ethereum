@@ -1,5 +1,5 @@
 id: infura_mainnet
-label: 'Infura Main Ethereum Network'
+label: 'Infura Main Ethereum Node'
 url: 'https://mainnet.infura.io/drupal'
 network_id: '1'
 status: false

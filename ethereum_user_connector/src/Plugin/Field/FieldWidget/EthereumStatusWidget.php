@@ -2,14 +2,11 @@
 
 namespace Drupal\ethereum_user_connector\Plugin\Field\FieldWidget;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
-use Ethereum\Ethereum;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,13 +21,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * )
  */
 class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginInterface {
-
-  /**
-   * The Ethereum JsonRPC client.
-   *
-   * @var \Ethereum\Ethereum
-   */
-  protected $client;
 
   /**
    * The config factory.
@@ -52,16 +42,9 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
    *   The widget settings.
    * @param array $third_party_settings
    *   Any third party settings.
-   * @param \Ethereum\Ethereum $ethereum_client
-   *   The Ethereum JsonRPC client.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, Ethereum $ethereum_client, ConfigFactoryInterface $config_factory) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
-
-    $this->client = $ethereum_client;
-    $this->configFactory = $config_factory;
   }
 
   /**
@@ -74,9 +57,7 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
       $plugin_definition,
       $configuration['field_definition'],
       $configuration['settings'],
-      $configuration['third_party_settings'],
-      $container->get('ethereum.client'),
-      $container->get('config.factory')
+      $configuration['third_party_settings']
     );
   }
 
@@ -96,31 +77,34 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
 
     global $base_path;
 
-    $entity = $items->getEntity();
-    $status_map = $entity->field_ethereum_account_status->getSettings()['allowed_values'];
-
-    // Module settings.
-    $config = $this->configFactory->get('ethereum_user_connector.settings');
+    $user = $items->getEntity();
+    $status_map = $user->field_ethereum_account_status->getSettings()['allowed_values'];
 
     $element['value'] = $element + [
       '#theme' => 'field_ethereum_account_status',
+      '#cache' => [
+        // @todo This cache setup does not seem to work.
+        'tags' => [
+          'config:ethereum_smartcontract.contract.register_drupal',
+          'config:ethereum.settings',
+        ],
+        'contexts' => ['user']
+      ],
       '#children' => $items,
-      '#user_ethereum_address' => $entity->field_ethereum_address->value,
-      '#status_number' => $entity->field_ethereum_account_status->value,
+      '#user_ethereum_address' => $user->field_ethereum_address->getString(),
+      '#status_number' => $user->field_ethereum_account_status->getString(),
       '#status_map' => json_encode($status_map),
-      '#status' => isset($status_map[$entity->field_ethereum_account_status->value]) ? $status_map[$entity->field_ethereum_account_status->value] : $status_map[0],
-      '#ethereum_drupal_hash' => $entity->field_ethereum_drupal_hash->value,
+      '#status' => isset($status_map[$user->field_ethereum_account_status->getString()]) ? $status_map[$user->field_ethereum_account_status->getString()] : $status_map[0],
+      '#ethereum_drupal_hash' => $user->field_ethereum_drupal_hash->getString(),
       '#attached' => array(
         'library' => array(
           'ethereum_user_connector/ethereum-user-connector',
+          // Add register_drupal (Currently actually all active contracts).
+          'ethereum_smartcontract/contracts'
         ),
         'drupalSettings' => array(
           'ethereumUserConnector' => array(
-            'contractAddress' => EthereumUserConnectorController::getContractAddress(),
-            'userEthereumAddress' => $entity->field_ethereum_address->value,
-            'drupalHash' => $entity->field_ethereum_drupal_hash->value,
-            'validateContractCall' => $this->client->ensureHexPrefix($config->get('contract_contractExists_call')),
-            'contractNewUserCall' => $this->client->ensureHexPrefix($config->get('contract_newUser_call')),
+            'drupalHash' => $user->field_ethereum_drupal_hash->getString(),
             'verificationUrl' => $base_path . 'ethereum/validate/',
             'updateAccountUrl' => $base_path . 'ethereum/update-account/',
           ),
@@ -129,5 +113,4 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
     ];
     return $element;
   }
-
 }
