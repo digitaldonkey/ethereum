@@ -1,0 +1,13 @@
+name: Ethereum Signup
+type: module
+description: Ethereum signed single sign on without smart contract.
+core: 8.x
+package: ethereum
+version: 8.x-1
+dependencies:
+  - ethereum
+  - externalauth
+  - rest
+configure: ethereum.settings.ethereum_signup
+test_dependencies:
+ - restui

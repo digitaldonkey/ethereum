@@ -1,0 +1,15 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - ethereum_signup
+    - serialization
+id: ethereum_signup_verify
+plugin_id: ethereum_signup_verify
+granularity: method
+configuration:
+  POST:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie

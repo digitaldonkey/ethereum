@@ -1,0 +1,5 @@
+ethereum.settings.ethereum-signup:
+  route_name: ethereum.settings.ethereum_signup
+  parent: ethereum.admin_index
+  title: 'Ethereum Signup Configuration'
+  description: 'Configure contract less single sign on.'

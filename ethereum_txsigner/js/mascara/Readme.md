@@ -23,11 +23,11 @@ Gol is to mplement transaction signers (web3 providers) and fall back to [Metama
 
 A tiny UI showing the web3 account and network status. It should look like one of the following lines.
 
-![Mascara wrapper ui](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/doc-assets/mascara-wrapper-ui.gif)
+![Mascara wrapper ui](https://raw.githubusercontent.com/digitaldonkey/mascara_wrapper/master/doc-assets/mascara-wrapper-ui.gif)
  
 **What it does?**
  
-![Maskara wrapper current state](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/doc-assets/mascara-wrapper-UML.gif)
+![Maskara wrapper current state](https://raw.githubusercontent.com/digitaldonkey/mascara_wrapper/master/doc-assets/mascara-wrapper-UML.gif)
 
 **How to launch my app?**
 
@@ -70,7 +70,7 @@ npm run build
 
 ```
 npm install --global watchify
-cd js/metamask
+cd js/mascara
 npm install
 npm run dev
 ```

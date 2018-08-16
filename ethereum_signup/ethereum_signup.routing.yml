@@ -1,0 +1,7 @@
+ethereum.settings.ethereum_signup:
+  path: '/admin/config/ethereum/ethereum-signup'
+  defaults:
+    _form: '\Drupal\ethereum_signup\Form\AdminForm'
+    _title: 'Ethereum User Signup Configuration'
+  requirements:
+    _permission: 'administer site configuration'

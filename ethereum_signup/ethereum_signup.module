@@ -1,0 +1,129 @@
+<?php
+
+/**
+ * @file
+ * Contains ethereum_user_connector.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\StringTranslation\TranslatableMarkup;
+use Drupal\ethereum_signup\Controller\EthereumSignupController;
+
+/**
+ * Implements hook_form_alter().
+ *
+ * Adding Ethereum to Registration and login forms.
+ *
+ * @inheritdoc
+ */
+function ethereum_signup_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  global $base_url;
+
+  if ($form_id == 'user_login_form' || $form_id == 'user_register_form' || $form_id === 'user_pass_reset') {
+    $config = \Drupal::config('ethereum_signup.settings');
+
+    $settings = array(
+      'require_mail' => ($config->get('require_mail') || $config->get('require_mail_confirm')),
+      'require_mail_confirm' => $config->get('require_mail_confirm'),
+      'require_admin_confirm' => $config->get('require_admin_confirm'),
+      'register_link_text' => $config->get('register_link_text'),
+      'register_terms_text' => $config->get('register_terms_text'),
+      'login_link_text' => $config->get('login_link_text'),
+    );
+
+    $form['ethereum-signup'] = array(
+      '#title' => new TranslatableMarkup('Sign up and log in using Ethereum'),
+      '#theme' => 'ethereum_signup_login_block',
+      '#ui_visible_without_web3' => $config->get('ui_visible_without_web3'),
+      '#weight' => 100,
+    );
+
+    // Log in link.
+    if ($form_id == 'user_login_form' || $form_id === 'user_pass_reset') {
+      $form['ethereum-signup']['#login_link_text'] = $config->get('login_link_text');
+      $settings['api'] = $base_url . '/ethereum/signup/auth';
+    }
+
+    // Registration link.
+    if ($form_id == 'user_register_form') {
+      $form['ethereum-signup']['#register_link_text'] = $config->get('register_link_text');
+      $settings['api'] = $base_url . '/ethereum/signup/register';
+    }
+
+    $form['#attached']['drupalSettings']['ethereum_signup'] = $settings;
+    $form['#attached']['library'][] = 'ethereum_signup/ethereum-signup';
+  }
+
+  // Turn Password reset into Mail-confirmation-only.
+  if ($form_id === 'user_pass_reset') {
+    $buildInfo = $form_state->getBuildInfo();
+    if (EthereumSignupController::isEthereumSignupUser($buildInfo['args'][0])) {
+      $form['#title'] = new TranslatableMarkup('Email confirmed');
+      $args = $form['message']['#markup']->getArguments();
+      $text = '<p>Email for %user_name confirmed.</p>';
+      $form['message']['#markup']= new TranslatableMarkup($text, $args);
+      unset($form['help']);
+      unset($form['actions']);
+      unset($form['#submit']);
+      $form['#action'] = substr($form['#action'], 0, strpos ( $form['#action'] , 'user')) . 'user';
+    }
+  }
+
+  // Remove Passwords for Ethereum Signup Accounts.
+  if ($form_id === 'user_form') {
+    $user = $form_state->getStorage();
+    if (isset($user['user']) && EthereumSignupController::isEthereumSignupUser($user['user'])) {
+      unset($form['account']['pass']);
+    }
+  }
+
+}
+
+/**
+ * Implements hook_preprocess().
+ *
+ * Prepare template variables for field_ethereum_account_status template.
+ *
+ * @inheritdoc
+ */
+function ethereum_signup_preprocess_ethereum_signup_login_block (&$variables) {
+  $vars = $variables['ethereum_signup_login_block'];
+  $variables['title'] = $vars['#title'];
+
+  if (isset($vars['#register_link_text'])) {
+    $variables['register_link_text'] = $vars['#register_link_text'];
+  }
+  if (isset($vars['#login_link_text'])) {
+    $variables['login_link_text'] = $vars['#login_link_text'];
+  }
+  $variables['ui_visible_without_web3'] = $vars['#ui_visible_without_web3'];
+}
+
+
+/**
+ * Implements hook_theme().
+ */
+function ethereum_signup_theme() {
+  return [
+    'ethereum_signup_login_block' => [
+      'template' => 'ethereum_signup_login_block',
+      'render element' => 'ethereum_signup_login_block',
+    ],
+  ];
+}
+
+
+
+/**
+ * Implements hook_help().
+ *
+ * @inheritdoc
+ */
+function ethereum_signup_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.ethereum_signup':
+      return ethereum_get_readme_html('ethereum_signup');
+    default:
+  }
+}

@@ -31,11 +31,11 @@ Prototype of Drupal Smart Contract ABI interface.
 so you can use a contract like 
 
 ```php 
-try {
-  $contractConfigEntity = \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');
+$contractConfigEntity = \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');
 
+try {
   // Callable Smart contract of type: \Ethereum\SmartContract.
-  $contract = $$contractConfigEntity->getCallable();
+  $contract = $contractConfigEntity->getCallable();
 
   // Call contract function.
   $user_address = $contract->validateUserByHash(new EthS($hash));
