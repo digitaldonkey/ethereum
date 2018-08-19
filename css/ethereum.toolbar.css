@@ -1,0 +1,24 @@
+/**
+ * @file
+ * Styling for the Ethereum module icons.
+ */
+
+/**
+ * Toolbar tab icon.
+ */
+.toolbar-bar .toolbar-icon-ethereum {
+  display: block;
+}
+.toolbar-bar .toolbar-icon-ethereum:before {
+  background-image: url(../misc/icons/bebebe/ethereum.svg);
+}
+
+/**
+ * Tab appearance.
+ */
+.toolbar .toolbar-bar .ethereum-toolbar-tab .network-label {
+  color: #e09600;
+}
+.toolbar .toolbar-bar .ethereum-toolbar-tab--is-mainnet .network-label {
+  color: #81C071;
+}

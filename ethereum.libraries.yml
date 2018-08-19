@@ -6,3 +6,9 @@ ethereum-admin-form:
     - core/drupal
     - core/jquery
     - core/jquery.once
+
+ethereum-toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/ethereum.toolbar.css: {}

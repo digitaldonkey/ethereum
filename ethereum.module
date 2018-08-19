@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\ethereum\Controller\EthereumController;
+use Drupal\ethereum\Entity\EthereumServer;
 use League\CommonMark\CommonMarkConverter;
 
 /**
@@ -44,4 +46,43 @@ function ethereum_field_formatter_info_alter(array &$info) {
   // Allow the 'Ethereum address' field type to use the existing 'Basic string'
   // formatter.
   $info['basic_string']['field_types'][] = 'ethereum_address';
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function ethereum_toolbar() {
+  $current_server = \Drupal::config('ethereum.settings')->get('current_server');
+  $server = EthereumServer::load($current_server);
+  $networks = EthereumController::getNetworks();
+
+  $items['ethereum'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#value' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$server->getNetworkId()]['label']]),
+      '#attributes' => [
+        'title' => t('Current Ethereum network'),
+        'class' => ['toolbar-icon', 'toolbar-icon-ethereum'],
+      ],
+    ],
+    '#wrapper_attributes' => [
+      'class' => ['ethereum-toolbar-tab'],
+    ],
+    '#weight' => 1500,
+    '#attached' => [
+      'library' => [
+        'ethereum/ethereum-toolbar',
+      ],
+    ],
+  ];
+
+  // Add a special class to the wrapper if we are on the main network so we
+  // can highlight it with a different color.
+  if ($server->getNetworkId() === '1') {
+    $items['ethereum']['#wrapper_attributes']['class'][] = 'ethereum-toolbar-tab--is-mainnet';
+  }
+
+  return $items;
 }
