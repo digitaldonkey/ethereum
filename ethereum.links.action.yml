@@ -3,3 +3,9 @@ entity.ethereum_server.add_server_form:
   title: 'Add Ethereum node'
   appears_on:
     - ethereum.settings
+
+entity.ethereum_address.add_form:
+  route_name: entity.ethereum_address.add_form
+  title: 'Add address'
+  appears_on:
+    - entity.ethereum_address.collection
