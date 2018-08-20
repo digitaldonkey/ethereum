@@ -24,7 +24,6 @@ use Drupal\ethereum\EthereumAddressInterface;
  *   handlers = {
  *     "storage_schema" = "Drupal\ethereum\EthereumAddressStorageSchema",
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
- *     "access" = "Drupal\ethereum\EthereumAddressAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
  *     "form" = {
  *       "default" = "Drupal\Core\Entity\ContentEntityForm",
