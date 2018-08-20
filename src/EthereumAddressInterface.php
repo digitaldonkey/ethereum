@@ -10,6 +10,24 @@ use Drupal\Core\Entity\ContentEntityInterface;
 interface EthereumAddressInterface extends ContentEntityInterface {
 
   /**
+   * Gets the Ethereum address.
+   *
+   * @return string
+   *   The Ethereum address.
+   */
+  public function getAddress();
+
+  /**
+   * Sets the address.
+   *
+   * @param string $address
+   *   The address.
+   *
+   * @return $this
+   */
+  public function setAddress($address);
+
+  /**
    * Gets the address' network ID.
    *
    * @return string

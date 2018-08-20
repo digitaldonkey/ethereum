@@ -38,7 +38,8 @@ use Drupal\ethereum\EthereumAddressInterface;
  *   admin_permission = "administer site configuration",
  *   base_table = "ethereum_address",
  *   entity_keys = {
- *     "id" = "address",
+ *     "id" = "id",
+ *     "uuid" = "uuid",
  *     "label" = "address",
  *   },
  *   links = {
@@ -47,10 +48,28 @@ use Drupal\ethereum\EthereumAddressInterface;
  *     "edit-form" = "/admin/config/ethereum/addresses/address/{ethereum_address}/edit",
  *     "delete-form" = "/admin/config/ethereum/addresses/address/{ethereum_address}/delete",
  *     "collection" = "/admin/config/ethereum/addresses",
- *   }
+ *   },
+ *   constraints = {
+ *     "EthereumAddressNetwork" = {}
+ *   },
  * )
  */
 class EthereumAddress extends ContentEntityBase implements EthereumAddressInterface {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getAddress() {
+    return $this->get('address')->value;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setAddress($address) {
+    $this->set('address', $address);
+    return $this;
+  }
 
   /**
    * {@inheritdoc}
@@ -86,6 +105,11 @@ class EthereumAddress extends ContentEntityBase implements EthereumAddressInterf
    * {@inheritdoc}
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = parent::baseFieldDefinitions($entity_type);
+
+    // Ensure that we can store as many addresses as possible.
+    $fields['id']->setSetting('size', 'big');
+
     $fields['address'] = BaseFieldDefinition::create('ethereum_address')
       ->setLabel(new TranslatableMarkup('Address'))
       ->setRequired(TRUE)

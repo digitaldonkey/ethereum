@@ -17,9 +17,11 @@ class EthereumAddressStorageSchema extends SqlContentEntityStorageSchema {
   protected function getEntitySchema(ContentEntityTypeInterface $entity_type, $reset = FALSE) {
     $schema = parent::getEntitySchema($entity_type, $reset);
 
-    // Use a composite primary key because an Ethereum address can only exist in
-    // the context of a specific network.
-    $schema[$this->storage->getBaseTable()]['primary key'] = [$entity_type->getKey('id'), 'network'];
+    // Add a UNIQUE index on the 'address' and 'network' fields because two
+    // identical addresses can not live on the same network.
+    $schema[$this->storage->getBaseTable()]['unique keys'] += [
+      'ethereum_address__address_network' => ['address', 'network'],
+    ];
 
     return $schema;
   }
@@ -33,6 +35,9 @@ class EthereumAddressStorageSchema extends SqlContentEntityStorageSchema {
 
     if ($table_name == $this->storage->getBaseTable()) {
       switch ($field_name) {
+        case 'address':
+          $schema['fields'][$field_name]['not null'] = TRUE;
+          break;
         case 'network':
           $schema['fields'][$field_name]['not null'] = TRUE;
           $schema['fields'][$field_name]['length'] = 4;

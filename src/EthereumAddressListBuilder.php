@@ -27,9 +27,9 @@ class EthereumAddressListBuilder extends EntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     /** @var \Drupal\ethereum\EthereumAddressInterface $entity */
-    $row['address'] = $entity->id();
-    $networks = EthereumController::getNetworksAsOptions();
-    $row['network'] = $networks[$entity->getNetworkId()];
+    $networks = EthereumController::getNetworks();
+    $row['address'] = $entity->getAddress();
+    $row['network'] = $networks[$entity->getNetworkId()]['label'];
     return $row + parent::buildRow($entity);
   }
 
