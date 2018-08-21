@@ -13,6 +13,7 @@ use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController;
 use Drupal\Component\Utility\Xss;
 
 
+
 /**
  * Provides a resource to get view modes by entity and bundle.
  *
@@ -95,6 +96,9 @@ class ValidateEthereumAccount extends ResourceBase {
   public function get($hash) {
     if ($this->currentUser->isAuthenticated()) {
       $controller = \Drupal::service('class_resolver')->getInstanceFromDefinition(EthereumUserConnectorController::class);
+
+      /* @var $controller EthereumUserConnectorController */
+
       $validation = $controller->verifyUserByHash(Xss::filter($hash));
       if (is_array($validation) && $validation['success']) {
         $message = $this->t('Successfully validated account ' . $validation['ethereum_address'] . ' with hash ' . $validation['ethereum_drupal_hash']);

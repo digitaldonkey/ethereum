@@ -7,3 +7,8 @@ smartcontract-entity-form:
     - core/drupal
     - core/jquery
     - core/jquery.once
+smartcontract-entity-form-css:
+  version: VERSION
+  css:
+    theme:
+      css/smartcontract-entity-form.css: {}

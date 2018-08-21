@@ -1,0 +1,22 @@
+{
+  "parser": "babel-eslint",
+    "extends": [
+      "standard"
+    ],
+    "plugins": [
+      "babel"
+    ],
+    "rules": {
+      "key-spacing"          : 0,
+      "padded-blocks": ["error", {"blocks": "never", "classes": "always"}],
+      "jsx-quotes"           : [2, "prefer-single"],
+      "max-len"              : [2, 120, 2],
+      "object-curly-spacing" : [2, "always"],
+      "brace-style"          : [2, "stroustrup"],
+      "space-before-function-paren": [2, {
+        "anonymous": "always",
+        "named": "never",
+        "asyncArrow": "always"
+      }]
+    }
+}

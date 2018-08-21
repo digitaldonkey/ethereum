@@ -11,12 +11,18 @@ ethereum_smartcontract.contract.*:
     contract_src:
       type: string
       label: 'Contract Source file (relative path to ethereum_smartcontract directory).'
-    contract_compiled_json:
+    abi:
       type: string
-      label: 'Compiled contract JSON as provided by solidity compiler (solc).'
+      label: 'Smart contract ABI'
     networks:
       type: sequence
       label: 'Contract addresses by network id.'
       sequence:
         -  type: string
            label: '<network_id> => <contract address>'
+    is_imported:
+      type: bool
+      label: 'Contract was imported from Truffle'
+    imported_file:
+      type: string
+      label: 'Full path to the imported JSON file if applicable.'

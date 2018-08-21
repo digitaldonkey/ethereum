@@ -61,7 +61,7 @@ This job creates a minified version.
 
 ```
 npm install --global browserify
-cd js/metamask
+cd js/mascara
 npm install
 npm run build
 ```

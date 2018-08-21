@@ -69,7 +69,7 @@
 
     var settings = $.extend({
       // These are the defaults.
-      version: '0.4.23',
+      version: '0.4.24',
       optimize: 1
     }, options);
 
