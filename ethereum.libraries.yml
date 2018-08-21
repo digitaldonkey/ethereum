@@ -1,3 +1,16 @@
+web3:
+  remote: https://github.com/ethereum/web3.js
+  version: "1.0.0-beta.35"
+  license:
+    name: GNU-GPL-3.0-or-later
+    url: https://github.com/ethereum/web3.js/blob/v1.0.0-beta.35/LICENSE
+    gpl-compatible: true
+  js:
+    /libraries/web3.js/dist/web3.min.js: { minified: true }
+    js/ethereum-web3.js: {}
+  dependencies:
+    - core/drupalSettings
+
 ethereum-admin-form:
   version: VERSION
   js:
@@ -6,3 +19,4 @@ ethereum-admin-form:
     - core/drupal
     - core/jquery
     - core/jquery.once
+    - ethereum/web3
