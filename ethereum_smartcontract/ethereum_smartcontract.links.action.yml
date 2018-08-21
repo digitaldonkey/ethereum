@@ -1,5 +1,23 @@
 entity.smartcontract.add_form:
   route_name: 'entity.smartcontract.add_form'
-  title: 'Add smartcontract'
+  title: 'Add Smartcontract'
   appears_on:
     - entity.smartcontract.collection
+
+entity.smartcontract.import_form_one:
+  route_name: 'entity.smartcontract.import_form_one'
+  title: 'Import from Truffle'
+  appears_on:
+  - entity.smartcontract.collection
+
+entity.smartcontract.import_form_two:
+  route_name: 'entity.smartcontract.import_form_two'
+  title: 'Import from Truffle'
+
+entity.smartcontract.import_form_three:
+  route_name: 'entity.smartcontract.import_form_three'
+  title: 'Import smartcontract from Truffle'
+
+entity.smartcontract.import_form_update:
+  route_name: 'entity.smartcontract.import_form_update'
+  title: 'Update Truffle Smartcontract from Disk'
