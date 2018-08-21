@@ -4,11 +4,9 @@ Drupal Ethereum
 
 **Introduction**
 
-Drupal Ethereum Module enhances the Drupal ecosystem with Ethereum functionality. 
+Drupal Ethereum Module enhances the Drupal ecosystem with Ethereum SmartContract functionality. 
 
 The basic **Ethereum module** provides a basic framework to interact with the Blockchain via the [Ethereum-PHP](https://github.com/digitaldonkey/ethereum-php) library and is prepared to talk to different Ethereum network nodes (like development, testing, live).
-
-<small>This module provides a List of networks (ethereum.ethereum_networks.yml) and a current server setting (ethereum.settings.yml).</small>
 
 [**Ethereum Smartcontract**](https://github.com/digitaldonkey/ethereum/tree/8.x-1.x/ethereum_smartcontract) submodule allows you to manage smart contracts and use Drupal configuration to connect to the contract depending on the Network the contract has been deployed to. 
 
@@ -36,9 +34,10 @@ You might watch my Drupal conference talks from [Vienna](https://events.drupal.o
 
 **TLDR; Quick set-up**
 
+* Add Web3js to the "repositories" section of your root `composer.json` (see "Add the following to the repositories section..."  below)
 * Run `composer install` to get all required dependencies
 * Make sure Drupal has a Ethereum Node to read from by configuring *Configure Ethereum connection* (/admin/config/ethereum/network). **Saving the form settings** will validate the current settings and let you know if something is wrong. 
-* You can start testing with Infura networks provided, run a test client like [Ganache](http://truffleframework.com/ganache) (former [testrpc](http://truffleframework.com/ganache/)) or set up you own Ethereum node.
+* You can start testing with Infura networks provided. 
 
 If you used [composer](https://www.lullabot.com/articles/goodbye-drush-make-hello-composer) to install Drupal core and the Ethereum module everything should work out of the box using <a href="infura.io">Infura's free service</a> to connect to the Ethereum network. 
  
@@ -46,25 +45,20 @@ If you used [composer](https://www.lullabot.com/articles/goodbye-drush-make-hell
 
 The quickest way to do this is to follow the steps below. You will need PHP [Composer](https://getcomposer.org/) and [drush](http://www.drush.org/en/master/) installed on your system. Alternatively, you can <a href="https://www.drupal.org/docs/8/install">install Drupal manually</a>. 
 
-**Download latest Drupal**
+**Install Drupal**
 
 ```
+# Download latest Drupal
 composer create-project drupal-composer/drupal-project:~8.0 drupal --stability dev --no-interaction
-```
 
-**Create a Database**
-
-```
+# Create a Database
 mysql -uroot  --execute="CREATE DATABASE \`drupalEthereumTest.local\`;"
-```
 
-**Drupal with drush**
-
-```
+# Drupal with drush
 # Create a configuration export directory. This is not required, but very usefull.
 mkdir drupal/config
-# Change to web root 
 
+# Change to web root 
 cd drupal/web/
 # Scripted drupal installation. Revalidate the database. It will be overwritten.
 drush site-install standard --db-url="mysql://root:root@localhost:3306/drupalEthereumTest.local" --account-name="tho" --account-pass="password" --site-name="drupalEthereum.local" --account-mail="email@donkeymedia.eu" --site-mail="email@donkeymedia.eu" --config-dir="../config" --notify="global"
@@ -72,30 +66,15 @@ drush site-install standard --db-url="mysql://root:root@localhost:3306/drupalEth
 
 _DON'T FORGET TO CHANGE YOUR PASSWORD AFTER FIRST LOGIN._
 
-**Download and enable additional Drupal modules**
 
-[RestUI](https://www.drupal.org/project/restui) is a user interface for Drupal 8's REST module.
+**Composer install**
 
-```
-# Composer commands need to be run from the drupal directory
-cd ..
-composer require drupal/restui drupal/admin_toolbar
-``` 
-Enable the modules
-
-```
-cd web/
-drush en admin_toolbar_tools -y
-# If enabling REST API produces an error you may do it later in the Drupal UI.
-drush en restui -y
-```
-
-**Add Drupal Ethereum Module**
+[RestUI](https://www.drupal.org/project/restui) is a user interface for Drupal 8's REST module. You'll need it for development.
 
 Add the following to the "repositories" section of your root `composer.json` file:
 
 ```
-"web3": {
+{
     "type": "package",
     "package": {
         "name": "ethereum/web3.js",
@@ -109,22 +88,40 @@ Add the following to the "repositories" section of your root `composer.json` fil
 },
 ```
 
-Then you should be able to install the module as usual (through Composer):
+Composer commands need to be run from the drupal directory
 
 ```
-# Composer commands need to be run from the drupal directory
-cd ..
-composer require drupal/ethereum
+# Download using composer
+composer require drupal/ethereum drupal/restui drupal/admin_toolbar 
+composer install 
+ 
+# Enable the modules
 cd web/
-drush en ethereum -y
+drush en ethereum restui admin_toolbar_tools -y
 ```
 
 Visit /admin/config/ethereum/network, save the configuration settings then check the status page at /admin/reports/ethereum to verify that it's working.
 
+## Networks & Ethereum nodes
+
+**Networks** are Drupal configuration. This module provides a List of networks ([ethereum.ethereum_networks.yml](https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/config/install/ethereum.ethereum_networks.yml)).
+Ethereum nodes and Networks are matched by the Ethereum network ID.
+Currently there is no UI for editing networks. You can add new network IDs by changing file above and re-enabling the module. 
+
+**Network Settings** are provided at */admin/config/ethereum/network*.
+
+**Ethereum Server** also refered as *Ethereum Nodes* are the connection to the Ethereum Blockchain. We manage the Servers as editable configuration entities. 
+
+**Default Network** setting allows to select a default route Drupal will use to connect to Ethereum Blockchain. 
+
 
 ## Running your own Ethereum node
 
-If you want to use geth (go-ethereum client), <a href="https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum">install it</a> then start the geth server with rpc.
+**Ganache** is a very easy to use Ethereum Blockchain for development and testing. It is [available for many platforms](https://truffleframework.com/ganache) and has a Block explorer build in. 
+
+**Docker Ganache-cli** has no Block explorer, but it allows you to keep a persisten *test chain*. Have a look at [ganache-cli-docker-compose](https://github.com/digitaldonkey/ganache-cli-docker-compose).
+
+**Geth** is the *go-ethereum client*. If you want to use geth (go-ethereum client), <a href="https://github.com/ethereum/go-ethereum/wiki/Building-Ethereum">install it</a> then start the geth server with rpc.
 On a Mac this looks like this (be aware that the "*" allows connections from any host):
 
 ``` 
@@ -132,28 +129,10 @@ On a Mac this looks like this (be aware that the "*" allows connections from any
 ``` 
 
 
-**Development environment for *smart contracts* using Testrpc**
+## Development environment with Truffle
 
-If you want to experiment with developing your own smart contract, it is recommended to use testrpc, which provides a fast Ethereum node for local testing. 
+If you want to experiment with developing your own smart contract, it is recommended to use [Truffle](http://truffleframework.com/).
 
-You may modify the currently provided *<a href="https://github.com/digitaldonkey/register_drupal_ethereum">Login Smart Contract</a>* by cloning/forking it. The repository contains a very little Truffle App which helps you to get started with test driven smart contract development. 
+Check out the currently provided *<a href="https://github.com/digitaldonkey/register_drupal_ethereum">Login Smart Contract</a>* by cloning/forking it. The repository contains a very basic App which helps you understand the registration contract from *ethereum_user_connector* module. 
 
-**Connecting with Testrpc**
-
-``` 
-# Start testrpc
-testrpc
-
-# Clone sign-up-contract:
-git clone https://github.com/digitaldonkey/register_drupal_ethereum
-cd register_drupal_ethereum
-
-# Deploy contract to testrpc
-# This will provide you the smart contract address, which you might want to add Drupals settings. 
-truffle migrate
-
-# Start local development environement
-truffle serve
-```  
-
-## Development and testing
+You can now import SmartContracts from Truffle directly into Drupal configuration. 
