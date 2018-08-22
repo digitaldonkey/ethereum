@@ -20,3 +20,9 @@ ethereum-admin-form:
     - core/jquery
     - core/jquery.once
     - ethereum/web3
+
+ethereum-toolbar:
+  version: VERSION
+  css:
+    theme:
+      css/ethereum.toolbar.css: {}
