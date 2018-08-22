@@ -214,6 +214,7 @@ class EthereumController extends ControllerBase {
     }
     $status_rows[] = [$this->t("Coinbase (eth_coinbase)"), $coin_base];
     $address = array();
+
     foreach ($this->web3->eth_accounts() as $addr) {
       $address[] = $addr->hexVal();
     }
@@ -265,10 +266,12 @@ class EthereumController extends ControllerBase {
       $this->t("Uncles of latest block"),
       Markup::create('<div style="max-width: 800px; max-height: 120px; overflow: scroll">' . $this->web3->debug('', $block_latest->getProperty('uncles')) . '</div>'),
     ];
-    $high_block = $this->web3->eth_getBlockByNumber(new EthBlockParam(999999999), new EthB(FALSE));
+    $highBlockNumber = 999999999;
+    $high_block = $this->web3->eth_getBlockByNumber(new EthBlockParam($highBlockNumber), new EthB(FALSE));
+    $high_block = !is_null($high_block) ? $high_block->getProperty('hash') : 'Block ' . $highBlockNumber . ' is null.';
     $random_rows[] = [
       $this->t("Get hash of a high block number<br /><small>Might be empty</small>"),
-      $high_block->getProperty('hash'),
+      $high_block,
     ];
 
 
