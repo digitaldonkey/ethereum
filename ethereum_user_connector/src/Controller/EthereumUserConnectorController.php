@@ -30,9 +30,9 @@ class EthereumUserConnectorController extends EthereumController {
   /**
    * Get SmartContract config entity.
    *
-   * @return SmartContractInterface
-   *
+   * @return \Drupal\Core\Entity\EntityInterface|null
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
   public static function getContractEntity() {
     return \Drupal::entityTypeManager()->getStorage('smartcontract')->load('register_drupal');

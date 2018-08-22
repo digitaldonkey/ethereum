@@ -50,13 +50,23 @@ class EthereumSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Ethereum Default Network'),
     ];
 
+    $enabled_servers = EthereumController::getServerOptionsArray(TRUE);
     $form['default_network']['current_server'] = [
       '#type' => 'select',
-      '#title' => $this->t("Default Server"),
+      '#title' => $this->t('Backend server'),
       '#required' => TRUE,
-      '#description' => $this->t("Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected."),
-      '#options' => EthereumController::getServerOptionsArray(TRUE),
+      '#description' => $this->t('Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected.'),
+      '#options' => $enabled_servers,
       '#default_value' => $config->get('current_server'),
+    ];
+
+    $form['default_network']['frontend_server'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Frontend server'),
+      '#description' => $this->t('Select a default Ethereum Node to connect Drupal frontend to. Only enabled servers can be selected and it has to be on the same network as the backend server.'),
+      '#empty_option' => $this->t('Same as backend'),
+      '#options' => $enabled_servers,
+      '#default_value' => $config->get('frontend_server'),
     ];
 
     $form['default_network']['infura_note'] = [
@@ -73,19 +83,34 @@ class EthereumSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $server_id = $form_state->getValue('current_server');
-    $server = EthereumServer::load($server_id);
+    /** @var \Drupal\ethereum\EthereumServerInterface[] $servers */
+    $servers = EthereumServer::loadMultiple();
 
-    if (!$server->status()) {
-      $form_state->setError($form['default_network']['current_server'], $this->t('%label is not enabled.', ['%label' => $server->label()]));
+    // Validate the backend server.
+    $backend_server_id = $form_state->getValue('current_server');
+    if (!$servers[$backend_server_id]->status()) {
+      $form_state->setError($form['default_network']['current_server'], $this->t('%label is not enabled.', ['%label' => $servers[$backend_server_id]->label()]));
     }
 
-    $verify = $server->validateConnection();
+    $verify = $servers[$backend_server_id]->validateConnection();
     if ($verify['error']) {
-      $form_state->setError(
-        $form['default_network']['current_server'],
-        $verify['message']
-      );
+      $form_state->setError($form['default_network']['current_server'], $verify['message']);
+    }
+
+    // Validate the frontend server.
+    if ($frontend_server_id = $form_state->getValue('frontend_server')) {
+      if (!$servers[$frontend_server_id]->status()) {
+        $form_state->setError($form['default_network']['frontend_server'], $this->t('%label is not enabled.', ['%label' => $servers[$frontend_server_id]->label()]));
+      }
+
+      $verify = $servers[$frontend_server_id]->validateConnection();
+      if ($verify['error']) {
+        $form_state->setError($form['default_network']['frontend_server'], $verify['message']);
+      }
+
+      if ($servers[$frontend_server_id]->getNetworkId() != $servers[$backend_server_id]->getNetworkId()) {
+        $form_state->setError($form['default_network']['frontend_server'], $this->t('The backend and frontend servers must be on the same Ethereum network.'));
+      }
     }
   }
 
@@ -93,8 +118,10 @@ class EthereumSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
+    $values = $form_state->getValues();
     $this->config('ethereum.settings')
-      ->set('current_server', $form_state->getValue('current_server'))
+      ->set('current_server', $values['current_server'])
+      ->set('frontend_server', $values['frontend_server'])
       ->save();
 
     parent::submitForm($form, $form_state);

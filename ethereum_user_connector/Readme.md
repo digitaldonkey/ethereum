@@ -23,6 +23,12 @@ It shows a prove of concept how to set up a "unpayed paywall" using this module.
 * Give permisssion for authenticated users to access the Rest Services
   * restful get update_ethereum_address
   * restful get validate_ethereum_account
+* Settinh up UI
+  * Add custom Display settings for Register/Login at people/accounts/form-display
+  * Add "Ethereum Address" and "Ethereum Account status" fields to the user edit form
+  * Remove the search form at admin/structure/block. It has the same ID than the user (Because of https://www.drupal.org/project/drupal/issues/2938842)
+  * Add the "Ethereum transaction signer Block" at admin/structure/block to your preferred theme location
+
   
 UPDATE 
 * ~Non annonymus registration?~ We will do this in ethereum_signup module after it's merged

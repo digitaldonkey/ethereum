@@ -1,0 +1,5 @@
+textarea[readonly],
+input[readonly] {
+    color: #828282 !important;
+    background: #dadada !important;
+}

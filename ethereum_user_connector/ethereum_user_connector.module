@@ -9,6 +9,7 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\user\Entity\User;
 use Drupal\ethereum_user_connector\Controller\EthereumUserConnectorController as UserConnector;
 use Drupal\Core\Form\FormStateInterface;
+use Ethereum\EthereumStatic;
 
 define('ETHEREUM_USER_CONNECTOR_AUTH_ROLE', 'authorized_ethereum_user');
 
@@ -54,7 +55,7 @@ function ethereum_user_connector_user_presave(User $user) {
     $curr_contract = UserConnector::getContractAddress();
 
     // Generate a hash of this Drupal instance, Smart Contract and User address.
-    $hash = md5($base_url . $curr_address . $curr_contract);
+    $hash = EthereumStatic::removeHexPrefix(EthereumStatic::sha3($base_url . $curr_address . $curr_contract));
 
     if (!$last_address || $last_hash !== $hash) {
       $user->field_ethereum_drupal_hash->set(0, $hash);
