@@ -73,12 +73,15 @@ function ethereum_toolbar() {
   $server = EthereumServer::load($current_server);
   $networks = EthereumController::getNetworks();
 
+  $statusRoute = \Drupal\Core\Url::fromRoute('ethereum.status');
+  $statusLink = $statusRoute->access() ? $statusRoute->tostring() : '';
+
   $items['ethereum'] = [
     '#type' => 'toolbar_item',
     'tab' => [
       '#type' => 'html_tag',
       '#tag' => 'span',
-      '#value' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$server->getNetworkId()]['label']]),
+      '#value' => '<a href="' . $statusLink . '" class="network-label">' . t('Network: @network_label', ['@network_label' => $networks[$server->getNetworkId()]['label']]) . '</a>',
       '#attributes' => [
         'title' => t('Current Ethereum network'),
         'class' => ['toolbar-icon', 'toolbar-icon-ethereum'],
