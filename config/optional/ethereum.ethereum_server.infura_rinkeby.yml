@@ -1,0 +1,6 @@
+id: infura_rinkeby
+label: 'Infura Rinkeby Test Node'
+url: 'https://rinkeby.infura.io/drupal'
+network_id: '4'
+status: true
+description: 'Infura (https://www.infura.io) provides access to Ethereum Nodes, so that you don''t require to host you own.'
