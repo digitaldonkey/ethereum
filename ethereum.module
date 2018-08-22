@@ -61,11 +61,10 @@ function ethereum_js_settings_alter(&$settings, AttachedAssetsInterface $assets)
   // code to rely on an instantiated Web3 object.
   $cfg = \Drupal::config('ethereum.settings');
   $frontend_server = $cfg->get('frontend_server') ? $cfg->get('frontend_server') : $cfg->get('current_server');
-  $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)
-    ->getUrl();
+  $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)->getUrl();
 }
 
- /*
+/**
  * Implements hook_toolbar().
  */
 function ethereum_toolbar() {
