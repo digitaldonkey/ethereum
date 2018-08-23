@@ -1,5 +1,5 @@
 entity.smartcontract.collection:
-  path: '/admin/config/ethereum/smartcontracts'
+  path: '/admin/config/ethereum/smartcontract'
   defaults:
     _entity_list: 'smartcontract'
     _title: 'Smart Contracts'
@@ -11,6 +11,38 @@ entity.smartcontract.add_form:
   defaults:
     _entity_form: 'smartcontract.add'
     _title: 'Add smartcontract'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.import_form_one:
+  path: '/admin/config/ethereum/smartcontract/import'
+  defaults:
+    _entity_form: 'smartcontract.import_form_one'
+    _title: 'Import smartcontract from Truffle'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.import_form_two:
+  path: '/admin/config/ethereum/smartcontract/import-select'
+  defaults:
+    _entity_form: 'smartcontract.import_form_two'
+    _title: 'Import smartcontract from Truffle'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.import_form_three:
+  path: '/admin/config/ethereum/smartcontract/import-submit'
+  defaults:
+    _entity_form: 'smartcontract.import_form_three'
+    _title: 'Import smartcontract from Truffle'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.smartcontract.import_form_update:
+  path: '/admin/config/ethereum/smartcontract/update/{smartcontract}'
+  defaults:
+    _entity_form: 'smartcontract.import_form_update'
+    _title: 'Update Truffle smartcontract from Disk'
   requirements:
     _permission: 'administer site configuration'
 

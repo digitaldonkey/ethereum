@@ -50441,28 +50441,30 @@ module.exports = require('../package.json').version;
 
 },{"../package.json":274}],274:[function(require,module,exports){
 module.exports={
+  "_args": [
+    [
+      "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
+      "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara"
+    ]
+  ],
   "_from": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_id": "websocket@1.0.26",
+  "_id": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
   "_inBundle": false,
   "_integrity": "",
   "_location": "/web3-providers-ws/websocket",
   "_phantomChildren": {},
   "_requested": {
     "type": "git",
-    "raw": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-    "name": "websocket",
-    "escapedName": "websocket",
+    "raw": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
     "rawSpec": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
     "saveSpec": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
     "fetchSpec": "git://github.com/frozeman/WebSocket-Node.git",
     "gitCommittish": "6c72925e3f8aaaea8dc8450f97627e85263999f2"
   },
-  "_requiredBy": [
-    "/web3-providers-ws"
-  ],
+  "_requiredBy": [],
   "_resolved": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_spec": "websocket@git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
-  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara/node_modules/web3-providers-ws",
+  "_spec": "git://github.com/frozeman/WebSocket-Node.git#6c72925e3f8aaaea8dc8450f97627e85263999f2",
+  "_where": "/Users/tho/htdocs/ConsenSys/DrupalEthereum/FeatureWeb3Provider/drupal/web/modules/contrib/ethereum/ethereum_txsigner/js/mascara",
   "author": {
     "name": "Brian McKelvey",
     "email": "brian@worlize.com",
@@ -50472,7 +50474,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/theturtle32/WebSocket-Node/issues"
   },
-  "bundleDependencies": false,
   "config": {
     "verbose": false
   },
@@ -50489,7 +50490,6 @@ module.exports={
     "typedarray-to-buffer": "^3.1.2",
     "yaeti": "^0.0.6"
   },
-  "deprecated": false,
   "description": "Websocket Client & Server Library implementing the WebSocket protocol as specified in RFC 6455.",
   "devDependencies": {
     "buffer-equal": "^1.0.0",

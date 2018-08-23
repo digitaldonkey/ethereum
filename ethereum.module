@@ -5,7 +5,10 @@
  * Contains ethereum.module.
  */
 
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\ethereum\Controller\EthereumController;
+use Drupal\ethereum\Entity\EthereumServer;
 use League\CommonMark\CommonMarkConverter;
 
 /**
@@ -19,6 +22,7 @@ function ethereum_help($route_name, RouteMatchInterface $route_match) {
     case 'help.page.ethereum':
       return ethereum_get_readme_html('ethereum');
     default:
+      return '';
   }
 }
 
@@ -44,4 +48,60 @@ function ethereum_field_formatter_info_alter(array &$info) {
   // Allow the 'Ethereum address' field type to use the existing 'Basic string'
   // formatter.
   $info['basic_string']['field_types'][] = 'ethereum_address';
+}
+
+/**
+ * Implements hook_js_settings_alter().
+ *
+ * @param $settings
+ * @param \Drupal\Core\Asset\AttachedAssetsInterface $assets
+ */
+function ethereum_js_settings_alter(&$settings, AttachedAssetsInterface $assets) {
+  // Provide the URL of the current server in drupalSettings to allow JavaScript
+  // code to rely on an instantiated Web3 object.
+  $cfg = \Drupal::config('ethereum.settings');
+  $frontend_server = $cfg->get('frontend_server') ? $cfg->get('frontend_server') : $cfg->get('current_server');
+  $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)->getUrl();
+}
+
+/**
+ * Implements hook_toolbar().
+ */
+function ethereum_toolbar() {
+  $current_server = \Drupal::config('ethereum.settings')->get('current_server');
+  $server = EthereumServer::load($current_server);
+  $networks = EthereumController::getNetworks();
+
+  $statusRoute = \Drupal\Core\Url::fromRoute('ethereum.status');
+  $statusLink = $statusRoute->access() ? $statusRoute->tostring() : '';
+
+  $items['ethereum'] = [
+    '#type' => 'toolbar_item',
+    'tab' => [
+      '#type' => 'html_tag',
+      '#tag' => 'span',
+      '#value' => '<a href="' . $statusLink . '" class="network-label">' . t('Network: @network_label', ['@network_label' => $networks[$server->getNetworkId()]['label']]) . '</a>',
+      '#attributes' => [
+        'title' => t('Current Ethereum network'),
+        'class' => ['toolbar-icon', 'toolbar-icon-ethereum'],
+      ],
+    ],
+    '#wrapper_attributes' => [
+      'class' => ['ethereum-toolbar-tab'],
+    ],
+    '#weight' => 1500,
+    '#attached' => [
+      'library' => [
+        'ethereum/ethereum-toolbar',
+      ],
+    ],
+  ];
+
+  // Add a special class to the wrapper if we are on the main network so we
+  // can highlight it with a different color.
+  if ($server->getNetworkId() === '1') {
+    $items['ethereum']['#wrapper_attributes']['class'][] = 'ethereum-toolbar-tab--is-mainnet';
+  }
+
+  return $items;
 }
