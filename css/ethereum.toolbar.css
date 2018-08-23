@@ -6,9 +6,6 @@
 /**
  * Toolbar tab icon.
  */
-.toolbar-bar .toolbar-icon-ethereum {
-  display: block;
-}
 .toolbar-bar .toolbar-icon-ethereum:before {
   background-image: url(../misc/icons/bebebe/ethereum.svg);
 }

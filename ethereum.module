@@ -7,6 +7,7 @@
 
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
 use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\Entity\EthereumServer;
 use League\CommonMark\CommonMarkConverter;
@@ -81,15 +82,12 @@ function ethereum_toolbar() {
   $server = EthereumServer::load($current_server);
   $networks = EthereumController::getNetworks();
 
-  $statusRoute = \Drupal\Core\Url::fromRoute('ethereum.status');
-  $statusLink = $statusRoute->access() ? $statusRoute->tostring() : '';
-
   $items['ethereum'] = [
     '#type' => 'toolbar_item',
     'tab' => [
-      '#type' => 'html_tag',
-      '#tag' => 'span',
-      '#value' => '<a href="' . $statusLink . '" class="network-label">' . t('Network: @network_label', ['@network_label' => $networks[$server->getNetworkId()]['label']]) . '</a>',
+      '#type' => 'link',
+      '#title' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$server->getNetworkId()]['label']]),
+      '#url' => Url::fromRoute('ethereum.status'),
       '#attributes' => [
         'title' => t('Current Ethereum network'),
         'class' => ['toolbar-icon', 'toolbar-icon-ethereum'],
