@@ -1,0 +1,4 @@
+entity.ethereum_address.collection:
+  title: List
+  route_name: entity.ethereum_address.collection
+  base_route: entity.ethereum_address.collection

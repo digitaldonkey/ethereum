@@ -14,7 +14,7 @@ use Drupal\ethereum\EthereumAddressInterface;
  * @ContentEntityType(
  *   id = "ethereum_address",
  *   label = @Translation("Ethereum address"),
- *   label_collection = @Translation("Ethereum address"),
+ *   label_collection = @Translation("Ethereum addresses"),
  *   label_singular = @Translation("address"),
  *   label_plural = @Translation("addresses"),
  *   label_count = @PluralTranslation(
@@ -41,6 +41,7 @@ use Drupal\ethereum\EthereumAddressInterface;
  *     "uuid" = "uuid",
  *     "label" = "address",
  *   },
+ *   field_ui_base_route = "entity.ethereum_address.collection",
  *   links = {
  *     "canonical" = "/admin/config/ethereum/addresses/address/{ethereum_address}",
  *     "add-form" = "/admin/config/ethereum/addresses/add",
