@@ -116,11 +116,13 @@ class EthereumAddress extends ContentEntityBase implements EthereumAddressInterf
       ->setReadOnly(TRUE)
       ->setDisplayOptions('view', [
         'label' => 'hidden',
-        'type' => 'basic_string',
+        'type' => 'ethereum_address',
       ])
       ->setDisplayOptions('form', [
         'type' => 'ethereum_address',
-      ]);
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);;
 
     $fields['network'] = BaseFieldDefinition::create('list_string')
       ->setLabel(new TranslatableMarkup('Network'))
@@ -131,7 +133,9 @@ class EthereumAddress extends ContentEntityBase implements EthereumAddressInterf
       ->setSetting('allowed_values_function', '\Drupal\ethereum\Controller\EthereumController::getNetworksAsOptions')
       ->setDisplayOptions('form', [
         'type' => 'options_select',
-      ]);
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
 
     $fields['contract'] = BaseFieldDefinition::create('boolean')
@@ -140,7 +144,9 @@ class EthereumAddress extends ContentEntityBase implements EthereumAddressInterf
       ->setReadOnly(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'boolean_checkbox',
-      ]);
+      ])
+      ->setDisplayConfigurable('view', TRUE)
+      ->setDisplayConfigurable('form', TRUE);
 
     return $fields;
   }

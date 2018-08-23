@@ -14,7 +14,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   label = @Translation("Ethereum address"),
  *   description = @Translation("Provides a field for Ethereum addresses."),
  *   default_widget = "ethereum_address",
- *   default_formatter = "basic_string"
+ *   default_formatter = "ethereum_address"
  * )
  */
 class EthereumAddressItem extends StringItem {
