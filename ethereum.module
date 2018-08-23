@@ -51,6 +51,15 @@ function ethereum_field_formatter_info_alter(array &$info) {
 }
 
 /**
+ * Implements hook_views_data_alter().
+ */
+function ethereum_views_data_alter(array &$data) {
+  // Provide a nice list of options for the 'network' filter.
+  $data['ethereum_address']['network']['filter']['id'] = 'in_operator';
+  $data['ethereum_address']['network']['filter']['options callback'] = 'Drupal\ethereum\Controller\EthereumController::getNetworksAsOptions';
+}
+
+/**
  * Implements hook_js_settings_alter().
  *
  * @param $settings

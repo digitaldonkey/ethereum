@@ -40,7 +40,7 @@ class EthereumAddressStorageSchema extends SqlContentEntityStorageSchema {
           break;
         case 'network':
           $schema['fields'][$field_name]['not null'] = TRUE;
-          $schema['fields'][$field_name]['length'] = 4;
+          $schema['fields'][$field_name]['length'] = 10;
           break;
       }
     }
