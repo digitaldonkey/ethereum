@@ -3,7 +3,6 @@
 namespace Drupal\ethereum_user_connector\Controller;
 
 use Drupal\ethereum\Controller\EthereumController;
-use Drupal\ethereum_smartcontract\SmartContractInterface;
 use Ethereum\DataType\EthD;
 use Ethereum\EthereumStatic;
 
@@ -50,52 +49,74 @@ class EthereumUserConnectorController extends EthereumController {
    * @throws \Exception
    */
   public function verifyUserByHash($hash) {
+    $return = array(
+      'error' => TRUE,
+      'message' => null,
+      'uid' => null,
+      'ethereum_address' => null,
+      'ethereum_drupal_hash' => $hash,
+    );
     try {
-      // Callable Smart contract of type: \Ethereum\SmartContract.
+      /* @var $contract \Ethereum\SmartContract */
       $contract = $this->getContractEntity()->getCallable();
-
-      // Call contract function.
+      /* @var $user_address \Ethereum\DataType\EthD20 */
       $user_address = $contract->validateUserByHash(new EthD(EthereumStatic::ensureHexPrefix($hash)));
-
-      if (!$user_address->isNotNull()) {
-        throw new \Exception('No Ethereum address found in login smart contract registry for drupal hash: ' . $hash);
-      }
-
-      // Check if User Exists
-      $query = \Drupal::service('entity.query')
-        ->get('user')
-        ->condition('field_ethereum_drupal_hash', $hash)
-        ->condition('field_ethereum_address', $user_address->hexVal());
-      $entity_ids = $query->execute();
-
-      if (empty($entity_ids) || count($entity_ids) !== 1) {
-        throw new \Exception('No Drupal user found for Ethereum address and drupal hash. Address: ' . $user_address->hexVal() . ' Hash: ' . $hash);
-      }
-
-      // Update User's ethereum_account_status field.
-      $uid = reset($entity_ids);
-      $user = \Drupal::entityTypeManager()->getStorage('user')->load($uid);
-      $user->field_ethereum_account_status->setValue('2');
-      if ($user->save() !== SAVED_UPDATED) {
-        throw new \Exception('Error updating user Ethereum status for UID: ' . $uid);
-      }
     }
     catch (\Exception $e) {
       // Log the exception to watchdog.
       watchdog_exception('ethereum_user_connector', $e);
-      return array(
-        'success' => FALSE,
-      );
+      $return['message'] = $this->t('Could not call Ethereum Contract. Please try again later.');
+      return $return;
     }
 
-    // Jay! User validated and Confirmed.
-    return array(
-      'success' => TRUE,
-      'message' => 'Successfully validated address ' . $user_address->hexVal(),
-      'uid' => $uid,
-      'ethereum_address' => $user_address->hexVal(),
-      'ethereum_drupal_hash' => $hash,
+    if (!isset ($user_address) || !$user_address->isNotNull()) {
+      $return['message'] = 'No Ethereum address found in login smart contract registry for drupal hash: ' . $hash;
+      return $return;
+    }
+    else {
+      $return['ethereum_address'] = $user_address->hexVal();
+    }
+
+    // Check if User Exists
+    $query = \Drupal::service('entity.query')
+      ->get('user')
+      ->condition('field_ethereum_drupal_hash', EthereumStatic::removeHexPrefix($hash))
+      ->condition('field_ethereum_address', $user_address->hexVal());
+    $entity_ids = $query->execute();
+
+    if (empty($entity_ids) || count($entity_ids) !== 1) {
+      $return['message'] = $this->t(
+        'No user found for Ethereum address and hash. Address @address Hash @hash',
+        ['@address' => $user_address->hexVal(), '@hash' => $hash]
+      );
+      return $return;
+    }
+
+    // Update User's ethereum_account_status field.
+    $uid = reset($entity_ids);
+    /* @var $user \Drupal\user\UserInterface */
+    $user = \Drupal::entityTypeManager()->getStorage('user')->load($uid);
+    $user->set('field_ethereum_account_status', '2');
+    if ($user->save() !== SAVED_UPDATED) {
+      $return['message'] = $this->t(
+        'Error updating user Ethereum status for user @user',
+        ['@user' => $user->label()]
+      );
+      return $return;
+    }
+
+    // Jay.
+    \Drupal::logger('ethereum_user_connector')->info(
+      'Account "@address" was added to the registry contract at "@contract".', [
+      '@address' => $user_address->hexVal(),
+      '@contract' => $contract->getAddress(),
+    ]);
+
+    $return['error'] = FALSE;
+    $return['message'] = $this->t(
+      'Successfully validated address @address', ['@address' => $return['ethereum_address']]
     );
+    return $return;
   }
 
 }

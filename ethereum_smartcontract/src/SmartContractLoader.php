@@ -40,6 +40,13 @@ class SmartContractLoader extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'ethereum_smartcontract');
   }
 
+  /**
+   * @param $plugin_id
+   * @param array $configuration
+   *
+   * @return \Ethereum\SmartContract
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   */
   public function createInstance($plugin_id, array $configuration = []) {
     if (!is_array($this->definitions[$plugin_id])) {
       throw new PluginNotFoundException($plugin_id);

@@ -15,4 +15,3 @@ permissions:
   - 'access shortcuts'
   - 'search content'
   - 'restful get update_ethereum_address'
-  - 'restful get validate_ethereum_account'
