@@ -98,7 +98,7 @@ class EventProcessor extends ResourceBase {
         /* @var $contract SmartContractEntity */
         $event = $contract->getCallable()->processLog($filterChange);
         if ($event) {
-          $emittedEvents[] = $event;
+          $emittedEvents[$contract->id()][] = $event;
         }
       }
     }
@@ -137,17 +137,29 @@ class EventProcessor extends ResourceBase {
           ->eth_getTransactionReceipt(new EthD32($tx_hash));
         if ($txData) {
           foreach ($txData->logs as $filterChange) {
-            $emittedEvents = array_merge($emittedEvents, self::processContractLogs($filterChange));
+            $emittedEvents = array_merge_recursive($emittedEvents, self::processContractLogs($filterChange));
           }
         }
+        $responseData = [];
         if (count($emittedEvents)) {
-          foreach ($emittedEvents as $event) {
-            \Drupal::logger('ethereum_smartcontract')->info(
-              $this->t('Processed Event "@event"', ['@event' => $event->getName()]) .
-              ' <br />' . str_replace("\n", '<br />', $event->getLog()));
+          foreach ($emittedEvents as $contract => $events) {
+
+            foreach ($events as $event) {
+
+              // Log Event.
+              \Drupal::logger('ethereum_smartcontract')->info(
+                $this->t('Processed Event "@event"', ['@event' => $event->getName()]) .
+                ' <br />' . str_replace("\n", '<br />', $event->getLog()));
+
+              // Add event results to Ajax request if it provides Data.
+              if ($event->getResponse()) {
+                $responseData[$contract][$event->getName()][] = $event->getResponse();
+              }
+            }
+
           }
         }
-        $resp = new ResourceResponse(['success' => TRUE]);
+        $resp = new ResourceResponse($responseData);
       } catch (\Exception $e) {
         \Drupal::logger('ethereum_smartcontract')->error($e->getMessage());
         $resp = new ResourceResponse(['error' => $this->t('Could not process your transaction.')], 503);
