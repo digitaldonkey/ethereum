@@ -48,11 +48,13 @@ function ethereum_smartcontract_help($route_name, RouteMatchInterface $route_mat
  * @return array Library.
  */
 function ethereum_smartcontract_library_info_build() {
+  global $base_url;
   $libraries = array();
 
   // Get smartcontract Entities.
   $contracts = \Drupal::entityTypeManager()->getStorage('smartcontract')->loadMultiple();
   $settings = ['ethereum' => ['contracts' => []]];
+  $settings['ethereum']['processTxUrl'] = $base_url . '/ethereum/process_tx/';
 
   foreach ($contracts as $contract) {
     if ($contract->status()) {
