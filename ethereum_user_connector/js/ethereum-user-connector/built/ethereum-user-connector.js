@@ -1,4 +1,4 @@
-(function(){function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s}return e})()({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var _this = this;
 
 /**
@@ -125,6 +125,7 @@ class UserConnector {
     this.web3 = web3;
     this.address = account.toLowerCase();
     this.cnf = drupalSettings.ethereumUserConnector;
+    this.processTxUrl = drupalSettings.ethereum.processTxUrl;
 
     this.authHash = null;
 
@@ -140,7 +141,7 @@ class UserConnector {
     this.contract = new web3.eth.Contract(drupalSettings.ethereum.contracts.register_drupal.jsonInterface, drupalSettings.ethereum.contracts.register_drupal.address);
     this.validateContract();
 
-    // Update Hash in background if ther is no verified address yet.
+    // Update Hash in background if there is no verified address yet.
     if (!Drupal.behaviors.ethereumUserConnectorAddressStatus.hasVerifiedAddress()) {
       this.getAuthHash();
       Drupal.behaviors.ethereumUserConnectorAddressStatus.setAddress(this.address);
@@ -204,24 +205,7 @@ class UserConnector {
         this.transactionHash = hash;
       }).on('receipt', receipt => {
         this.receipt = receipt;
-
-        // Here we have the
-        // AccountCreatedEvent(address from, bytes32 hash, int256 error)
-        // @todo error handling.
-        // Hash allready registered to address.
-        // accountCreated(msg.sender, drupalUserHash, 4);
-        //  --> In this case we can proceed as normal.
-        // Hash allready registered to different address.
-        // accountCreated(msg.sender, drupalUserHash, 3);
-        // Hash too long
-        // accountCreated(msg.sender, drupalUserHash, 2);
-        // Registry is disabled because a newer version is available
-        // accountCreated(msg.sender, drupalUserHash, 1);
-        // Success
-        // accountCreated(msg.sender, drupalUserHash, 0);
-        // @todo The event would ideally be watched at server side.
-
-        this.verifySubmission();
+        this.verifySubmission(receipt.transactionHash);
       })
       // Triggers for every confirm
       // .on('confirmation', (confirmationNumber, receipt) => {
@@ -245,20 +229,27 @@ class UserConnector {
    * There is a AJAX handler which will assign an new role to the user if submission
    * was verified by Drupal.
    */
-  async verifySubmission() {
+  async verifySubmission(txHash) {
 
     // Let Drupal backend verify the transaction submitted by user.
-    const url = `${this.cnf.verificationUrl + this.authHash}?_format=json&t=${new Date().getTime()}`;
+    const url = `${this.processTxUrl + txHash}?_format=json&t=${new Date().getTime()}`;
     const response = await fetch(url, { method: 'get', credentials: 'same-origin' });
+
     if (!response.ok) {
       const msg = 'Can not get verificationUrl';
       this.message.innerHTML += Drupal.theme('message', msg, 'error');
     }
     const result = await response.json();
 
-    const resultType = result.success ? 'status' : 'error';
-    this.message.innerHTML = Drupal.theme('message', result.message, resultType);
-    window.location.reload(true);
+    // Note on EventIndex:
+    // in case your contract emits the same Event twice within one TX you might have more than one.
+
+    // result.<ContractName>.<EventName>.[EventIndex]
+    const resultType = result.register_drupal.AccountCreated[0].error ? 'error' : 'status';
+    this.message.innerHTML = Drupal.theme('message', result.register_drupal.AccountCreated[0].message, resultType);
+    if (!result.register_drupal.AccountCreated[0].error) {
+      window.location.reload(true);
+    }
   }
 
 }
@@ -283,7 +274,6 @@ Drupal.theme.message = (content, type = 'status') => {
  * web3Ready is fired by ethereum_txsigner.txsigner.mascara
  */
 window.addEventListener('web3Ready', () => {
-  console.log('web3Ready');
   window.web3Runner.runWhenReady({
     requireAccount: true,
     networkId: drupalSettings.ethereum.network.id,

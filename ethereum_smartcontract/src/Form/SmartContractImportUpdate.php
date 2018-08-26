@@ -49,6 +49,9 @@ class SmartContractImportUpdate extends SmartContractImportMultistepFormBase {
 
     try {
       if ($contractEntity->save()) {
+
+        //@todo We should invalidate the Rest Cache.
+
         \Drupal::messenger()->addMessage(
           $this->t('Updated contract data from file @file', ['@file' => $file]));
       }

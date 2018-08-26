@@ -95,6 +95,7 @@ class UpdateEthereumAddress extends ResourceBase {
    *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function get($address) {
+    $cached = TRUE; // Default: TRUE - Helpful for development.
 
     // @todo Add setting for allow anonymous signup?
     // This requires a different storage mechanism for the Hash.
@@ -124,9 +125,8 @@ class UpdateEthereumAddress extends ResourceBase {
         }
         $hash = $user->get('field_ethereum_drupal_hash')->getString();
 
-        $response = new ResourceResponse(array('hash' => $hash));
-        $response->addCacheableDependency($user);
-        return $response;
+        $resp = new ResourceResponse(array('hash' => $hash));
+        return $cached ? $resp : $resp->addCacheableDependency(['#cache' => ['max-age' => 0]]);
       }
       throw new InvalidArgumentException();
     }

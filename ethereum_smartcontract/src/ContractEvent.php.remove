@@ -1,0 +1,20 @@
+<?php
+
+namespace Drupal\ethereum_smartcontract;
+use Ethereum\EmittedEvent;
+
+
+class ContractEvent {
+
+  public $event;
+  protected $response;
+
+  public function __construct(array $response, EmittedEvent $event) {
+    $this->event = $event;
+    $this->response = $response;
+  }
+
+  public function getResponse(){
+    return $this->response;
+  }
+}
