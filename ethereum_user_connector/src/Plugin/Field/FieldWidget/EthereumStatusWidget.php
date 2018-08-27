@@ -99,13 +99,11 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
       '#attached' => array(
         'library' => array(
           'ethereum_user_connector/ethereum-user-connector',
-          // Add register_drupal (Currently actually all active contracts).
           'ethereum_smartcontract/contracts'
         ),
         'drupalSettings' => array(
           'ethereumUserConnector' => array(
             'drupalHash' => $user->field_ethereum_drupal_hash->getString(),
-            'verificationUrl' => $base_path . 'ethereum/validate/',
             'updateAccountUrl' => $base_path . 'ethereum/update-account/',
           ),
         ),
