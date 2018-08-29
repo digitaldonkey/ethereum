@@ -3,14 +3,28 @@
   "version": "1.0.0",
   "description": "",
   "main": "ethereum-signup.js",
-  "dependencies": {},
-  "devDependencies": {
+  "author": "Thorsten Krug",
+  "license": "MIT",
+  "dependencies": {
     "eth-sig-util": "^1.4.2",
     "ethereumjs-util": "^5.2.0"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.2",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.10.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "uglify-es": "^3.3.10"
   },
-  "author": "",
-  "license": "ISC"
+  "scripts": {
+    "dev": "watchify --debug  src/ethereumSignup.js -o built/ethereum-signup.js -v",
+    "production": "browserify src/ethereumSignup.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-signup.min.js",
+    "build": "browserify src/ethereumSignup.js -o built/ethereum-signup.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output built/ethereum-signup.min.js -- built/ethereum-signup.js"
+  }
 }

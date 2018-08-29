@@ -112,7 +112,7 @@ class VerifySignup extends ResourceBase {
       $ethSign = new EthereumSignupController();
       $response = $ethSign->verifyRegistration($data['address'], $data['signature'], $data['email'], $this->require_mail);
 
-      if (isset($response['success']) && $response['success']) {
+      if (!$response['error']) {
         $message = $this->t('Successfully validated account ' . $response['ethereum_address'] . ' with hash signature ' . $data['signature']);
         Drupal::logger('ethereum_signup')->notice($message);
         // @todo Maybe log failing attempts with IP.
@@ -152,7 +152,7 @@ class VerifySignup extends ResourceBase {
         throw new \Exception('Invalid params: Missing params');
       }
 
-      $address = Xss::filter($data['address']);
+      $address = strtolower(Xss::filter($data['address']));
       if (substr($address, 0, 2) === '0x' &&
         strlen($address) === 42 &&
         !ctype_xdigit(substr($address, 2))

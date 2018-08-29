@@ -1,11 +1,7 @@
 ethereum-signup:
   version: VERSION
   js:
-#    js/require.js: {}
-    js/ethereum-signup.bundle.js: {}
-#    js/ethereumjs-util/dist/ethereum-js-util.js: {}
+    js/built/ethereum-signup.js: {}
   dependencies:
     - core/drupal
-    - core/jquery
     - core/drupalSettings
-    - core/jquery.once
