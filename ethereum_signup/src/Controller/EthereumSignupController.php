@@ -61,7 +61,7 @@ class EthereumSignupController extends EthereumController {
     $store = Drupal::service('user.shared_tempstore')->get(self::PROVIDER);
     $store->set($address, $challenge_text);
     return array(
-      'success' => TRUE,
+      'error' => FALSE,
       'challenge' => $challenge_text,
     );
   }
@@ -95,7 +95,7 @@ class EthereumSignupController extends EthereumController {
         user_login_finalize($user);
       }
       else {
-        $error = $this->t('User with ' . $address . ' does not exist.');
+        $error = $this->t('User with Ethereum address @address does not exist.', ['@address' => $address]);
       }
     }
     else {
@@ -104,13 +104,12 @@ class EthereumSignupController extends EthereumController {
 
     if (!$error) {
       return array(
-        'success' => TRUE,
+        'error' => FALSE,
         'reload' => $this->login_redirect,
       );
     }
     else {
       return array(
-        'success' => FALSE,
         'error' => $error,
       );
     }
@@ -144,7 +143,6 @@ class EthereumSignupController extends EthereumController {
 
     // Initialize expected response.
     $resp = (object) array(
-      'success' => FALSE,
       'account_exists' => NULL,
       'error' => NULL,
       'ethereum_address' => $address,
@@ -155,7 +153,7 @@ class EthereumSignupController extends EthereumController {
 
     $signatureIsVerified = ($address === $recoveredAddress);
     if(!$signatureIsVerified) {
-      $resp->error = $this->t('Signature verification failed for ' . $address);
+      $resp->error = $this->t('Signature verification failed for @address', ['@address' => $address]);
     }
 
     // Check signature and if not address is not yet registered.
@@ -169,7 +167,7 @@ class EthereumSignupController extends EthereumController {
       // User exists.
       $resp->account_exists = TRUE;
       $resp->uid = $existing_user_uid;
-      $resp->error = $this->t('A user with Ethereum address ' . $address . ' already exists.');
+      $resp->error = $this->t('A user with Ethereum address @address already exists.', ['@address' => $$address]);
     }
 
     // Create new User.
@@ -226,7 +224,7 @@ class EthereumSignupController extends EthereumController {
         $new_user->save();
 
         // Jay! User validated and Confirmed.
-        $resp->success = TRUE;
+        $resp->error = FALSE;
         $resp->uid = $new_user->id();
 
         // Jay! User validated and Confirmed.

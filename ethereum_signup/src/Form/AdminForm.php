@@ -75,7 +75,7 @@ class AdminForm extends ConfigFormBase {
       '#type' => 'checkbox',
       '#title' => $this->t('Display Ethereum for everybody'),
       '#default_value' => $config->get('ui_visible_without_web3'),
-      '#description' => $this->t('The user needs a web3 provider enabled in the browser in order to sign transactions. Un-checking will hide the "signup with Ethereum" option if the users browser does not support web3. You may use Metamask prowser plugin (currently available for Chrome and Firefox) or Mist browser developed by Ethereum foundation.'),
+      '#description' => $this->t('The user needs a web3 provider enabled in the browser in order to sign transactions. Un-checking will hide the "signup with Ethereum" option if the users browser does not support web3. You may use Metamask browser plugin (currently available for Chrome and Firefox) or Mist browser developed by Ethereum foundation.'),
     ];
 
     $form['settings']['login_redirect'] = [

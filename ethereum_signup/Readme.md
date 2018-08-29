@@ -36,15 +36,3 @@ Requires email to send out email conformation mail.
 
 **Require email** Deactivate to have Ethereum-only accounts in combination with *Visitors can directly log in*.
 Make sure *Require email verification when a visitor creates an account* and *Notify user when account is activated* **are not checked in Drupal account settings (/admin/config/people/accounts)**.
-
-### Install 
-Currently there is no EC-recover available in PHP. 
-
-The [Ethereum PHP Library](https://github.com/digitaldonkey/ethereum-php) (which we use) currently works around that issue by using a [command line tool for secp256k1](https://github.com/digitaldonkey/secp256k1-bash) used to recover the message. 
-
-*Temporary Requirements*
-
-* For now you will need the **feature-ecrecover** branch of [Ethereum PHP Library](https://github.com/digitaldonkey/ethereum-php). 
-* [secp256k1-bash](https://github.com/digitaldonkey/secp256k1-bash) available at /opt/local/bin/ecrecover. 
-
-Ethereum module aims to provide out-of the box experience. Ethereum Signup will not be merged to main branch until a PHP or JsonRPC based solution is implemented.

@@ -6,11 +6,12 @@ use Drupal;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
 use Drupal\rest\ResourceResponse;
+use Ethereum\EthereumStatic;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\ethereum_signup\Controller\EthereumSignupController;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
+
 
 
 /**
@@ -134,7 +135,7 @@ class Auth extends ResourceBase {
     }
     else {
       // throw new AccessDeniedHttpException();
-      throw new InvalidArgumentException();
+      throw new \InvalidArgumentException();
     }
   }
 
@@ -154,9 +155,7 @@ class Auth extends ResourceBase {
     try {
       $signature = Xss::filter($data['signature']);
       if (substr($signature, 0, 2) === '0x' &&
-        strlen($signature) >= 132 &&
-        // TODO What is the length of a signature?
-        // strlen($signature) <= 132 &&
+        strlen($signature) === 132 &&
         !ctype_xdigit(substr($signature, 2))
       ) {
         throw new \Exception('Invalid param signature: ' . $signature);
@@ -178,12 +177,8 @@ class Auth extends ResourceBase {
    */
   private function validateAddress(Array $data) {
     try {
-
-      $address = Xss::filter($data['address']);
-      if (substr($address, 0, 2) === '0x' &&
-        strlen($address) === 42 &&
-        !ctype_xdigit(substr($address, 2))
-      ) {
+      $address = strtolower(Xss::filter($data['address']));
+      if (!EthereumStatic::isValidAddress($address)) {
         throw new \Exception('Invalid param address: ' . $address);
       }
       return $address;
