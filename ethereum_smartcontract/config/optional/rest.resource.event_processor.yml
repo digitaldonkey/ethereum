@@ -1,0 +1,16 @@
+status: true
+dependencies:
+  module:
+  - ethereum_smartcontract
+  - serialization
+  - user
+id: event_processor
+plugin_id: event_processor
+granularity: resource
+configuration:
+  methods:
+  - GET
+  formats:
+  - json
+  authentication:
+  - cookie
