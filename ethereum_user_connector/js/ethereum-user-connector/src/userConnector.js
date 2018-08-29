@@ -1,4 +1,8 @@
-
+/*!
+ * UserConnector - Ethereum Registry Contract.
+ * @author Thorsten Krug
+ * @license  GPL2
+ */
 class UserConnector {
 
   constructor(web3, account) {

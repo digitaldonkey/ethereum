@@ -1,6 +1,11 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var _this = this;
 
+/*!
+ * AddressStatus - Visualize Signature status for Address field.
+ * @author Thorsten Krug
+ * @license  GPL2
+ */
 /**
  * Handling Ethereum address status
  *
@@ -43,6 +48,7 @@ class AddressStatus {
   }
 
   addressChanged(event, self) {
+
     const input = event.target;
     // In Drupal Ethereum we always save Ethereum addresses in lowercase!
     const val = input.value.trim().toLocaleLowerCase();
@@ -118,7 +124,11 @@ Drupal.behaviors.ethereumUserConnectorAddressStatus = {
 };
 
 },{}],2:[function(require,module,exports){
-
+/*!
+ * UserConnector - Ethereum Registry Contract.
+ * @author Thorsten Krug
+ * @license  GPL2
+ */
 class UserConnector {
 
   constructor(web3, account) {
