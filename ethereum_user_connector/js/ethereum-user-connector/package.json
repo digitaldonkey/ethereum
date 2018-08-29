@@ -6,7 +6,7 @@
   "scripts": {
     "build": "browserify src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js -- ./built/ethereum-user-connector.js",
     "dev": "watchify --debug  src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js -v",
-    "production": "browserify src/index.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js",
+    "production": "browserify src/userConnector.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js",
     "minify-only": "./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-user-connector.min.js -- ./built/ethereum-user-connector.js",
     "build-only": "browserify src/userConnector.js src/addressStatus.js -o built/ethereum-user-connector.js"
   },

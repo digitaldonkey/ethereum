@@ -1,4 +1,8 @@
-
+/*!
+ * AddressStatus - Visualize Signature status for Address field.
+ * @author Thorsten Krug
+ * @license  GPL2
+ */
 /**
  * Handling Ethereum address status
  *
@@ -43,6 +47,7 @@ class AddressStatus {
   }
 
   addressChanged(event, self) {
+
     const input = event.target
     // In Drupal Ethereum we always save Ethereum addresses in lowercase!
     const val = input.value.trim().toLocaleLowerCase()
@@ -101,7 +106,6 @@ class AddressStatus {
   }
 
 }
-
 
 /**
  * Attaching AddressStatus behaviour.
