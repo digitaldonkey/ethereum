@@ -131,6 +131,8 @@ Drupal.behaviors.ethereumUserConnectorAddressStatus = {
  */
 class UserConnector {
 
+  /* global drupalSettings */
+
   constructor(web3, account) {
     this.web3 = web3;
     this.address = account.toLowerCase();
@@ -184,7 +186,7 @@ class UserConnector {
     const url = `${this.cnf.updateAccountUrl + this.address}?_format=json&t=${new Date().getTime()}`;
     const response = await fetch(url, { method: 'get', credentials: 'same-origin' });
     if (!response.ok) {
-      const msg = 'Can not get a hash for user address. Check permission for \'Access GET on Update Ethereum account resource\'';
+      const msg = 'Can not get a hash. Check permission for \'Access GET on Update Ethereum account resource\'';
       this.message.innerHTML += Drupal.theme('message', msg, 'error');
     }
     const authHash = await response.json();
@@ -205,6 +207,31 @@ class UserConnector {
       await this.getAuthHash();
     }
 
+    try {
+      // Check if we all ready registered with this hash
+      await this.web3.eth.getPastLogs({
+        fromBlock: '0x0',
+        address: drupalSettings.ethereum.contracts.register_drupal.address,
+        topics: [
+        // topics[0] is the hash of the event signature
+        this.web3.utils.sha3('AccountCreated(address,bytes32)'),
+        // Indexed value is the address padded to 32bit.
+        `0x000000000000000000000000${this.address.slice(2)}`]
+      }).then(accountCreatedEvents => {
+        accountCreatedEvents.forEach(tx => {
+          if (tx.type === 'mined' && tx.data === `0x${this.authHash}`) {
+            // We found a TX:
+            // User all ready submitted before. Let's re-validate.
+            return this.verifySubmission(tx.transactionHash);
+          }
+        });
+      });
+    } catch (err) {
+      const msg = `<pre> ${err.message}</pre>`;
+      this.message.innerHTML += Drupal.theme('message', msg, 'error');
+    }
+
+    // Ask user to submit to registry contract.
     try {
       await this.contract.methods.newUser(`0x${this.authHash}`).send({ from: this.address }).on('transactionHash', hash => {
         const msg = `Submitted your verification. TX ID: ${hash}
@@ -240,7 +267,6 @@ class UserConnector {
    * was verified by Drupal.
    */
   async verifySubmission(txHash) {
-
     // Let Drupal backend verify the transaction submitted by user.
     const url = `${this.processTxUrl + txHash}?_format=json&t=${new Date().getTime()}`;
     const response = await fetch(url, { method: 'get', credentials: 'same-origin' });
