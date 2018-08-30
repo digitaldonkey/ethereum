@@ -96,7 +96,7 @@ class UserConnector {
         ]
       }).then((accountCreatedEvents) => {
         accountCreatedEvents.forEach((tx) => {
-          if (tx.type === 'mined' && tx.data === `0x${this.authHash}`) {
+          if (tx.data === `0x${this.authHash}`) {
             // We found a TX:
             // User all ready submitted before. Let's re-validate.
             return this.verifySubmission(tx.transactionHash)
