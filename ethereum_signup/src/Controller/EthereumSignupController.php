@@ -167,7 +167,7 @@ class EthereumSignupController extends EthereumController {
       // User exists.
       $resp->account_exists = TRUE;
       $resp->uid = $existing_user_uid;
-      $resp->error = $this->t('A user with Ethereum address @address already exists.', ['@address' => $$address]);
+      $resp->error = $this->t('A user with Ethereum address @address already exists.', ['@address' => $address]);
     }
 
     // Create new User.

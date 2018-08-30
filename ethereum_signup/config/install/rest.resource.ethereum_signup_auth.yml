@@ -4,8 +4,8 @@ dependencies:
     - ethereum_signup
     - serialization
     - user
-id: ethereum_signup_verify
-plugin_id: ethereum_signup_verify
+id: ethereum_signup_auth
+plugin_id: ethereum_signup_auth
 granularity: resource
 configuration:
   methods:

@@ -19,7 +19,7 @@ use Drupal\ethereum_signup\Controller\EthereumSignupController;
  *
  * @RestResource(
  *   id = "ethereum_signup_auth",
- *   label = @Translation("Challenge response login."),
+ *   label = @Translation("Challenge response login"),
  *   uri_paths = {
  *     "create" = "/ethereum/signup/auth",
  *     "https://www.drupal.org/link-relations/create" = "/ethereum/signup/auth"
