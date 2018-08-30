@@ -53,9 +53,6 @@ window.addEventListener('load', () => {
 })
 
 window.addEventListener('web3Ready', () => {
-  window.console.log('web3Ready')
-
-  window.console.log(window.drupalSettings.ethereum.apps, 'window.drupalSettings.ethereum.apps')
   window.drupalSettings.ethereum.apps.forEach((app) => {
     window.web3Runner.runWhenReady(app)
   })
