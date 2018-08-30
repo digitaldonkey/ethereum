@@ -1,5 +1,5 @@
-require_mail: false
-require_mail_confirm: false
+require_mail: true
+require_mail_confirm: true
 require_admin_confirm: false
 register_role: ethereum_signup_user
 register_link_text: 'Create new account using Ethereum'
