@@ -153,8 +153,8 @@ class UserConnector {
 
     // Update Hash in background if there is no verified address yet.
     if (!Drupal.behaviors.ethereumUserConnectorAddressStatus.hasVerifiedAddress()) {
-      this.getAuthHash();
       Drupal.behaviors.ethereumUserConnectorAddressStatus.setAddress(this.address);
+      this.getAuthHash();
     }
   }
 
