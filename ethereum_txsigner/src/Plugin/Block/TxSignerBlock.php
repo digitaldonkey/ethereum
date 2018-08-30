@@ -28,6 +28,19 @@ class TxSignerBlock extends BlockBase {
     $activeServerId = \Drupal::config('ethereum.settings')->get('current_server');
     $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
 
+    if (\Drupal::service('module_handler')->moduleExists('ethereum_smartcontract')){
+      $activeLibs = [
+        'ethereum_txsigner/txsigners',
+        // Required ot ethereum_smartcontract_library_info_build will not fire.
+        'ethereum_smartcontract/contracts',
+      ];
+    }
+    else {
+      $activeLibs = [
+        'ethereum_txsigner/txsigners',
+      ];
+    }
+
     return [
       '#type' => 'markup',
       '#markup' => '<div id="web3status"></div>',
@@ -37,11 +50,7 @@ class TxSignerBlock extends BlockBase {
         ],
       ],
       '#attached' => [
-        'library' => [
-          'ethereum_txsigner/txsigners',
-          // Required ot ethereum_smartcontract_library_info_build will not fire.
-          'ethereum_smartcontract/contracts',
-        ],
+        'library' => $activeLibs,
         'drupalSettings' => [
           'ethereum' => [
             'network' => [
