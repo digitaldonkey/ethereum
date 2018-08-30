@@ -13,7 +13,7 @@ Two types of messages are signed
 The Module hooks in user_login_form and user_register_form to provide an option to sign up using Ethereum.
 The form user_pass_reset is changed if the user is registered with Ethereum in order to provide email verification without setting a password. 
 
-### Ethereum Signup vs Ethereum User connector
+## Ethereum Signup vs Ethereum User connector
 
 *Ethereum Signup* module only uses Ethereum cryptographic functions. No transactions are made during the signup. Sign-up can be archived with zero cost.
 
@@ -22,7 +22,7 @@ You might want to evaluate this module when you intend to create a paywall by mo
 
 There is no connection between this two modules currently and they are not tested together.
 
-### Configurable registration options
+## Configurable registration options
 
 **Visitors can directly log in.**
 This would provide a Ethereum account-only Drupal account. No passwords or emails are required. 
@@ -36,3 +36,9 @@ Requires email to send out email conformation mail.
 
 **Require email** Deactivate to have Ethereum-only accounts in combination with *Visitors can directly log in*.
 Make sure *Require email verification when a visitor creates an account* and *Notify user when account is activated* **are not checked in Drupal account settings (/admin/config/people/accounts)**.
+
+##Install	
+
+* Enable module
+* Place *Ethereum transaction signer Block* in your theme to appear on /user/login and /user/register
+* Review config at /admin/config/ethereum/ethereum-signup

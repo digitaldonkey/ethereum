@@ -56,7 +56,7 @@ class EthereumSignup {
       address: this.account,
       signature,
     }
-    this.postRequest(`${this.settings.api}?_format=json&XDEBUG_SESSION_START=PHPSTORM`, data, EthereumSignup.loginFinalize)
+    this.postRequest(`${this.settings.api}?_format=jsonPHPSTORM`, data, EthereumSignup.loginFinalize)
   }
 
   /**
@@ -146,6 +146,9 @@ class EthereumSignup {
       const resp = JSON.parse(xhr.response)
       if (xhr.status === 200 && !resp.error) {
         successCallback(resp)
+      }
+      else if (xhr.status !== 200) {
+        this.handleError(resp.message)
       }
       else {
         this.handleError(resp.error)
@@ -250,7 +253,7 @@ Drupal.theme.message = (content, type = 'status') => {
 window.addEventListener('web3Ready', () => {
   window.web3Runner.runWhenReady({
     requireAccount: true,
-    networkId: drupalSettings.ethereum.network.id,
+    networkId: '*',
     run: (web3, account = null) => {
       Drupal.behaviors.ethereum_signup = new EthereumSignup(
         web3,

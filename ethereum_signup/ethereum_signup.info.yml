@@ -8,6 +8,7 @@ dependencies:
   - ethereum
   - externalauth
   - rest
+  - ethereum_txsigner
 configure: ethereum.settings.ethereum_signup
 test_dependencies:
  - restui
