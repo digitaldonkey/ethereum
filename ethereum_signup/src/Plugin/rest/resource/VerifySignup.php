@@ -2,25 +2,22 @@
 
 namespace Drupal\ethereum_signup\Plugin\rest\resource;
 
-use Drupal;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\rest\Plugin\ResourceBase;
-use Drupal\rest\ResourceResponse;
+use Drupal\rest\ModifiedResourceResponse;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Psr\Log\LoggerInterface;
-use Drupal\Ethereum;
 use Drupal\Component\Utility\Xss;
 use Drupal\ethereum_signup\Controller\EthereumSignupController;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
-
+use Drupal\core\Url;
+use Ethereum\EthereumStatic;
 
 /**
  * Provides a resource to get view modes by entity and bundle.
  *
  * @RestResource(
  *   id = "ethereum_signup_verify",
- *   label = @Translation("Validate elipic curve signature"),
+ *   label = @Translation("Validate elliptic curve signature"),
  *   uri_paths = {
  *     "create" = "/ethereum/signup/register",
  *     "https://www.drupal.org/link-relations/create" = "/ethereum/signup/register"
@@ -61,7 +58,7 @@ class VerifySignup extends ResourceBase {
     LoggerInterface $logger,
     AccountProxyInterface $current_user) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $cnf = Drupal::config('ethereum_signup.settings');
+    $cnf = \Drupal::config('ethereum_signup.settings');
     $this->require_mail = ($cnf->get('require_mail') || $cnf->get('require_mail_confirm'));
   }
 
@@ -100,9 +97,8 @@ class VerifySignup extends ResourceBase {
    *
    * @throws \Exception
    *
-   * @return ResourceResponse
+   * @return ModifiedResourceResponse
    *   With validated data.
-   *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function post(Array $data) {
 
@@ -114,18 +110,22 @@ class VerifySignup extends ResourceBase {
 
       if (!$response['error']) {
         $message = $this->t('Successfully validated account ' . $response['ethereum_address'] . ' with hash signature ' . $data['signature']);
-        Drupal::logger('ethereum_signup')->notice($message);
+        \Drupal::logger('ethereum_signup')->notice($message);
         // @todo Maybe log failing attempts with IP.
+
+        if ($this->require_mail) {
+          \Drupal::messenger()->addMessage('Successfully validated account. Please check your email for confirmation.');
+          $response['reload'] = Url::fromRoute('user.login', [],  ['absolute' => TRUE])->tostring();
+        }
+
       }
-      $return = new ResourceResponse($response);
-      $return->addCacheableDependency(FALSE);
-      return $return;
+      return new ModifiedResourceResponse($response);
     }
     else {
       // If tha params are wrong, somebody may try to cheat.
       // @todo Maybe log failing attempts with IP. Here: Wrong params.
       // throw new AccessDeniedHttpException();
-      throw new InvalidArgumentException();
+      throw new \InvalidArgumentException();
     }
   }
 
@@ -153,10 +153,7 @@ class VerifySignup extends ResourceBase {
       }
 
       $address = strtolower(Xss::filter($data['address']));
-      if (substr($address, 0, 2) === '0x' &&
-        strlen($address) === 42 &&
-        !ctype_xdigit(substr($address, 2))
-      ) {
+      if (!EthereumStatic::isValidAddress($address)) {
         throw new \Exception('Invalid param address: ' . $address);
       }
 
@@ -172,7 +169,7 @@ class VerifySignup extends ResourceBase {
       if (isset($data['email'])) {
         $email = Xss::filter($data['email']);
         if ($this->require_mail) {
-          if (!Drupal::service('email.validator')->isValid($email)) {
+          if (!\Drupal::service('email.validator')->isValid($email)) {
             throw new \Exception('Invalid param signature: ' . $email);
           }
         }

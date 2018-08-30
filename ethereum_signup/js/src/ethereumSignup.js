@@ -56,7 +56,7 @@ class EthereumSignup {
       address: this.account,
       signature,
     }
-    this.postRequest(`${this.settings.api}?_format=jsonPHPSTORM`, data, EthereumSignup.loginFinalize)
+    this.postRequest(`${this.settings.api}?_format=json`, data, EthereumSignup.loginFinalize)
   }
 
   /**

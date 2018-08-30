@@ -42,3 +42,6 @@ Make sure *Require email verification when a visitor creates an account* and *No
 * Enable module
 * Place *Ethereum transaction signer Block* in your theme to appear on /user/login and /user/register
 * Review config at /admin/config/ethereum/ethereum-signup
+* Check permissions
+ * Access POST on **Challenge response login** resource for anonymous user
+ * Access POST on **Validate elliptic curve signature** resource for anonymous user
