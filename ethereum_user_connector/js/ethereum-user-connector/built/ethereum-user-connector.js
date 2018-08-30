@@ -209,6 +209,9 @@ class UserConnector {
 
     try {
       // Check if we all ready registered with this hash
+
+      console.log(this.authHash, 'this.authHash');
+
       await this.web3.eth.getPastLogs({
         fromBlock: '0x0',
         address: drupalSettings.ethereum.contracts.register_drupal.address,
@@ -219,7 +222,7 @@ class UserConnector {
         `0x000000000000000000000000${this.address.slice(2)}`]
       }).then(accountCreatedEvents => {
         accountCreatedEvents.forEach(tx => {
-          if (tx.type === 'mined' && tx.data === `0x${this.authHash}`) {
+          if (tx.data === `0x${this.authHash}`) {
             // We found a TX:
             // User all ready submitted before. Let's re-validate.
             return this.verifySubmission(tx.transactionHash);
