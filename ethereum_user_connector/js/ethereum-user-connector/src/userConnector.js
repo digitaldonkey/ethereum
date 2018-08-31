@@ -36,9 +36,55 @@ class UserConnector {
   }
 
   /**
-   * Set this.contractVerified
+   * validateEthereumUser()
    *
-   * @returns {Promise<*>}
+   * @param {Event} event
+   *   User initiated Click event.
+   */
+  async validateEthereumUser(event) {
+    event.preventDefault()
+    let userRejected = false
+
+    try {
+      if (!this.authHash) {
+        await this.getAuthHash()
+      }
+      const previousTx = await this.checkPreviousSubmission()
+      if (previousTx) {
+        this.verifySubmission(previousTx)
+      }
+      else {
+        // Ask user to submit to registry contract.
+        await this.contract.methods.newUser(`0x${this.authHash}`).send({ from: this.address })
+          .on('transactionHash', (hash) => {
+            const msg = `Submitted your verification. TX ID: ${hash}
+                  <br /> Transaction is pending Ethereum Network Approval.
+                  <br /> It takes some time for Drupal to validate the transaction. Please be patient.`
+            this.message.innerHTML += Drupal.theme('message', msg)
+            this.button.remove()
+            this.transactionHash = hash
+          })
+          .on('receipt', (receipt) => {
+            this.receipt = receipt
+            this.verifySubmission(receipt.transactionHash)
+          })
+      }
+    }
+    catch (err) {
+      userRejected = err.message.includes('denied transaction')
+      if (userRejected) {
+        this.message.innerHTML += Drupal.theme('message', 'You rejected the Transaction', 'error')
+      }
+      else {
+        const msg = `<pre> ${err.message}</pre>`
+        this.message.innerHTML += Drupal.theme('message', msg, 'error')
+      }
+      window.console.error(err)
+    }
+  }
+
+  /**
+   * Set this.contractVerified
    */
   async validateContract() {
     const contractVerified = await this.contract.methods.contractExists().call()
@@ -55,8 +101,6 @@ class UserConnector {
 
   /**
    * getAuthHash from Drupal.
-   *
-   * @returns {Promise<void>}
    */
   async getAuthHash() {
     const url = `${this.cnf.updateAccountUrl + this.address}?_format=json&t=${new Date().getTime()}`
@@ -69,77 +113,34 @@ class UserConnector {
     this.authHash = authHash.hash
   }
 
+
+
   /**
-   * validateEthereumUser()
+   * Check if the user all ready submitted a TX to the registry contract.
    *
-   * @param event
-   * @returns {Promise<void>}
+   * @return {string|null}
+   *   TX-hash of this address in the contract or null.
    */
-  async validateEthereumUser(event) {
-    event.preventDefault()
-    let userRejected = false
-
-    if (!this.authHash) {
-      await this.getAuthHash()
-    }
-
-    try {
-      // Check if we all ready registered with this hash
-      await this.web3.eth.getPastLogs({
-        fromBlock:'0x0',
-        address: drupalSettings.ethereum.contracts.register_drupal.address,
-        topics: [
-          // topics[0] is the hash of the event signature
-          this.web3.utils.sha3('AccountCreated(address,bytes32)'),
-          // Indexed value is the address padded to 32bit.
-          `0x000000000000000000000000${this.address.slice(2)}`
-        ]
-      }).then((accountCreatedEvents) => {
-        accountCreatedEvents.forEach((tx) => {
-          if (tx.data === `0x${this.authHash}`) {
-            // We found a TX:
-            // User all ready submitted before. Let's re-validate.
-            return this.verifySubmission(tx.transactionHash)
-          }
-        })
+  async checkPreviousSubmission() {
+    let ret = null
+    const accountCreatedEvents = await this.web3.eth.getPastLogs({
+      fromBlock:'0x0',
+      address: drupalSettings.ethereum.contracts.register_drupal.address,
+      topics: [
+        // topics[0] is the hash of the event signature
+        this.web3.utils.sha3('AccountCreated(address,bytes32)'),
+        // Indexed value is the address padded to 32bit.
+        `0x000000000000000000000000${this.address.slice(2)}`
+      ]
+    })
+    if (accountCreatedEvents.length) {
+      accountCreatedEvents.forEach((tx) => {
+        if (tx.data === `0x${this.authHash}`) {
+          ret = tx.transactionHash
+        }
       })
     }
-    catch (err) {
-      const msg = `<pre> ${err.message}</pre>`
-      this.message.innerHTML += Drupal.theme('message', msg, 'error')
-    }
-
-    // Ask user to submit to registry contract.
-    try {
-      await this.contract.methods.newUser(`0x${this.authHash}`).send({ from: this.address })
-        .on('transactionHash', (hash) => {
-          const msg = `Submitted your verification. TX ID: ${hash}
-                      <br /> Transaction is pending Ethereum Network Approval.
-                      <br /> It takes some time for Drupal to validate the transaction. Please be patient.`
-          this.message.innerHTML += Drupal.theme('message', msg)
-          this.button.remove()
-          this.transactionHash = hash
-        })
-        .on('receipt', (receipt) => {
-          this.receipt = receipt
-          this.verifySubmission(receipt.transactionHash)
-        })
-        // Triggers for every confirm
-        // .on('confirmation', (confirmationNumber, receipt) => {
-        //   window.console.log('on confirmation', [confirmationNumber, receipt])
-        // })
-        .on('error', window.console.error)
-    }
-    catch (err) {
-      userRejected = err.message.includes('denied transaction')
-      if (userRejected) {
-        this.message.innerHTML += Drupal.theme('message', 'You rejected the Transaction', 'error')
-      }
-      else {
-        const msg = `<pre> ${err.message}</pre>`
-        this.message.innerHTML += Drupal.theme('message', msg, 'error')
-      }
-    }
+    return ret
   }
 
   /**
@@ -147,6 +148,9 @@ class UserConnector {
    *
    * There is a AJAX handler which will assign an new role to the user if submission
    * was verified by Drupal.
+   *
+   * @param {string} txHash
+   *   32bit 0x-prefixed hex value.
    */
   async verifySubmission(txHash) {
     // Let Drupal backend verify the transaction submitted by user.
@@ -166,20 +170,19 @@ class UserConnector {
     const resultType = result.register_drupal.AccountCreated[0].error ? 'error' : 'status'
     this.message.innerHTML = Drupal.theme('message', result.register_drupal.AccountCreated[0].message, resultType)
     if (!result.register_drupal.AccountCreated[0].error) {
-      window.location.reload(true)
+      // window.location.reload(true)
     }
   }
-
 }
 
 /**
  * Message template
  *
- * @param content String - Message string (may contain html)
- * @param type String [status|warning|error] - Message type.
- *   Defaults to status - a green info message.
+ * @param {string} content - Message string (may contain html)
+ * @param {string} type - [status|warning|error] - Message type.
+ *   Defaults to status
  *
- * @return String HTML.
+ * @return {string} HTML content.
  */
 Drupal.theme.message = (content, type = 'status') => {
   let msg = `<div role="contentinfo" class="messages messages--${type}"><div role="alert">`
