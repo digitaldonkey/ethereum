@@ -55,7 +55,7 @@ class EthereumSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#title' => $this->t('Backend server'),
       '#required' => TRUE,
-      '#description' => $this->t('Select a default Ethereum Node to connect Drupal backend to. Only enabled servers can be selected.'),
+      '#description' => $this->t('Select a default Ethereum Node to connect the Drupal backend to. Only enabled servers can be selected.'),
       '#options' => $enabled_servers,
       '#default_value' => $config->get('current_server'),
     ];
@@ -63,7 +63,7 @@ class EthereumSettingsForm extends ConfigFormBase {
     $form['default_network']['frontend_server'] = [
       '#type' => 'select',
       '#title' => $this->t('Frontend server'),
-      '#description' => $this->t('Select a default Ethereum Node to connect Drupal frontend to. Only enabled servers can be selected and it has to be on the same network as the backend server.'),
+      '#description' => $this->t('Select a default Ethereum Node to connect the Drupal frontend to. Only enabled servers can be selected and it has to be on the same network as the backend server.'),
       '#empty_option' => $this->t('Same as backend'),
       '#options' => $enabled_servers,
       '#default_value' => $config->get('frontend_server'),
@@ -71,7 +71,7 @@ class EthereumSettingsForm extends ConfigFormBase {
 
     $form['default_network']['infura_note'] = [
       '#type' => 'markup',
-      '#markup' => '<p><a href="https://infura.io/">Infura</a> is a webservice which provides access to Ethereum.<br />Infura requires a token for access. The "drupal" token only to get started. It is not intended for production use and may be revoked on extensive usage.<br /><b>Please <a href="https://infura.io/signup">register</a> your own free Infura token for your own application or run your own Ethereum node.</b><br /></p>',
+      '#markup' => '<p><a href="https://infura.io/">Infura</a> is a webservice which provides access to the Ethereum network.<br />Infura requires a token for access. The "drupal" token is only useful to get started quickly, it is not intended for production use and may be revoked on extensive usage.<br /><b>Please <a href="https://infura.io/signup">register</a> your own free Infura token for your application or run your own Ethereum node.</b><br /></p>',
     ];
 
     $form['#attached']['library'][] = 'ethereum/ethereum-admin-form';

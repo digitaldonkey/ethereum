@@ -12,5 +12,5 @@ ethereum.admin_index:
 ethereum.settings:
   route_name: ethereum.settings
   parent: ethereum.admin_index
-  title: 'Ethereum Network Configuration'
-  description: 'Configure how Drupal connects to Ethereum.'
+  title: 'Ethereum network configuration'
+  description: 'Configure how Drupal connects to the Ethereum network.'
