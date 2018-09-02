@@ -188,10 +188,25 @@ class EthereumController extends ControllerBase {
    * @return array
    *   Render array. Table with current status of the ethereum node.
    */
-  public function status() {
+  public function status($server_id = NULL) {
+    if ($server_id) {
+      try {
+        $server = $this->getServer($server_id);
+      }
+      catch (\Exception $e) {
+        //    catch (\Exception $e) {
+        // Generic exception handling if something else gets thrown.
+        \Drupal::logger('ethereum')->error($e->getMessage());
+        return [
+          '#markup' => $e->getMessage(),
+        ];
+      }
+    }
+    else {
+      //
+      $server = $this->getDefaultServer();
+    }
 
-    // Default server.
-    $server = $this->getDefaultServer();
 
     // Validate active server.
     $liveStatus = $server->validateConnection();
