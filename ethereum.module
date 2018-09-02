@@ -52,6 +52,31 @@ function ethereum_field_formatter_info_alter(array &$info) {
 }
 
 /**
+ * Implements hook_field_views_data().
+ */
+function ethereum_field_views_data(\Drupal\field\FieldStorageConfigInterface $field_storage) {
+  $data = views_field_default_views_data($field_storage);
+  foreach ($data as $table_name => $table_data) {
+    // Add the relationship only on the target_id field.
+    $data[$table_name][$field_storage->getName() . '_network']['filter']['id'] = 'in_operator';
+    $data[$table_name][$field_storage->getName() . '_network']['filter']['options callback'] = '_ethereum_get_networks_options';
+  }
+
+  return $data;
+}
+
+/**
+ * Returns the Ethereum networks as an array suitable for an options element.
+ *
+ * @return array
+ *   An array of Ethereum Networks containing the network name, ID, and
+ *   description, keyed by the network ID.
+ */
+function _ethereum_get_networks_options() {
+  return \Drupal::service('ethereum.manager')->getNetworksAsOptions();
+}
+
+/**
  * Implements hook_js_settings_alter().
  *
  * @param $settings
