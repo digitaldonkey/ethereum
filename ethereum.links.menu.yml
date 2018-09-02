@@ -14,3 +14,9 @@ ethereum.settings:
   parent: ethereum.admin_index
   title: 'Ethereum Network Configuration'
   description: 'Configure how Drupal connects to Ethereum.'
+
+entity.ethereum_address.collection:
+  title: 'Ethereum addresses'
+  parent: ethereum.admin_index
+  description: 'Create and manage Ethereum addresses.'
+  route_name: entity.ethereum_address.collection
