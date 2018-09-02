@@ -2,9 +2,6 @@
 
 namespace Drupal\ethereum;
 
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\ethereum\Controller\EthereumController;
-use Drupal\ethereum\Entity\EthereumServer;
 use Ethereum\Ethereum;
 
 /**
@@ -13,20 +10,20 @@ use Ethereum\Ethereum;
 class EthereumClientFactory {
 
   /**
-   * The config factory.
+   * The Ethereum manager service.
    *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   * @var \Drupal\ethereum\EthereumManagerInterface
    */
-  protected $configFactory;
+  protected $ethereumManager;
 
   /**
-   * Constructs a new EthereumClientFactory.
+   * Constructs a EthereumClientFactory object.
    *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The configuration factory.
+   * @param \Drupal\ethereum\EthereumManagerInterface $ethereum_manager
+   *   The Ethereum manager service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
-    $this->configFactory = $config_factory;
+  public function __construct(EthereumManagerInterface $ethereum_manager) {
+    $this->ethereumManager = $ethereum_manager;
   }
 
   /**
@@ -44,7 +41,7 @@ class EthereumClientFactory {
    */
   public function get($host = NULL) {
     if (!$host) {
-      $host = EthereumController::getDefaultServer()->getUrl();
+      $host = $this->ethereumManager->getCurrentServer()->getUrl();
     }
     return new Ethereum($host);
   }

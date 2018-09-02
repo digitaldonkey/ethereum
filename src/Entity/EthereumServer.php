@@ -75,9 +75,9 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   /**
    * The Ethereum network ID of the server.
    *
-   * @see \Drupal\ethereum\Controller\EthereumController::getNetworks()
+   * @see \Drupal\ethereum\EthereumManagerInterface::getAllNetworks()
    *
-   * @var integer
+   * @var string
    */
   protected $network_id;
 

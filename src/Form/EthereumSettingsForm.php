@@ -2,15 +2,59 @@
 
 namespace Drupal\ethereum\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum\Controller\EthereumController;
-use Drupal\ethereum\Entity\EthereumServer;
+use Drupal\ethereum\EthereumManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
 * Defines a form to configure Ethereum connection settings for this site.
 */
 class EthereumSettingsForm extends ConfigFormBase {
+
+  /**
+   * The Ethereum manager service.
+   *
+   * @var \Drupal\ethereum\EthereumManagerInterface
+   */
+  protected $ethereumManager;
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
+   * Constructs a EthereumSettingsForm object.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\ethereum\EthereumManagerInterface $ethereum_manager
+   *   The Ethereum manager service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
+   */
+  public function __construct(ConfigFactoryInterface $config_factory, EthereumManagerInterface $ethereum_manager, EntityTypeManagerInterface $entity_type_manager) {
+    parent::__construct($config_factory);
+
+    $this->ethereumManager = $ethereum_manager;
+    $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),
+      $container->get('ethereum.manager'),
+      $container->get('entity_type.manager')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -34,14 +78,14 @@ class EthereumSettingsForm extends ConfigFormBase {
 
     // Verify current server.
     if (!$form_state->getUserInput()) {
-      $server = EthereumServer::load($config->get('current_server'));
+      $server = $this->ethereumManager->getCurrentServer();
       $verify = $server->validateConnection();
       if ($verify['error']) {
         $this->messenger()->addError($verify['message']);
       }
     }
 
-    $form['servers'] = \Drupal::entityTypeManager()
+    $form['servers'] = $this->entityTypeManager
       ->getListBuilder('ethereum_server')
       ->render();
 
@@ -50,7 +94,7 @@ class EthereumSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Ethereum Default Network'),
     ];
 
-    $enabled_servers = EthereumController::getServerOptionsArray(TRUE);
+    $enabled_servers = $this->ethereumManager->getServersAsOptions(TRUE);
     $form['default_network']['current_server'] = [
       '#type' => 'select',
       '#title' => $this->t('Backend server'),
@@ -84,7 +128,7 @@ class EthereumSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     /** @var \Drupal\ethereum\EthereumServerInterface[] $servers */
-    $servers = EthereumServer::loadMultiple();
+    $servers = $this->entityTypeManager->getStorage('ethereum_server')->loadMultiple();
 
     // Validate the backend server.
     $backend_server_id = $form_state->getValue('current_server');
