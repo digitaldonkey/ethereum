@@ -138,6 +138,27 @@ class EthereumController extends ControllerBase {
   }
 
   /**
+   * Returns an Ethereum Server by server id.
+   *
+   * @param string $server_id
+   *   Unique server identifier.
+   * @return EthereumServerInterface
+   *   Ethereum server config entity.
+   *
+   * @throws \Exception
+   */
+  public static function getServer($server_id) {
+    $server = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($server_id);
+    if (!$server) {
+      throw new \Exception("Server '$server_id' does not exist.");
+    }
+    if (!$server->status()) {
+      throw new \Exception("Server '$server_id' is not enabled.");
+    }
+    return $server;
+  }
+
+  /**
    * Outputs function call logging as drupal message.
    *
    * This will output logs of all calls if $this->debug = TRUE.
