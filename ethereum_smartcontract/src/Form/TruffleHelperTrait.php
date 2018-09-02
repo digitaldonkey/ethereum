@@ -1,13 +1,9 @@
 <?php
 
-
 namespace Drupal\ethereum_smartcontract\Form;
 
-
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum_smartcontract\Entity\SmartContract;
 use Ethereum\SmartContract as Web3Contract;
-
 
 trait TruffleHelperTrait {
 
@@ -53,7 +49,7 @@ trait TruffleHelperTrait {
    * @return array
    */
   protected static function importNetworks(array $deployedNetworks) {
-    $available = EthereumController::getNetworks();
+    $available = \Drupal::service('ethereum.manager')->getAllNetworks();
     $return = [];
     foreach ($deployedNetworks as $netId => $network) {
       if (isset($available[$netId])) {

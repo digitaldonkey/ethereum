@@ -8,9 +8,7 @@ use Ethereum\Ethereum;
 use Drupal\ethereum\EthereumServerInterface;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\EthB;
-use Ethereum\DataType\EthS;
 use Drupal\Core\Render\Markup;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Controller routines for Ethereum routes.
@@ -37,104 +35,9 @@ class EthereumController extends ControllerBase {
    */
   public function __construct(string $host = null) {
     if (!$host) {
-      $host = $this->getDefaultServer()->get('url');
+      $host = \Drupal::service('ethereum.manager')->getCurrentServer()->getUrl();
     }
     $this->web3 = new Ethereum($host);
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(self::getDefaultServer()->getUrl());
-  }
-
-  /**
-   * Returns Ethereum Networks.
-   *
-   * @return array
-   *   Array of Ethereum Networks containing ID, Name, Description.
-   */
-  public static function getNetworksAsOptions() {
-    $networks = [];
-      foreach (self::getNetworks() as $k => $item) {
-        $networks[$item['id']] = $item['label'] . ' (' . $item['id'] . ')  - ' . $item['description'];
-      }
-      return $networks;
-  }
-
-  /**
-   * Returns Ethereum Networks.
-   *
-   * @return array
-   *   Array of Ethereum Networks containing ID, Name, Description.
-   */
-  public static function getNetworks() {
-    $networks = \Drupal::config('ethereum.ethereum_networks')->getRawData();
-    // Filter out non-numeric keys, like _core
-    $networks = array_filter($networks, function ($k){ return is_int($k);}, ARRAY_FILTER_USE_KEY);
-    $keyEd = [];
-    foreach ($networks as $k => $net) {
-      $keyEd[$net['id']] = $net;
-    }
-    return $keyEd;
-  }
-
-  /**
-   * Ethereum Servers as options.
-   *
-   * @param bool $filter_enabled
-   *   (optional) Restrict to enabled servers. Defaults to FALSE.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *
-   * @return array
-   *   Array [] = machine_name => Label
-   */
-  public static function getServerOptionsArray($filter_enabled = FALSE){
-    $servers = self::getServers($filter_enabled);
-    return array_map(function($k) { return $k->label(); }, $servers);
-  }
-
-  /**
-   * Returns Ethereum Servers.
-   *
-   * @param bool $filter_enabled
-   *    (optional) Restrict to enabled servers. Defaults to FALSE.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
-   *
-   * @return \Drupal\ethereum\EthereumServerInterface[]
-   */
-  public static function getServers($filter_enabled = FALSE) {
-    $storage = \Drupal::entityTypeManager()->getStorage('ethereum_server');
-    if ($filter_enabled) {
-      $servers = $storage->loadByProperties(['status' => TRUE]);
-    }
-    else {
-      $servers = $storage->loadMultiple();
-    }
-    return $servers;
-  }
-
-  /**
-   * Returns Ethereum Default Server
-   *
-   * @return EthereumServerInterface
-   *   Ethereum current Default server config entity.
-   *
-   * @throws \Exception
-   */
-  public static function getDefaultServer() {
-    $current = \Drupal::config('ethereum.settings')->get('current_server');
-    $server = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($current);
-    if (!$server) {
-      throw new \Exception('Current default server (' . $current . ') does not exist.');
-    }
-    if (!$server->status()) {
-      throw new \Exception('Current default server is not enabled.');
-    }
-    return $server;
   }
 
   /**
@@ -168,9 +71,8 @@ class EthereumController extends ControllerBase {
    *   Render array. Table with current status of the ethereum node.
    */
   public function status() {
-
     // Default server.
-    $server = $this->getDefaultServer();
+    $server = \Drupal::service('ethereum.manager')->getCurrentServer();
 
     // Validate active server.
     $liveStatus = $server->validateConnection();
@@ -320,8 +222,7 @@ class EthereumController extends ControllerBase {
    *    Table render array.
    */
   public function getServerInfoAsTable(EthereumServerInterface $server) {
-
-    $networks = EthereumController::getNetworks();
+    $networks = \Drupal::service('ethereum.manager')->getAllNetworks();
     $currentNet = $networks[$server->get('network_id')];
 
     $formElement = array(
