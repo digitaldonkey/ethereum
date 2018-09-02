@@ -5,7 +5,8 @@ namespace Drupal\ethereum\Form;
 use Drupal\Core\Entity\EntityForm;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\ethereum\Entity\EthereumServer;
-use Drupal\ethereum\Controller\EthereumController;
+use Drupal\ethereum\EthereumManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Form handler for the Ethereum Server add and edit forms.
@@ -18,6 +19,32 @@ class EthereumServerForm extends EntityForm {
    * @var \Drupal\ethereum\EthereumServerInterface
    */
   protected $entity;
+
+  /**
+   * The Ethereum manager service.
+   *
+   * @var \Drupal\ethereum\EthereumManagerInterface
+   */
+  protected $ethereumManager;
+
+  /**
+   * Constructs a new EthereumServerForm.
+   *
+   * @param \Drupal\ethereum\EthereumManagerInterface $ethereum_manager
+   *   The Ethereum Manager service.
+   */
+  public function __construct(EthereumManagerInterface $ethereum_manager) {
+    $this->ethereumManager = $ethereum_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('ethereum.manager')
+    );
+  }
 
   /**
   * {@inheritdoc}
@@ -62,7 +89,7 @@ class EthereumServerForm extends EntityForm {
     $form['network_id'] = [
       '#type' => 'radios',
       '#title' => $this->t('Ethereum Network ID'),
-      '#options' => EthereumController::getNetworksAsOptions(),
+      '#options' => $this->ethereumManager->getNetworksAsOptions(TRUE, TRUE),
       '#required' => TRUE,
       '#default_value' => $server->getNetworkId(),
     ];
@@ -85,10 +112,10 @@ class EthereumServerForm extends EntityForm {
     $server = $this->entity;
     $status = $server->save();
     if ($status == SAVED_UPDATED) {
-      \Drupal::messenger()->addStatus($this->t('The server %label has been updated.', ['%label' => $server->label()]));
+      $this->messenger()->addStatus($this->t('The server %label has been updated.', ['%label' => $server->label()]));
     }
     elseif ($status == SAVED_NEW) {
-      \Drupal::messenger()->addStatus($this->t('The server %label has been added.', ['%label' => $server->label()]));
+      $this->messenger()->addStatus($this->t('The server %label has been added.', ['%label' => $server->label()]));
     }
     $form_state->setRedirect('ethereum.settings');
   }

@@ -6,7 +6,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum\Controller\EthereumController;
+use Drupal\ethereum\EthereumManagerInterface;
 use Ethereum\Ethereum;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Link;
@@ -27,14 +27,24 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
   protected $web3;
 
   /**
+   * The Ethereum manager service.
+   *
+   * @var \Drupal\ethereum\EthereumManagerInterface
+   */
+  protected $ethereumManager;
+
+  /**
    * Constructs a new AdminForm.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    * @param \Ethereum\Ethereum $web3
+   * @param \Drupal\ethereum\EthereumManagerInterface $ethereum_manager
+   *   The Ethereum manager service.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Ethereum $web3) {
+  public function __construct(ConfigFactoryInterface $config_factory, Ethereum $web3, EthereumManagerInterface $ethereum_manager) {
     parent::__construct($config_factory);
     $this->web3 = $web3;
+    $this->ethereumManager = $ethereum_manager;
   }
 
   /**
@@ -43,7 +53,8 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('ethereum.client')
+      $container->get('ethereum.client'),
+      $container->get('ethereum.manager')
     );
   }
 
@@ -65,8 +76,7 @@ class AdminForm extends ConfigFormBase implements ContainerInjectionInterface {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-
-    $defaultServer = EthereumController::getDefaultServer();
+    $defaultServer = $this->ethereumManager->getCurrentServer();
 
     $contract = \Drupal::entityTypeManager()
       ->getStorage('smartcontract')->load('register_drupal');
