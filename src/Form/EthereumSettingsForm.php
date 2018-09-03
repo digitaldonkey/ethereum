@@ -65,7 +65,10 @@ class EthereumSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Frontend server'),
       '#description' => $this->t('Select a default Ethereum Node to connect Drupal frontend to. Only enabled servers can be selected and it has to be on the same network as the backend server.'),
       '#empty_option' => $this->t('Same as backend'),
-      '#options' => $enabled_servers,
+      '#options' => array_merge(
+        ['disabled' => 'Disable frontend Server'],
+        $enabled_servers
+      ),
       '#default_value' => $config->get('frontend_server'),
     ];
 
@@ -99,17 +102,23 @@ class EthereumSettingsForm extends ConfigFormBase {
 
     // Validate the frontend server.
     if ($frontend_server_id = $form_state->getValue('frontend_server')) {
-      if (!$servers[$frontend_server_id]->status()) {
-        $form_state->setError($form['default_network']['frontend_server'], $this->t('%label is not enabled.', ['%label' => $servers[$frontend_server_id]->label()]));
-      }
 
-      $verify = $servers[$frontend_server_id]->validateConnection();
-      if ($verify['error']) {
-        $form_state->setError($form['default_network']['frontend_server'], $verify['message']);
+      if ($frontend_server_id === 'disabled') {
+        return;
       }
+      else {
+        if (!$servers[$frontend_server_id]->status()) {
+          $form_state->setError($form['default_network']['frontend_server'], $this->t('%label is not enabled.', ['%label' => $servers[$frontend_server_id]->label()]));
+        }
 
-      if ($servers[$frontend_server_id]->getNetworkId() != $servers[$backend_server_id]->getNetworkId()) {
-        $form_state->setError($form['default_network']['frontend_server'], $this->t('The backend and frontend servers must be on the same Ethereum network.'));
+        $verify = $servers[$frontend_server_id]->validateConnection();
+        if ($verify['error']) {
+          $form_state->setError($form['default_network']['frontend_server'], $verify['message']);
+        }
+
+        if ($servers[$frontend_server_id]->getNetworkId() != $servers[$backend_server_id]->getNetworkId()) {
+          $form_state->setError($form['default_network']['frontend_server'], $this->t('The backend and frontend servers must be on the same Ethereum network.'));
+        }
       }
     }
   }
