@@ -8,7 +8,6 @@
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\Entity\EthereumServer;
 use League\CommonMark\CommonMarkConverter;
 
@@ -72,15 +71,16 @@ function ethereum_js_settings_alter(&$settings, AttachedAssetsInterface $assets)
  * Implements hook_toolbar().
  */
 function ethereum_toolbar() {
-  $current_server = \Drupal::config('ethereum.settings')->get('current_server');
-  $server = EthereumServer::load($current_server);
-  $networks = EthereumController::getNetworks();
+  /** @var \Drupal\ethereum\EthereumManagerInterface $ethereum_manager */
+  $ethereum_manager = \Drupal::service('ethereum.manager');
+  $current_server = $ethereum_manager->getCurrentServer();
+  $networks = $ethereum_manager->getAllNetworks();
 
   $items['ethereum'] = [
     '#type' => 'toolbar_item',
     'tab' => [
       '#type' => 'link',
-      '#title' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$server->getNetworkId()]['label']]),
+      '#title' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$current_server->getNetworkId()]['label']]),
       '#url' => Url::fromRoute('ethereum.status'),
       '#attributes' => [
         'title' => t('Current Ethereum network'),
@@ -100,7 +100,7 @@ function ethereum_toolbar() {
 
   // Add a special class to the wrapper if we are on the main network so we
   // can highlight it with a different color.
-  if ($server->getNetworkId() === '1') {
+  if ($current_server->getNetworkId() === '1') {
     $items['ethereum']['#wrapper_attributes']['class'][] = 'ethereum-toolbar-tab--is-mainnet';
   }
 

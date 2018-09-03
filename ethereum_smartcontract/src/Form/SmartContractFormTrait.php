@@ -3,13 +3,11 @@
 namespace Drupal\ethereum_smartcontract\Form;
 
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum_smartcontract\Entity\SmartContract;
 use Ethereum\EthereumStatic;
 use Drupal\Core\Url;
 
 trait SmartContractFormTrait {
-
 
   /**
    * Render the form directly from a Entity.
@@ -125,7 +123,7 @@ trait SmartContractFormTrait {
         'Contract address',
       ],
     );
-    foreach (EthereumController::getNetworks() as $net) {
+    foreach (\Drupal::service('ethereum.manager')->getAllNetworks() as $net) {
       $form['networks'][$net['id']]['id'] = array(
         '#markup' => '<b>' . $net['id'] . '</b>',
       );
