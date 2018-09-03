@@ -11,7 +11,7 @@ class UserConnector {
     this.web3 = web3
     this.address = account.toLowerCase()
     this.cnf = drupalSettings.ethereumUserConnector
-    this.processTxUrl = drupalSettings.ethereum.processTxUrl
+    this.processTxUrl = drupalSettings.ethereum_smartcontract.processTxUrl
 
     this.authHash = null
 
@@ -23,8 +23,8 @@ class UserConnector {
 
     // Instantiate contract.
     this.contract = new web3.eth.Contract(
-      drupalSettings.ethereum.contracts.register_drupal.jsonInterface,
-      drupalSettings.ethereum.contracts.register_drupal.address,
+      drupalSettings.ethereum_smartcontract.contracts.register_drupal.jsonInterface,
+      drupalSettings.ethereum_smartcontract.contracts.register_drupal.address,
     )
     this.validateContract()
 
@@ -125,7 +125,7 @@ class UserConnector {
     let ret = null
     const accountCreatedEvents = await this.web3.eth.getPastLogs({
       fromBlock:'0x0',
-      address: drupalSettings.ethereum.contracts.register_drupal.address,
+      address: drupalSettings.ethereum_smartcontract.contracts.register_drupal.address,
       topics: [
         // topics[0] is the hash of the event signature
         this.web3.utils.sha3('AccountCreated(address,bytes32)'),
@@ -197,7 +197,7 @@ Drupal.theme.message = (content, type = 'status') => {
 window.addEventListener('web3Ready', () => {
   window.web3Runner.runWhenReady({
     requireAccount: true,
-    networkId: drupalSettings.ethereum.network.id,
+    networkId: drupalSettings.ethereum_txsigner.network.id,
     run: (web3, account = null) => {
       Drupal.behaviors.ethereum_user_connector = new UserConnector(web3, account)
     }

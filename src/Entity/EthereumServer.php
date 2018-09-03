@@ -119,9 +119,11 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    */
   public function getJsConfig() {
     return [
-      'id' => $this->getNetworkId(),
-      'name' => $this->label(),
-      'blockExplorerLinks' => $this->getNetworkLinks()
+      'network' => [
+        'id' => $this->getNetworkId(),
+        'name' => $this->label(),
+        'blockExplorerLinks' => $this->getNetworkLinks()
+      ],
     ];
   }
 

@@ -45,7 +45,7 @@ trait SmartContractFormTrait {
     $form['status'] = array(
       '#type' => 'checkbox',
       '#title' => $this->t('Enable this contract'),
-      '#description' => $this->t('If a contract is enabled it\'s ABI  will be loaded as javascript setting in <code>drupalSettings.ethereum.contracts["id" => {...}]</code>'),
+      '#description' => $this->t('If a contract is enabled it\'s ABI  will be loaded as javascript setting in <code>drupalSettings.ethereum_smartcontract.contracts["id" => {...}]</code>'),
       '#default_value' => $contract->status(),
     );
 

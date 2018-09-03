@@ -36,7 +36,7 @@ Short version here. Please check out the [example code](https://github.com/digit
 ```
 const myAccountApp = {
   requireAccount: true,
-  networkId: drupalSettings.ethereum.network.id,
+  networkId: drupalSettings.ethereum_txsigner.network.id,
   run: (web3, account = null) => {
     window.console.log('SUCCESS myAccountApp', [web3, account])
   },
