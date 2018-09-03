@@ -96,6 +96,36 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   }
 
   /**
+   * Get Block explorer links.
+   *
+   * @return array
+   */
+  public function getNetworkLinks() {
+    $ret = [];
+    $allNetworks =  \Drupal::config('ethereum.ethereum_networks')->get();
+    $currentNetwork = array_filter($allNetworks, function($net) {
+      return isset($net['id']) && $net['id'] === $this->network_id;
+    });
+    foreach (array_pop($currentNetwork) as $key => $val) {
+      if (substr($key, 0, 7) === 'link_to') {
+        $ret[substr($key, 8)] = $val;
+      }
+    }
+    return $ret;
+  }
+
+  /**
+   * @return array
+   */
+  public function getJsConfig() {
+    return [
+      'id' => $this->getNetworkId(),
+      'name' => $this->label(),
+      'blockExplorerLinks' => $this->getNetworkLinks()
+    ];
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function isDefaultServer() {

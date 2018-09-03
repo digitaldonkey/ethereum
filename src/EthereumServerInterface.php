@@ -41,4 +41,18 @@ interface EthereumServerInterface extends ConfigEntityInterface {
    */
   public function validateConnection();
 
+
+  /**
+   * Provide a links to Block explorer.
+   *
+   * @return array
+   */
+  public function getNetworkLinks();
+
+  /**
+   * @return array
+   *   Network data to provide as js setting.
+   */
+  public function getJsConfig();
+
 }

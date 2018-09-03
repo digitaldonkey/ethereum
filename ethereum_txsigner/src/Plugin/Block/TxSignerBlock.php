@@ -52,13 +52,8 @@ class TxSignerBlock extends BlockBase {
       '#attached' => [
         'library' => $activeLibs,
         'drupalSettings' => [
-          'ethereum' => [
-            'network' => [
-              'id' => $activeServer->getNetworkId(),
-              'name' => $activeServer->label(),
-            ],
-            'apps' => [],
-          ]
+          'ethereum' => $activeServer->getJsConfig(),
+           'apps' => [],
         ]
       ]
     ];
