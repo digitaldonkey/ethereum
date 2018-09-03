@@ -119,7 +119,7 @@ class EventProcessor extends ResourceBase {
    *   Throws exception expected.
    */
   public function get($tx_hash = NULL) {
-    $cached = TRUE; // Default: TRUE - Helpful for development.
+    $cached = FALSE; // Missing cache invalidation.
     $resp = NULL;
 
     $tx_hash = strtolower(Xss::filter($tx_hash));

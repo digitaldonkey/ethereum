@@ -57,16 +57,15 @@ class UserConnector {
         // Ask user to submit to registry contract.
         await this.contract.methods.newUser(`0x${this.authHash}`).send({ from: this.address })
           .on('transactionHash', (hash) => {
-            const msg = `Submitted your verification. TX ID: ${hash}
-                  <br /> Transaction is pending Ethereum Network Approval.
-                  <br /> It takes some time for Drupal to validate the transaction. Please be patient.`
+            const msg = `Submitted your verification. Transaction ID: ${hash}`
             this.message.innerHTML += Drupal.theme('message', msg)
             this.button.remove()
             this.transactionHash = hash
           })
           .on('receipt', (receipt) => {
             this.receipt = receipt
-            this.verifySubmission(receipt.transactionHash)
+            // This will delay submission to Drupal until th TX is mined/confirmed.
+            Drupal.behaviors.txHash.submit(receipt.transactionHash, this.verifySubmission)
           })
       }
     }
@@ -170,7 +169,7 @@ class UserConnector {
     const resultType = result.register_drupal.AccountCreated[0].error ? 'error' : 'status'
     this.message.innerHTML = Drupal.theme('message', result.register_drupal.AccountCreated[0].message, resultType)
     if (!result.register_drupal.AccountCreated[0].error) {
-      // window.location.reload(true)
+      window.location.reload(true)
     }
   }
 }
