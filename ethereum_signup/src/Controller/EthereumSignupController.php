@@ -92,7 +92,20 @@ class EthereumSignupController extends EthereumController {
       $uid =  $authmap->getUid($restored_address, self::PROVIDER);
       if ($uid) {
         $user = User::load($uid);
-        user_login_finalize($user);
+        if ($user->isActive()) {
+          user_login_finalize($user);
+        }
+        else {
+          if ($this->require_mail_confirm) {
+            $error = $this->t('Please check your email and confirm your email address.');
+          }
+          elseif ($this->require_admin_confirm) {
+            $error = $this->t('Your account must be approved by an Administrator before you can log in.');
+          }
+          else {
+            $error = $this->t('Your account is disabled.');
+          }
+        }
       }
       else {
         $error = $this->t('User with Ethereum address @address does not exist.', ['@address' => $address]);
@@ -231,7 +244,7 @@ class EthereumSignupController extends EthereumController {
 
 
         // Check if Admin or email approval is required
-        if ($this->log_in_user || $this->require_mail_confirm) {
+        if ($this->log_in_user) {
           $new_user->set('status', 1);
           $new_user->save();
         }
