@@ -1,0 +1,39 @@
+.transaction {
+  display: flex;
+  flex-direction: row;
+  white-space: nowrap;
+  border: 1px solid;
+  line-height: 22px;
+  padding: .1em .25em;
+  max-width: 41.5em;
+  margin-top: .75em;
+}
+
+.transaction .blockchain-explorer-link {
+  text-decoration: none;
+  border: 0;
+}
+.transaction .blockchain-explorer-hash {
+  text-decoration: none;
+  border: 0;
+  margin-left: .75em;
+
+  text-overflow: ellipsis;
+  max-width: 100%;
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.transaction .clock {
+  display: inline-block;
+}
+.transaction .clock--svg {
+  width: 1.1em;
+  height: 1.1em;
+  margin: .2em;
+  display: inline-block;
+  vertical-align: middle;
+}
+.transaction .clock--svg *[stroke] {
+    stroke: #333;
+}

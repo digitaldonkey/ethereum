@@ -1,0 +1,28 @@
+{
+  "name": "submit_transaction_helper",
+  "version": "1.0.0",
+  "description": "Visualize TX confirmation and submits TX to Drupal if when mined.",
+  "main": "ethereum-submitTxHelper.js",
+  "author": "Thorsten Krug",
+  "private": true,
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babelify": "^8.0.0",
+    "browserify": "^16.2.2",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.10.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "uglify-es": "^3.3.10"
+  },
+  "scripts": {
+    "dev": "watchify --debug  src/submitTxHelper.js -o built/ethereum-submitTxHelper.js -v",
+    "production": "browserify src/submitTxHelper.js | ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output ./built/ethereum-submitTxHelper.min.js",
+    "build": "browserify src/submitTxHelper.js -o built/ethereum-submitTxHelper.js && ./node_modules/uglify-es/bin/uglifyjs --compress --mangle --source-map --comments 'some' --ecma 7 --output built/ethereum-submitTxHelper.min.js -- built/ethereum-submitTxHelper.js"
+  }
+}
