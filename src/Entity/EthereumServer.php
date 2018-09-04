@@ -39,6 +39,8 @@ use Ethereum\Ethereum;
  *   links = {
  *     "edit-form" = "/admin/config/ethereum/network/server/{ethereum_server}/edit",
  *     "delete-form" = "/admin/config/ethereum/network/server/{ethereum_server}/delete",
+ *     "enable" = "/admin/config/ethereum/network/server/{ethereum_server}/enable",
+ *     "disable" = "/admin/config/ethereum/network/server/{ethereum_server}/disable",
  *   }
  * )
  */
