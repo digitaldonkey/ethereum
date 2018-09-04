@@ -60,7 +60,7 @@ window.addEventListener('load', () => {
    *  @param settings App.settings
    *    {
    *      requireAccount: false, // Bool. Need the Ethereum user address to init your app?
-   *      network: drupalSettings.ethereum.network, // Ethereum Network ID or "*" for any.
+   *      network: drupalSettings.ethereum_txsigner.network, // Ethereum Network ID or "*" for any.
    *    }
    */
   window.web3Runner = new MascaraWrapper('web3status', drupalSettings.ethereum_txsigner.network)

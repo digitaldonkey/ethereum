@@ -21,6 +21,12 @@ function ethereum_txsigner_help($route_name, RouteMatchInterface $route_match) {
     // Main module help for the ethereum_txsigner module.
     case 'help.page.ethereum_txsigner':
       return ethereum_get_readme_html('ethereum_txsigner');
+    case 'entity.txsigner.collection':
+      $output  = '<p>' . t('This page provides a list of all Transaction Signer types. There currently is only one, consider this page informal.') . '</p>';
+      $output .= '<p>' . t('A transaction signer allows a user to sign a Ethereum network transaction (TX) with his Ethereum private key. In Drupal context we want to provide as may TX signers as possible to serve a large audience with different browsers, phones, hardware wallets, QR code based signatures.. etc.') . '</p>';
+      $output .= '<p>' . t('Ethereum ecosystem is young and best practices for frontend interaction are still in development. Drupal Ethereum tries embracing this by providing a plugg-able way so we can experiment with different frontend approaches.') . '</p>';
+      $output .= '<p>' . t('Abstracting TX signers allows us to provide a <a href="https://github.com/digitaldonkey/ethereum/blob/d0f46ae41311c897d028fa489aa885ae371e3c00/ethereum_txsigner/js/mascara/src/index.js#L3-L51">common way to add DAPP functionality</a> in Drupal.') . '</p>';
+      return $output;
     default:
   }
 }
@@ -34,7 +40,9 @@ function ethereum_txsigner_help($route_name, RouteMatchInterface $route_match) {
  * Loading txsigner "dynamically" (they are still cached) based on configuration.
  *
  * @return array
+ *
  * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+ * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
  */
 function ethereum_txsigner_library_info_build() {
   $libraries = array();
