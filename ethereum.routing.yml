@@ -45,3 +45,21 @@ entity.ethereum_server.delete_form:
     _title: 'Delete Ethereum Server Node'
   requirements:
     _permission: 'administer site configuration'
+
+entity.ethereum_server.enable:
+  path: '/admin/config/ethereum/network/server/{ethereum_server}/enable'
+  defaults:
+    _controller: '\Drupal\ethereum\Controller\EthereumUIController::ajaxOperation'
+    op: enable
+  requirements:
+    _permission: 'administer site configuration'
+    _csrf_token: 'TRUE'
+
+entity.ethereum_server.disable:
+  path: '/admin/config/ethereum/network/server/{ethereum_server}/disable'
+  defaults:
+    _controller: '\Drupal\ethereum\Controller\EthereumUIController::ajaxOperation'
+    op: disable
+  requirements:
+    _permission: 'administer site configuration'
+    _csrf_token: 'TRUE'
