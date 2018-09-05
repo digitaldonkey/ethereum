@@ -91,7 +91,7 @@ class EthereumStatusWidget extends WidgetBase implements ContainerFactoryPluginI
         'contexts' => ['user']
       ],
       '#children' => $items,
-      '#user_ethereum_address' => $user->field_ethereum_address->getString(),
+      '#user_ethereum_address' => $user->field_ethereum_address->value,
       '#status_number' => $user->field_ethereum_account_status->getString(),
       '#status_map' => json_encode($status_map),
       '#status' => isset($status_map[$user->field_ethereum_account_status->getString()]) ? $status_map[$user->field_ethereum_account_status->getString()] : $status_map[0],
