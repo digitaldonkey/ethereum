@@ -17,7 +17,8 @@ use Drupal\ethereum\Plugin\Field\FieldType\EthereumAddressItem;
  *   id = "ethereum_address",
  *   label = @Translation("Ethereum address"),
  *   field_types = {
- *     "ethereum_address"
+ *     "ethereum_address",
+ *     "ethereum_address_with_network",
  *   }
  * )
  */
@@ -107,9 +108,17 @@ class EthereumAddressFormatter extends BasicStringFormatter {
       return parent::viewElements($items, $langcode);
     }
 
-    $networks = EthereumController::getNetworks();
+    /** @var \Drupal\ethereum\EthereumManagerInterface $ethereum_manager */
+    $ethereum_manager = \Drupal::service('ethereum.manager');
+    $all_networks = $ethereum_manager->getAllNetworks();
+    $current_network_id = $ethereum_manager->getCurrentNetworkId();
+    $field_type_stores_network = $items->getFieldDefinition()->getType() === 'ethereum_address_with_network';
+
     foreach ($items as $delta => $item) {
-      $url = $this->buildUrl($item, $networks[$item->network]);
+      // If the field type associates an address to a specific network, use the
+      // specified network, otherwise just use the current network.
+      $network = $field_type_stores_network ? $all_networks[$item->network] : $all_networks[$current_network_id] ;
+      $url = $this->buildUrl($item, $network);
 
       $elements[$delta] = [
         '#type' => 'link',

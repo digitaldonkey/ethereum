@@ -17,7 +17,6 @@ use Drupal\Core\TypedData\DataDefinition;
  *   description = @Translation("Provides a field for Ethereum addresses."),
  *   default_widget = "ethereum_address",
  *   default_formatter = "ethereum_address",
- *   list_class = "\Drupal\ethereum\Plugin\Field\FieldType\EthereumAddressFieldItemList",
  * )
  */
 class EthereumAddressItem extends FieldItemBase {
@@ -28,10 +27,6 @@ class EthereumAddressItem extends FieldItemBase {
   public static function propertyDefinitions(FieldStorageDefinitionInterface $field_definition) {
     $properties['value'] = DataDefinition::create('string')
       ->setLabel(new TranslatableMarkup('Address'))
-      ->setSetting('case_sensitive', FALSE)
-      ->setRequired(TRUE);
-    $properties['network'] = DataDefinition::create('string')
-      ->setLabel(new TranslatableMarkup('Network'))
       ->setSetting('case_sensitive', FALSE)
       ->setRequired(TRUE);
 
@@ -47,11 +42,6 @@ class EthereumAddressItem extends FieldItemBase {
         'value' => [
           'type' => 'varchar_ascii',
           'length' => 42,
-          'binary' => FALSE,
-        ],
-        'network' => [
-          'type' => 'varchar_ascii',
-          'length' => 10,
           'binary' => FALSE,
         ],
       ],
@@ -83,7 +73,6 @@ class EthereumAddressItem extends FieldItemBase {
   public static function generateSampleValue(FieldDefinitionInterface $field_definition) {
     $values = [
       'value' => '0x0000000000000000000000000000000000000000',
-      'network' => '3',
     ];
     return $values;
   }
@@ -101,12 +90,6 @@ class EthereumAddressItem extends FieldItemBase {
    */
   public function preSave() {
     $this->value = strtolower($this->value);
-
-    // Ensure that the default value for the 'network' property is the Ethereum
-    // network ID of the current Ethereum server.
-    if (empty($this->network)) {
-      $this->network = \Drupal::service('ethereum.manager')->getCurrentNetworkId();
-    }
   }
 
 }

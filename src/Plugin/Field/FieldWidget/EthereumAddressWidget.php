@@ -36,12 +36,14 @@ class EthereumAddressWidget extends StringTextfieldWidget {
   public function settingsForm(array $form, FormStateInterface $form_state) {
     $element = parent::settingsForm($form, $form_state);
 
-    $element['use_current_network'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Use current network'),
-      '#default_value' => $this->getSetting('use_current_network'),
-      '#description' => $this->t('The network selection will not be displayed and the current Ethereum network will be used as a default value.'),
-    ];
+    if ($this->fieldDefinition->getType() === 'ethereum_address_with_network') {
+      $element['use_current_network'] = [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Use current network'),
+        '#default_value' => $this->getSetting('use_current_network'),
+        '#description' => $this->t('The network selection will not be displayed and the current Ethereum network will be used as a default value.'),
+      ];
+    }
 
     return $element;
   }
@@ -52,8 +54,10 @@ class EthereumAddressWidget extends StringTextfieldWidget {
   public function settingsSummary() {
     $summary = parent::settingsSummary();
 
-    if ($this->getSetting('use_current_network')) {
-      $summary[] = $this->t('Use current network as default');
+    if ($this->fieldDefinition->getType() === 'ethereum_address_with_network') {
+      if ($this->getSetting('use_current_network')) {
+        $summary[] = $this->t('Use current network as default');
+      }
     }
 
     return $summary;
