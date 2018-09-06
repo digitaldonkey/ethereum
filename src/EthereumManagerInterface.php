@@ -16,6 +16,17 @@ interface EthereumManagerInterface {
   public function getCurrentServer();
 
   /**
+   * Returns the requested backend server.
+   *
+   * @param string $server_id
+   *  The id of the server.
+   *
+   * @return \Drupal\ethereum\EthereumServerInterface
+   *   An ethereum_server object.
+   */
+  public function getServer($server_id);
+
+  /**
    * Returns the frontend server.
    *
    * @return \Drupal\ethereum\EthereumServerInterface

@@ -76,6 +76,22 @@ class EthereumManager implements EthereumManagerInterface {
   /**
    * {@inheritdoc}
    */
+  public function getServer($server_id) {
+    /** @var \Drupal\ethereum\EthereumServerInterface $server */
+    $server = $this->serverStorage->load($server_id);
+    if (!$server) {
+      throw new \RuntimeException('Server (' . $server_id . ') does not exist.');
+    }
+    if (!$server->status()) {
+      throw new \RuntimeException('Server is not enabled.');
+    }
+
+    return $server;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function getFrontendServer() {
     /** @var \Drupal\ethereum\EthereumServerInterface $server */
     $frontend_server_id = $this->ethereumSettings->get('frontend_server') ?: $this->ethereumSettings->get('current_server');
