@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Drupal\Component\Utility\Xss;
 use Drupal\ethereum_signup\Controller\EthereumSignupController;
-use Drupal\core\Url;
+use Drupal\Core\Url;
 use Ethereum\EthereumStatic;
 
 /**

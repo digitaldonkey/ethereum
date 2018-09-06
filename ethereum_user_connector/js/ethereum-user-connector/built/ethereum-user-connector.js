@@ -137,12 +137,13 @@ class UserConnector {
     this.web3 = web3;
     this.address = account.toLowerCase();
     this.cnf = drupalSettings.ethereumUserConnector;
-    this.processTxUrl = drupalSettings.ethereum.processTxUrl;
+    this.processTxUrl = drupalSettings.ethereum_smartcontract.processTxUrl;
+    this.verifySubmission = this.verifySubmission.bind(this);
 
     this.authHash = null;
 
     // Dom Elements
-    this.message = document.getElementById('myMessage');
+    this.message = document.getElementById('mascara-logger');
     this.button = document.getElementById('ethereum-verify').getElementsByTagName('button')[0];
 
     this.button.addEventListener('click', e => {
@@ -150,7 +151,7 @@ class UserConnector {
     });
 
     // Instantiate contract.
-    this.contract = new web3.eth.Contract(drupalSettings.ethereum.contracts.register_drupal.jsonInterface, drupalSettings.ethereum.contracts.register_drupal.address);
+    this.contract = new web3.eth.Contract(drupalSettings.ethereum_smartcontract.contracts.register_drupal.jsonInterface, drupalSettings.ethereum_smartcontract.contracts.register_drupal.address);
     this.validateContract();
 
     // Update Hash in background if there is no verified address yet.
@@ -176,19 +177,14 @@ class UserConnector {
       }
       const previousTx = await this.checkPreviousSubmission();
       if (previousTx) {
-        this.verifySubmission(previousTx);
+        Drupal.behaviors.txHash.submit(previousTx, this.verifySubmission);
       } else {
         // Ask user to submit to registry contract.
         await this.contract.methods.newUser(`0x${this.authHash}`).send({ from: this.address }).on('transactionHash', hash => {
-          const msg = `Submitted your verification. TX ID: ${hash}
-                  <br /> Transaction is pending Ethereum Network Approval.
-                  <br /> It takes some time for Drupal to validate the transaction. Please be patient.`;
-          this.message.innerHTML += Drupal.theme('message', msg);
           this.button.remove();
           this.transactionHash = hash;
-        }).on('receipt', receipt => {
-          this.receipt = receipt;
-          this.verifySubmission(receipt.transactionHash);
+          // This will delay submission to Drupal until th TX is mined/confirmed.
+          Drupal.behaviors.txHash.submit(hash, this.verifySubmission);
         });
       }
     } catch (err) {
@@ -242,7 +238,7 @@ class UserConnector {
     let ret = null;
     const accountCreatedEvents = await this.web3.eth.getPastLogs({
       fromBlock: '0x0',
-      address: drupalSettings.ethereum.contracts.register_drupal.address,
+      address: drupalSettings.ethereum_smartcontract.contracts.register_drupal.address,
       topics: [
       // topics[0] is the hash of the event signature
       this.web3.utils.sha3('AccountCreated(address,bytes32)'),
@@ -265,30 +261,26 @@ class UserConnector {
    * There is a AJAX handler which will assign an new role to the user if submission
    * was verified by Drupal.
    *
-   * @param {string} txHash
+   * @param {Response} ajaxResponse
    *   32bit 0x-prefixed hex value.
    */
-  async verifySubmission(txHash) {
-    // Let Drupal backend verify the transaction submitted by user.
-    const url = `${this.processTxUrl + txHash}?_format=json&t=${new Date().getTime()}`;
-    const response = await fetch(url, { method: 'get', credentials: 'same-origin' });
-
-    if (!response.ok) {
+  async verifySubmission(ajaxResponse) {
+    if (!ajaxResponse.ok) {
       const msg = 'Can not get verificationUrl';
       this.message.innerHTML += Drupal.theme('message', msg, 'error');
     }
-    const result = await response.json();
+    const result = await ajaxResponse.json();
 
     // Note on EventIndex:
     // in case your contract emits the same Event twice within one TX you might have more than one.
-
     // result.<ContractName>.<EventName>.[EventIndex]
     const resultType = result.register_drupal.AccountCreated[0].error ? 'error' : 'status';
     this.message.innerHTML = Drupal.theme('message', result.register_drupal.AccountCreated[0].message, resultType);
     if (!result.register_drupal.AccountCreated[0].error) {
-      // window.location.reload(true)
+      window.location.reload(true);
     }
   }
+
 }
 
 /**
@@ -313,7 +305,7 @@ Drupal.theme.message = (content, type = 'status') => {
 window.addEventListener('web3Ready', () => {
   window.web3Runner.runWhenReady({
     requireAccount: true,
-    networkId: drupalSettings.ethereum.network.id,
+    networkId: drupalSettings.ethereum_txsigner.network.id,
     run: (web3, account = null) => {
       Drupal.behaviors.ethereum_user_connector = new UserConnector(web3, account);
     }

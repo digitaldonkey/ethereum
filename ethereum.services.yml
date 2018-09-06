@@ -4,4 +4,7 @@ services:
     factory: ethereum.client_factory:get
   ethereum.client_factory:
     class: Drupal\ethereum\EthereumClientFactory
-    arguments: ['@config.factory']
+    arguments: ['@ethereum.manager']
+  ethereum.manager:
+    class: Drupal\ethereum\EthereumManager
+    arguments: ['@entity_type.manager', '@config.factory']

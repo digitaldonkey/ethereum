@@ -95,7 +95,7 @@ class UpdateEthereumAddress extends ResourceBase {
    *   See ethereum_user_connector\Controller\verifyUserByHash().
    */
   public function get($address) {
-    $cached = TRUE; // Default: TRUE - Helpful for development.
+    $cached = FALSE; // Until we have cache invalidation on Network change.
 
     // @todo Add setting for allow anonymous signup?
     // This requires a different storage mechanism for the Hash.

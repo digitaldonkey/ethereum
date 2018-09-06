@@ -31,12 +31,12 @@ A tiny UI showing the web3 account and network status. It should look like one o
 
 **How to launch my app?**
 
-Short version here. Please check out the [example code](https://github.com/digitaldonkey/ethereum/blob/feature-GlobalTransactionSigner/ethereum_txsigner/js/mascara/src/index.js). 
+Short version here. Please check out the [example code](https://github.com/digitaldonkey/ethereum/blob/8.x-1.x/ethereum_txsigner/js/mascara/src/index.js). 
 
 ```
 const myAccountApp = {
   requireAccount: true,
-  networkId: drupalSettings.ethereum.network.id,
+  networkId: drupalSettings.ethereum_txsigner.network.id,
   run: (web3, account = null) => {
     window.console.log('SUCCESS myAccountApp', [web3, account])
   },

@@ -39,6 +39,8 @@ use Ethereum\Ethereum;
  *   links = {
  *     "edit-form" = "/admin/config/ethereum/network/server/{ethereum_server}/edit",
  *     "delete-form" = "/admin/config/ethereum/network/server/{ethereum_server}/delete",
+ *     "enable" = "/admin/config/ethereum/network/server/{ethereum_server}/enable",
+ *     "disable" = "/admin/config/ethereum/network/server/{ethereum_server}/disable",
  *   }
  * )
  */
@@ -75,9 +77,9 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
   /**
    * The Ethereum network ID of the server.
    *
-   * @see \Drupal\ethereum\Controller\EthereumController::getNetworks()
+   * @see \Drupal\ethereum\EthereumManagerInterface::getAllNetworks()
    *
-   * @var integer
+   * @var string
    */
   protected $network_id;
 
@@ -93,6 +95,38 @@ class EthereumServer extends ConfigEntityBase implements EthereumServerInterface
    */
   public function getNetworkId() {
     return $this->network_id;
+  }
+
+  /**
+   * Get Block explorer links.
+   *
+   * @return array
+   */
+  public function getNetworkLinks() {
+    $ret = [];
+    $allNetworks =  \Drupal::config('ethereum.ethereum_networks')->get();
+    $currentNetwork = array_filter($allNetworks, function($net) {
+      return isset($net['id']) && $net['id'] === $this->network_id;
+    });
+    foreach (array_pop($currentNetwork) as $key => $val) {
+      if (substr($key, 0, 7) === 'link_to') {
+        $ret[substr($key, 8)] = $val;
+      }
+    }
+    return $ret;
+  }
+
+  /**
+   * @return array
+   */
+  public function getJsConfig() {
+    return [
+      'network' => [
+        'id' => $this->getNetworkId(),
+        'name' => $this->label(),
+        'blockExplorerLinks' => $this->getNetworkLinks()
+      ],
+    ];
   }
 
   /**

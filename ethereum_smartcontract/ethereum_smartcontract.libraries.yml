@@ -12,3 +12,12 @@ smartcontract-entity-form-css:
   css:
     theme:
       css/smartcontract-entity-form.css: {}
+smartcontract-submitTxHelper:
+  version: VERSION
+  js:
+    js/submitTxHelper/built/ethereum-submitTxHelper.js: {}
+  css:
+    theme:
+      js/submitTxHelper/css/ethereum-submitTxHelper.css: {}
+  dependencies:
+  - core/drupal

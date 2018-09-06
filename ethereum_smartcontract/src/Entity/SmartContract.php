@@ -3,7 +3,6 @@
 namespace Drupal\ethereum_smartcontract\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum_smartcontract\SmartContractInterface;
 use Ethereum\Ethereum;
 use Ethereum\SmartContract as Web3Contract;
@@ -157,7 +156,7 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
    * @return string
    */
   public function getCurrentNetworkAddress() {
-    $defaultServer = EthereumController::getDefaultServer();
+    $defaultServer = \Drupal::service('ethereum.manager')->getCurrentServer();
     //    if (!isset($this->networks[$defaultServer->getNetworkId()])) {
     //      throw new \Exception('Contract "' . $this->label() . '" is not deployed at active default network (' . $defaultServer->id() . ')');
     //    }
@@ -250,7 +249,7 @@ class SmartContract extends ConfigEntityBase implements SmartContractInterface {
    *   Deployed contract address and network.
    */
   public function getDeployed() {
-    $all = EthereumController::getNetworks();
+    $all = \Drupal::service('ethereum.manager')->getAllNetworks();
     $deployed = [];
     foreach ($this->getNetworks() as $netId => $address) {
       $deployed [$netId] = $all[$netId];

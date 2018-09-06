@@ -1,2 +1,2 @@
 current_server: infura_ropsten
-frontend_server: ''
+frontend_server: 'disabled'

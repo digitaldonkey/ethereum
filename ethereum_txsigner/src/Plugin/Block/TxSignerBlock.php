@@ -26,6 +26,7 @@ class TxSignerBlock extends BlockBase {
   public function build() {
 
     $activeServerId = \Drupal::config('ethereum.settings')->get('current_server');
+    /* @var $activeServer \Drupal\ethereum\Entity\EthereumServer */
     $activeServer = \Drupal::entityTypeManager()->getStorage('ethereum_server')->load($activeServerId);
 
     if (\Drupal::service('module_handler')->moduleExists('ethereum_smartcontract')){
@@ -52,13 +53,7 @@ class TxSignerBlock extends BlockBase {
       '#attached' => [
         'library' => $activeLibs,
         'drupalSettings' => [
-          'ethereum' => [
-            'network' => [
-              'id' => $activeServer->getNetworkId(),
-              'name' => $activeServer->label(),
-            ],
-            'apps' => [],
-          ]
+          'ethereum_txsigner' => $activeServer->getJsConfig(),
         ]
       ]
     ];

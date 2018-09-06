@@ -8,7 +8,6 @@
 use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
-use Drupal\ethereum\Controller\EthereumController;
 use Drupal\ethereum\Entity\EthereumServer;
 use League\CommonMark\CommonMarkConverter;
 
@@ -52,6 +51,31 @@ function ethereum_field_formatter_info_alter(array &$info) {
 }
 
 /**
+ * Implements hook_field_views_data().
+ */
+function ethereum_field_views_data(\Drupal\field\FieldStorageConfigInterface $field_storage) {
+  $data = views_field_default_views_data($field_storage);
+  foreach ($data as $table_name => $table_data) {
+    // Add the relationship only on the target_id field.
+    $data[$table_name][$field_storage->getName() . '_network']['filter']['id'] = 'in_operator';
+    $data[$table_name][$field_storage->getName() . '_network']['filter']['options callback'] = '_ethereum_get_networks_options';
+  }
+
+  return $data;
+}
+
+/**
+ * Returns the Ethereum networks as an array suitable for an options element.
+ *
+ * @return array
+ *   An array of Ethereum Networks containing the network name, ID, and
+ *   description, keyed by the network ID.
+ */
+function _ethereum_get_networks_options() {
+  return \Drupal::service('ethereum.manager')->getNetworksAsOptions();
+}
+
+/**
  * Implements hook_js_settings_alter().
  *
  * @param $settings
@@ -61,23 +85,27 @@ function ethereum_js_settings_alter(&$settings, AttachedAssetsInterface $assets)
   // Provide the URL of the current server in drupalSettings to allow JavaScript
   // code to rely on an instantiated Web3 object.
   $cfg = \Drupal::config('ethereum.settings');
-  $frontend_server = $cfg->get('frontend_server') ? $cfg->get('frontend_server') : $cfg->get('current_server');
-  $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)->getUrl();
+
+  if ($cfg->get('frontend_server') !== 'disabled') {
+    $frontend_server = $cfg->get('frontend_server') ? $cfg->get('frontend_server') : $cfg->get('current_server');
+    $settings['ethereum']['frontendServerHost'] = EthereumServer::load($frontend_server)->getUrl();
+  }
 }
 
 /**
  * Implements hook_toolbar().
  */
 function ethereum_toolbar() {
-  $current_server = \Drupal::config('ethereum.settings')->get('current_server');
-  $server = EthereumServer::load($current_server);
-  $networks = EthereumController::getNetworks();
+  /** @var \Drupal\ethereum\EthereumManagerInterface $ethereum_manager */
+  $ethereum_manager = \Drupal::service('ethereum.manager');
+  $current_server = $ethereum_manager->getCurrentServer();
+  $networks = $ethereum_manager->getAllNetworks();
 
   $items['ethereum'] = [
     '#type' => 'toolbar_item',
     'tab' => [
       '#type' => 'link',
-      '#title' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$server->getNetworkId()]['label']]),
+      '#title' => t('Network: <span class="network-label">@network_label</span>', ['@network_label' => $networks[$current_server->getNetworkId()]['label']]),
       '#url' => Url::fromRoute('ethereum.status'),
       '#attributes' => [
         'title' => t('Current Ethereum network'),
@@ -97,7 +125,7 @@ function ethereum_toolbar() {
 
   // Add a special class to the wrapper if we are on the main network so we
   // can highlight it with a different color.
-  if ($server->getNetworkId() === '1') {
+  if ($current_server->getNetworkId() === '1') {
     $items['ethereum']['#wrapper_attributes']['class'][] = 'ethereum-toolbar-tab--is-mainnet';
   }
 
