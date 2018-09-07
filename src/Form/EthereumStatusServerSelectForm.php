@@ -48,17 +48,22 @@ class EthereumStatusServerSelectForm extends FormBase {
     $config = $this->config('ethereum.settings');
     $enabled_servers = $this->ethereumManager->getServersAsOptions(TRUE);
 
-    $form['#title'] = $this->t('Check the status of an active network');
+    $form['#title'] = $this->t('Check the status of any active server');
+
     $form['server'] = [
       '#type' => 'select',
-      '#title' => $this->t('Reporting on'),
+      '#title' => $this->t('Reporting on:'),
       '#required' => TRUE,
       '#description' => $this->t('Choose a server to report on. Only enabled servers are listed.'),
       '#options' => $enabled_servers,
       '#default_value' => $config->get('current_server'),
     ];
 
-    $form['submit'] = [
+    $form['actions'] = [
+      '#type' => 'actions',
+    ];
+
+    $form['actions']['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
     ];
@@ -70,7 +75,12 @@ class EthereumStatusServerSelectForm extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $form_state->setRedirectUrl($this->getCancelUrl());
+    if ($form_state->getValue('server')) {
+      $form_state->setRedirect(
+        'ethereum.status',
+        ['server_id' => $form_state->getValue('server')]
+      );
+    }
   }
 
 }

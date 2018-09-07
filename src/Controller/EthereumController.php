@@ -65,17 +65,16 @@ class EthereumController extends ControllerBase {
    *
    * This page provides a overview about Ethereum functions and usage.
    *
-   * @throws \Exception
+   * @param string|null $server_id
+   *   The id of the server to report on.
    *
    * @return array
    *   Render array. Table with current status of the ethereum node.
+   *
+   * @throws \Exception
+   *   If the server can not be loaded.
    */
   public function status($server_id = NULL) {
-    // The status report page allows for reporting on any active server.
-    // If we're not reporting on the currently active server (default), then we
-    // need to load the server, and create the associated Ethereum object which
-    // is the web3 (JsonRPC) client. We can't use $this->web3 because that is
-    // linked to the currently in use (default) host.
     if ($server_id) {
       try {
         $server = \Drupal::service('ethereum.manager')->getServer($server_id);
