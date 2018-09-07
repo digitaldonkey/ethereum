@@ -71,13 +71,14 @@ class EthereumController extends ControllerBase {
    *   Render array. Table with current status of the ethereum node.
    */
   public function status($server_id = NULL) {
+    // The status report page allows for reporting on any active server.
     // If we're not reporting on the currently active server (default), then we
     // need to load the server, and create the associated Ethereum object which
     // is the web3 (JsonRPC) client. We can't use $this->web3 because that is
     // linked to the currently in use (default) host.
     if ($server_id) {
       try {
-        $server = $this->getServer($server_id);
+        $server = \Drupal::service('ethereum.manager')->getServer($server_id);
         $host = $server->get('url');
         $this->web3 = new Ethereum($host);
       }
@@ -89,11 +90,11 @@ class EthereumController extends ControllerBase {
       }
     }
     else {
-      // Default server.
+      // Load the server.
       $server = \Drupal::service('ethereum.manager')->getCurrentServer();
     }
 
-    // Validate active server.
+    // Validate the server.
     $liveStatus = $server->validateConnection();
     $this->messenger()->addMessage(
       $liveStatus['message'], ($liveStatus['error']) ? 'error' : 'status'

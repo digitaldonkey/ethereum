@@ -4,14 +4,39 @@ namespace Drupal\ethereum\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\ethereum\Entity\EthereumServer;
-use Drupal\ethereum\Controller\EthereumController;
+use Drupal\ethereum\EthereumManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a form to select one of the active Ethereum network servers.
  */
 class EthereumStatusServerSelectForm extends FormBase {
 
+  /**
+   * The Ethereum manager service.
+   *
+   * @var \Drupal\ethereum\EthereumManagerInterface
+   */
+  protected $ethereumManager;
+
+  /**
+   * Constructs a new EthereumStatusServerSelectForm.
+   *
+   * @param \Drupal\ethereum\EthereumManagerInterface $ethereum_manager
+   *   The Ethereum Manager service.
+   */
+  public function __construct(EthereumManagerInterface $ethereum_manager) {
+    $this->ethereumManager = $ethereum_manager;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('ethereum.manager')
+    );
+  }
   /**
    * {@inheritdoc}
    */
@@ -21,17 +46,9 @@ class EthereumStatusServerSelectForm extends FormBase {
 
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('ethereum.settings');
+    $enabled_servers = $this->ethereumManager->getServersAsOptions(TRUE);
 
     $form['#title'] = $this->t('Check the status of an active network');
-
-  // Verify current server.
-    $server = EthereumServer::load($config->get('current_server'));
-    $verify = $server->validateConnection();
-    if ($verify['error']) {
-      $this->messenger()->addError($verify['message']);
-    }
-
-    $enabled_servers = EthereumController::getServerOptionsArray(TRUE);
     $form['server'] = [
       '#type' => 'select',
       '#title' => $this->t('Reporting on'),
