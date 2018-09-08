@@ -73,7 +73,8 @@ class EthereumController extends ControllerBase {
    *   The current request.
    *
    * @return array
-   *   Render array.
+   *   Render array. Table with current status of the ethereum node. Or just
+   *   the server select form after initial submission.
    *
    * @throws \Exception
    *   If the server can not be loaded.
