@@ -9,6 +9,7 @@ use Drupal\ethereum\EthereumServerInterface;
 use Ethereum\DataType\EthBlockParam;
 use Ethereum\DataType\EthB;
 use Drupal\Core\Render\Markup;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Controller routines for Ethereum routes.
@@ -22,7 +23,7 @@ class EthereumController extends ControllerBase {
    */
   protected $web3;
 
-  // @todo Doesn't seem to be propagetad to the library anymore.
+  // @todo Doesn't seem to be propagated to the library anymore.
   private $debug = TRUE;
 
   /**
@@ -63,18 +64,30 @@ class EthereumController extends ControllerBase {
   /**
    * Displays the ethereum status report page.
    *
-   * This page provides a overview about Ethereum functions and usage.
+   * This page provides an overview of Ethereum functions and usage.
    *
    * @param string|null $server_id
    *   The id of the server to report on.
    *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The current request.
+   *
    * @return array
-   *   Render array. Table with current status of the ethereum node.
+   *   Render array.
    *
    * @throws \Exception
    *   If the server can not be loaded.
    */
-  public function status($server_id = NULL) {
+  public function status($server_id = NULL, Request $request) {
+    // Used to tell if the server select form was submitted.
+    $form_id = $request->request->get('form_id');
+    // If the server select form was submitted, we don't need to build the
+    // report because it will be built once the form redirect is complete.
+    // But we do need to build the form again otherwise it doesn't process.
+    if ($form_id && $form_id == 'ethereum_status_server_select_form') {
+      $server_id = $request->attributes->get('server_id');
+      return ['choose_server' => \Drupal::formBuilder()->getForm('Drupal\ethereum\Form\EthereumStatusServerSelectForm', $server_id)];
+    }
     if ($server_id) {
       try {
         $server = \Drupal::service('ethereum.manager')->getServer($server_id);
@@ -152,10 +165,8 @@ class EthereumController extends ControllerBase {
       ]
     ];
 
-
     $random_rows[] = [$this->t('<b>JsonRPC standard Methods</b>'), $this->t('Read more about <a href="https://github.com/ethereum/wiki/wiki/JSON-RPC">Ethereum JsonRPC-API</a> implementation.')];
     $random_rows[] = [$this->t('<b>Ethereum-PHP</b>'), $this->t('Ethereum <a href="http://ethereum-php.org/">Web3 PHP API reference</a> and <a href="https://github.com/digitaldonkey/ethereum-php">codebase</a>.')];
-
 
     // Blocks.
     $random_rows[] = [$this->t("<b>Block info</b>"), ''];
@@ -194,7 +205,6 @@ class EthereumController extends ControllerBase {
       $this->t("Get hash of a high block number<br /><small>Might be empty</small>"),
       $high_block,
     ];
-
 
     // More.
 
