@@ -44,7 +44,10 @@ class EthereumStatusServerSelectForm extends FormBase {
     return 'ethereum_status_server_select_form';
   }
 
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  /**
+   * {@inheritdoc}
+   */
+  public function buildForm(array $form, FormStateInterface $form_state, $server_id = NULL) {
     $config = $this->config('ethereum.settings');
     $enabled_servers = $this->ethereumManager->getServersAsOptions(TRUE);
 
@@ -56,7 +59,7 @@ class EthereumStatusServerSelectForm extends FormBase {
       '#required' => TRUE,
       '#description' => $this->t('Choose a server to report on. Only enabled servers are listed.'),
       '#options' => $enabled_servers,
-      '#default_value' => $config->get('current_server'),
+      '#default_value' => $server_id ?: $config->get('current_server'),
     ];
 
     $form['actions'] = [

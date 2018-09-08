@@ -225,7 +225,7 @@ class EthereumController extends ControllerBase {
     // $this->debug();
 
     return [
-      'choose_server' => \Drupal::formBuilder()->getForm('Drupal\ethereum\Form\EthereumStatusServerSelectForm'),
+      'choose_server' => \Drupal::formBuilder()->getForm('Drupal\ethereum\Form\EthereumStatusServerSelectForm', $server_id),
       'server_info' => $serverInfo,
       'server_live_status' => $serverLiveInfo,
       'random_stuff' => $serverRandomRows,
