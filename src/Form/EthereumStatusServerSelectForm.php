@@ -51,6 +51,15 @@ class EthereumStatusServerSelectForm extends FormBase {
     $config = $this->config('ethereum.settings');
     $enabled_servers = $this->ethereumManager->getServersAsOptions(TRUE);
 
+    foreach ($enabled_servers as $name => $label) {
+      if ($name === $config->get('current_server')) {
+        $enabled_servers[$name] = $label . ' (' . $this->t('default server') . ')';
+      }
+      if ($name === $config->get('frontend_server')) {
+        $enabled_servers[$name] = $label . ' (' . $this->t('frontend server') . ')';
+      }
+    }
+
     $form['#title'] = $this->t('Check the status of any active server');
 
     $form['server'] = [
