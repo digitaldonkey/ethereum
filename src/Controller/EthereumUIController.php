@@ -39,8 +39,8 @@ class EthereumUIController extends ControllerBase {
       return $response;
     }
 
-    // Otherwise, redirect back to the page.
-    return $this->redirect('entity.ethereum_server.collection');
+    // Otherwise, redirect back to the network settings page.
+    return $this->redirect('ethereum.settings');
   }
 
 }
