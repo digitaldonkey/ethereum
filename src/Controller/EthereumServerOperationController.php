@@ -9,12 +9,12 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
 
 /**
- * Returns responses for Ethereum UI routes.
+ * Defines a controller for operations on Ethereum Server entities.
  */
-class EthereumUIController extends ControllerBase {
+class EthereumServerOperationController extends ControllerBase {
 
   /**
-   * Calls a method on an ethereum_server entity and reloads the listing page.
+   * Calls an operation on an ethereum_server entity and reloads the listing page.
    *
    * @param \Drupal\ethereum\EthereumServerInterface $ethereum_server
    *   The server being acted upon.
@@ -27,7 +27,7 @@ class EthereumUIController extends ControllerBase {
    *   Either returns a rebuilt listing page as an AJAX response, or redirects
    *   back to the listing page.
    */
-  public function ajaxOperation(EthereumServerInterface $ethereum_server, $op, Request $request) {
+  public function performOperation(EthereumServerInterface $ethereum_server, $op, Request $request) {
     // Perform the operation.
     $ethereum_server->$op()->save();
 
