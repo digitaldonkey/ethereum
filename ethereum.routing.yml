@@ -1,7 +1,7 @@
 ethereum.status:
   path: '/admin/reports/ethereum/{server_id}'
   defaults:
-    _controller: 'Drupal\ethereum\Controller\EthereumController::status'
+    _controller: 'Drupal\ethereum\Controller\EthereumStatusPageController::status'
     _title: 'Ethereum'
     server_id: NULL
   requirements:
@@ -50,7 +50,7 @@ entity.ethereum_server.delete_form:
 entity.ethereum_server.enable:
   path: '/admin/config/ethereum/network/server/{ethereum_server}/enable'
   defaults:
-    _controller: '\Drupal\ethereum\Controller\EthereumServerOperationController::performOperation'
+    _controller: '\Drupal\ethereum\Controller\EthereumController::performOperation'
     op: enable
   requirements:
     _permission: 'administer site configuration'
@@ -59,7 +59,7 @@ entity.ethereum_server.enable:
 entity.ethereum_server.disable:
   path: '/admin/config/ethereum/network/server/{ethereum_server}/disable'
   defaults:
-    _controller: '\Drupal\ethereum\Controller\EthereumServerOperationController::performOperation'
+    _controller: '\Drupal\ethereum\Controller\EthereumController::performOperation'
     op: disable
   requirements:
     _permission: 'administer site configuration'
