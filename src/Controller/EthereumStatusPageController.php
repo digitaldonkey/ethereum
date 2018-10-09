@@ -10,14 +10,15 @@ use Drupal\Core\Render\Markup;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Controller routines for Ethereum routes.
+ * Defines a controller to display the Ethereum status report page.
  */
 class EthereumStatusPageController extends EthereumController {
 
   /**
    * Displays the ethereum status report page.
    *
-   * This page provides an overview of Ethereum functions and usage.
+   * Displays relevant information, including the selected connection details,
+   * and the Ethereum live node status.
    *
    * @param string|null $server_id
    *   The id of the server to report on.
