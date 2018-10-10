@@ -5,7 +5,6 @@ namespace Drupal\ethereum\Entity;
 use Drupal\Core\Config\Entity\ConfigEntityBase;
 use Drupal\Core\StringTranslation\TranslatableMarkup;
 use Drupal\ethereum\EthereumServerInterface;
-use Ethereum\Ethereum;
 
 /**
  * Defines the EthereumServer entity.
