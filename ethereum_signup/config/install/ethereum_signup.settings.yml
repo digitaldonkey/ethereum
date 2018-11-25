@@ -3,7 +3,7 @@ require_mail_confirm: true
 require_admin_confirm: false
 register_role: ethereum_signup_user
 register_link_text: 'Create new account using Ethereum'
-register_terms_text: 'I want to create a Account on this website. By I signing this text (using Ethereum personal_sign) I agree to the following conditions.'
+register_terms_text: 'I want to create a Account on this website. By signing this text (using Ethereum personal_sign) I agree to the following conditions.'
 login_link_text: 'Log in with Ethereum'
 login_welcome_text: "Welcome back!\nPlease sign to log-in today (#date).\n"
 login_redirect: "user"
