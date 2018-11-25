@@ -1,5 +1,5 @@
 entity.txsigner.collection:
   route_name: entity.txsigner.collection
   parent: ethereum.admin_index
-  title: 'Ethereum Transaction Signer Configuration'
+  title: 'Ethereum transaction signer'
   description: 'Manage transaction signers like Metamask.'
