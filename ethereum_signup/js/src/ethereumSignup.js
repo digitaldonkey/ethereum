@@ -1,5 +1,5 @@
 /*!
- * EthereumSignup - Ethereum based hallenge/response authentication for Drupal.
+ * EthereumSignup - Ethereum based challenge/response authentication for Drupal.
  * @author Thorsten Krug
  * @license  GPL2
  */
