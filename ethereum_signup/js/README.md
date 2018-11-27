@@ -12,6 +12,6 @@ Start developing code with live compiling
 
 ```
 cd ethereum/ethereum_signup/js
-npm instal
+npm install
 watchify ethereum-signup.js -o ethereum-signup.bundle.js
 ```
