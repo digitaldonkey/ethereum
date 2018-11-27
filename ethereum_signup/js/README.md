@@ -1,6 +1,6 @@
 # Compile JS
 
-to work on the javascrip youy need [browserify](http://browserify.org) or [watchify](https://www.npmjs.com/package/watchify).
+to work on the javascript you need [browserify](http://browserify.org) or [watchify](https://www.npmjs.com/package/watchify).
 
 Install watchify
 
