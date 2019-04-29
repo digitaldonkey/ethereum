@@ -30,7 +30,7 @@ class EthereumStatus extends ListStringItem {
   public static function defaultStorageSettings() {
     return [
       'allowed_values' => array(
-        0 => t('No Adress'),
+        0 => t('No Address'),
         1 => t('Unverified'),
         2 => t('Verified'),
         3 => t('Reverification required'),
