@@ -1,8 +1,9 @@
 ethereum.status:
-  path: '/admin/reports/ethereum'
+  path: '/admin/reports/ethereum/{server_id}'
   defaults:
     _controller: 'Drupal\ethereum\Controller\EthereumController::status'
     _title: 'Ethereum'
+    server_id: NULL
   requirements:
     _permission: 'administer site configuration'
 
